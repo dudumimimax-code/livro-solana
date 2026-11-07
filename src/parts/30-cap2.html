@@ -1,0 +1,510 @@
+<section class="chap" id="cap2">
+<div class="opener"><div class="wrap">
+  <div class="num">2</div>
+  <div>
+    <p class="kicker">Capítulo 2 · Fundamentos</p>
+    <h2>A infraestrutura dos mercados DeFi</h2>
+    <p class="lede">Quando alguém diz "troquei SOL por USDC em uma DEX", o que aconteceu tecnicamente? Quem era a contraparte? De onde veio o preço? Este capítulo abre a máquina.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>descrever, etapa por etapa, onde e como uma negociação acontece em uma CEX e em uma DEX;</li>
+      <li>explicar o que é uma pool de liquidez, de onde vem a liquidez e qual o papel econômico dos LPs;</li>
+      <li>distinguir AMMs de produto constante (CPMM), de <em>stable-swap</em> e de liquidez concentrada (CLMM);</li>
+      <li>calcular a quantidade recebida em um swap, com e sem taxa, e interpretar o resultado;</li>
+      <li>interpretar o TVL e reconhecer por que ele não equivale à profundidade de mercado;</li>
+      <li>medir profundidade e eficiência de capital, e comparar modelos de liquidez em cenário controlado.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Todos os valores numéricos deste capítulo — reservas, preços, volumes, TVL, posições de LP — são <span class="badge sim">simulado</span> e didáticos: foram construídos para exercitar as fórmulas e <strong>não representam extração on-chain reproduzível</strong>. O preço de US$ 150 por SOL é hipotético, como no Capítulo 1. Os únicos parâmetros vindos de documentação oficial são a taxa-base e a fórmula da taxa de priorização da Solana <span class="cite">(SOLANA FOUNDATION, 2026a)</span> e as faixas de taxa da Uniswap <span class="cite">(UNISWAP, 2026a)</span>. O roteiro para repetir as medições com dados reais está na seção 2.9.</p>
+  </div>
+
+  <p class="lead">O Capítulo 1 terminou com uma ideia simples: TradFi e DeFi são dois arranjos para organizar a confiança em torno do dinheiro. Falta abrir a máquina. Em que momento a operação deixou de ser uma intenção e virou um registro definitivo?</p>
+  <p>Responder a essas perguntas é o objetivo deste capítulo: <strong>entender onde a liquidez é criada e como as negociações acontecem</strong>. Antes de medir quanto custa negociar — tema do Capítulo 3 —, é preciso saber em que estrutura a negociação ocorre, porque o custo, o preço e o risco de uma operação são consequência direta dessa estrutura.</p>
+
+  <h3 class="sec" id="s2-1"><span class="n">2.1</span>Exchanges centralizadas e descentralizadas</h3>
+  <p>Uma <strong>exchange</strong> é a infraestrutura que reúne intenções de compra e de venda, organiza a liquidez, determina o preço de execução e conduz a operação até a liquidação. Sua função econômica é reduzir o custo de encontrar uma contraparte e concentrar a descoberta de preço em um único ambiente, em vez de deixá-la espalhada em negociações bilaterais. O Capítulo 1 mostrou isso no pregão da NYSE; o que muda entre os modelos é o <em>mecanismo</em> que cumpre essas funções.</p>
+  <p>Em uma <strong>CEX</strong>, uma empresa opera todo o ciclo. O usuário deposita ativos sob a custódia da plataforma e passa a ter um saldo registrado no banco de dados dela. As ordens entram em um livro de ofertas mantido pela exchange, onde um motor de <em class="t">matching</em> as casa por critério de preço e tempo. Ao casar duas ordens, a plataforma apenas atualiza os saldos internos: a liquidação é um registro interno, e a blockchain só é acionada nos depósitos e saques.</p>
+  <p>Em uma <strong>DEX</strong>, o usuário mantém as chaves da carteira e assina uma transação que invoca um programa publicado na blockchain. A contraparte pode ser um livro de ofertas on-chain ou, mais comumente, uma pool de liquidez cujo preço resulta de uma fórmula. A validação é feita pelos validadores da rede, e a liquidação acontece na própria transação. Em blockchains como a Solana, uma transação é <strong>atômica</strong>: ou todas as suas instruções são executadas, ou nenhuma é — o que elimina o intervalo entre "executar" e "liquidar" que existe em sistemas com câmaras de compensação <span class="cite">(WERNER et al., 2021; XU et al., 2021)</span>.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 740 230" role="img" aria-label="Fluxo comparado de uma negociação em CEX e em DEX" style="width:100%;height:auto">
+        <style>
+          .fl-t{font-family:var(--mono);font-size:9px;fill:var(--ink-2)}
+          .fl-h{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+          .fl-b{fill:var(--surf-chart);stroke-width:1.2}
+        </style>
+        <text class="fl-h" x="0" y="12" fill="var(--c1)">CEX — exchange centralizada</text>
+        <g>
+          <g stroke="var(--c1)">
+            <rect class="fl-b" x="0" y="24" width="96" height="44" rx="3"/><rect class="fl-b" x="108" y="24" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="216" y="24" width="96" height="44" rx="3"/><rect class="fl-b" x="324" y="24" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="432" y="24" width="96" height="44" rx="3"/><rect class="fl-b" x="540" y="24" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="648" y="24" width="92" height="44" rx="3"/>
+          </g>
+          <g fill="var(--c1)">
+            <path d="M98 46l8-4v8z"/><path d="M206 46l8-4v8z"/><path d="M314 46l8-4v8z"/><path d="M422 46l8-4v8z"/><path d="M530 46l8-4v8z"/><path d="M638 46l8-4v8z"/>
+          </g>
+          <g class="fl-t" text-anchor="middle">
+            <text x="48" y="42">Usuário</text><text x="48" y="54">conta na</text><text x="48" y="64">exchange</text>
+            <text x="156" y="42">Ordem</text><text x="156" y="54">livro interno</text>
+            <text x="264" y="42">Mecanismo</text><text x="264" y="54">matching</text><text x="264" y="64">engine</text>
+            <text x="372" y="42">Liquidez</text><text x="372" y="54">ordens de</text><text x="372" y="64">outros</text>
+            <text x="480" y="42">Preço</text><text x="480" y="54">melhor</text><text x="480" y="64">bid / ask</text>
+            <text x="588" y="42">Confirmação</text><text x="588" y="54">saldo interno</text><text x="588" y="64">atualizado</text>
+            <text x="694" y="42">Liquidação</text><text x="694" y="54">registro</text><text x="694" y="64">interno</text>
+          </g>
+        </g>
+        <text class="fl-h" x="0" y="134" fill="var(--c2)">DEX — exchange descentralizada (AMM)</text>
+        <g>
+          <g stroke="var(--c2)">
+            <rect class="fl-b" x="0" y="146" width="96" height="44" rx="3"/><rect class="fl-b" x="108" y="146" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="216" y="146" width="96" height="44" rx="3"/><rect class="fl-b" x="324" y="146" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="432" y="146" width="96" height="44" rx="3"/><rect class="fl-b" x="540" y="146" width="96" height="44" rx="3"/>
+            <rect class="fl-b" x="648" y="146" width="92" height="44" rx="3"/>
+          </g>
+          <g fill="var(--c2)">
+            <path d="M98 168l8-4v8z"/><path d="M206 168l8-4v8z"/><path d="M314 168l8-4v8z"/><path d="M422 168l8-4v8z"/><path d="M530 168l8-4v8z"/><path d="M638 168l8-4v8z"/>
+          </g>
+          <g class="fl-t" text-anchor="middle">
+            <text x="48" y="164">Usuário</text><text x="48" y="176">carteira com</text><text x="48" y="186">chave própria</text>
+            <text x="156" y="164">Ordem</text><text x="156" y="176">transação</text><text x="156" y="186">assinada</text>
+            <text x="264" y="164">Mecanismo</text><text x="264" y="176">programa</text><text x="264" y="186">on-chain</text>
+            <text x="372" y="164">Liquidez</text><text x="372" y="176">reservas</text><text x="372" y="186">da pool</text>
+            <text x="480" y="164">Preço</text><text x="480" y="176">função das</text><text x="480" y="186">reservas</text>
+            <text x="588" y="164">Confirmação</text><text x="588" y="176">validadores</text><text x="588" y="186">da rede</text>
+            <text x="694" y="164">Liquidação</text><text x="694" y="176">atômica, na</text><text x="694" y="186">transação</text>
+          </g>
+        </g>
+        <text class="fl-t" x="0" y="216" fill="var(--ink-3)">Mesmas sete funções, mecanismos diferentes — e dependências diferentes em cada etapa.</text>
+      </svg>
+    </div>
+    <figcaption><b>Figura 2.1</b> — Fluxo de uma negociação: usuário → ordem → mecanismo de execução → liquidez → preço → confirmação → liquidação. Ilustração conceitual de autoria própria (simplificada); arquiteturas reais variam por plataforma.</figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>A Figura 2.1 sugere uma leitura que o Capítulo 1 já antecipou: <strong>não se trata de "com intermediário" contra "sem intermediário"</strong>, e sim de componentes diferentes e de formas diferentes de coordenação. Uma DEX também depende de atores intermediários técnicos — a carteira e a interface usadas para montar a transação, o provedor de RPC que a envia, os agregadores que escolhem a rota, os validadores, os oráculos e, em muitos casos, chaves administrativas.</p>
+
+  <h3 class="sec" id="s2-2"><span class="n">2.2</span>DEXs na Solana</h3>
+  <p>Na Solana, o estado de uma pool de liquidez fica armazenado em <strong>contas</strong> (<em class="t">accounts</em>), e a lógica do swap reside em um programa. Para negociar, o usuário monta uma transação com as instruções e as contas envolvidas, assina com sua chave e a envia a um nó RPC, que a encaminha aos validadores.</p>
+  <p><strong>Roteamento.</strong> O mesmo par de ativos pode ter várias pools, com taxas e profundidades distintas. Por isso, muitos usuários negociam por meio de <strong>agregadores</strong>, que comparam rotas e podem dividir uma ordem entre pools ou encadeá-las em mais de uma perna <span class="cite">(JUPITER, 2026)</span>. Isso tem uma consequência metodológica já anunciada no Capítulo 1: somar o volume de swaps exige evitar dupla contagem das pernas de uma mesma rota.</p>
+  <p><strong>Nem toda DEX é igual.</strong> O que varia é o mecanismo de liquidez. A Orca, por exemplo, documenta dois tipos de pool: as <em class="t">Splash Pools</em>, mais simples, e as pools de liquidez concentrada, nas quais o LP escolhe uma faixa de preço e que são parametrizadas por um espaçamento de <em class="t">ticks</em> <span class="cite">(ORCA, 2026)</span>. Outras DEXs da Solana operam com livros de ofertas on-chain ou com curvas dinâmicas.</p>
+  <p><strong>Custos e confirmação.</strong> Na Solana, a taxa-base é de 5.000 <em class="t">lamports</em> por assinatura, e há uma taxa de priorização opcional, calculada como <em>limite de unidades de computação × preço por unidade</em> (em micro-lamports) ÷ 1.000.000 <span class="cite">(SOLANA FOUNDATION, 2026a)</span>. Como 1 SOL equivale a 10⁹ lamports, uma transação com uma assinatura, limite de 200.000 unidades e preço de 50.000 micro-lamports por unidade paga 15.000 lamports, isto é, 0,000015 SOL — cerca de US$ 0,00225 ao preço hipotético de US$ 150. Para efeito de comparação, a taxa de 0,30% de uma pool sobre um swap de US$ 3.000 é de US$ 9,00. <strong>O custo de rede costuma ser pequeno diante da taxa do protocolo e do impacto no preço</strong>, que só se tornam visíveis quando a operação é medida por inteiro.</p>
+  <p>A confirmação também é graduada: a transação pode ser observada como processada, confirmada ou finalizada, e a escolha do nível define o que se considera "ocorrido" em uma análise <span class="cite">(SOLANA FOUNDATION, 2026b)</span>.</p>
+
+  <h3 class="sec" id="s2-3"><span class="n">2.3</span>Pools de liquidez</h3>
+  <p>Uma <strong>pool de liquidez</strong> é um conjunto de reservas de dois ou mais ativos, mantido sob o controle de um contrato inteligente, que serve de contraparte para quem deseja negociar aqueles ativos. Ela existe porque, sem livro de ofertas, é preciso que alguém esteja sempre disposto a comprar e a vender. A pool substitui o formador de mercado humano por um estoque de ativos depositado antecipadamente. A liquidez é <strong>criada</strong> quando os LPs depositam e <strong>consumida</strong> quando os traders trocam.</p>
+  <p>Considere a pool didática <strong>SOL/USDC</strong> que acompanha todo o livro. As reservas são <v>x</v> = 1.000 SOL e <v>y</v> = 150.000 USDC; o preço marginal, dado pela razão entre as reservas, é 150 USDC por SOL; e o valor total depositado é US$ 300.000.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.1 — Um swap de 3.000 USDC na pool didática, sem taxa <span class="badge sim">simulado</span></caption>
+      <thead><tr><th>Etapa</th><th class="n">Reserva de SOL (x)</th><th class="n">Reserva de USDC (y)</th><th class="n">Preço marginal (y ÷ x)</th></tr></thead>
+      <tbody>
+        <tr><td>Estado inicial</td><td class="n">1.000,0000</td><td class="n">150.000,00</td><td class="n">150,00</td></tr>
+        <tr><td>Operação</td><td class="n neg">−19,6078</td><td class="n pos">+3.000,00</td><td class="n">—</td></tr>
+        <tr><td><strong>Estado final</strong></td><td class="n">980,3922</td><td class="n">153.000,00</td><td class="n">156,06</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">O usuário entrega 3.000 USDC e a reserva de USDC sobe para 153.000. A pool devolve SOL até que o produto das reservas volte ao valor original: 150.000.000 ÷ 153.000 = 980,3922, de modo que saem <b>19,6078 SOL</b>. O preço médio pago foi 3.000 ÷ 19,6078 = <b>153,00</b> USDC por SOL, e o novo preço marginal é <b>156,06</b>.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <p>O ponto central é a relação entre <strong>reservas e capacidade de negociação</strong>: a mesma ordem de 3.000 USDC em uma pool com o dobro das reservas retira 19,8020 SOL a um preço médio de 151,50 — cerca de 1% melhor. Quanto maiores as reservas em relação ao tamanho da ordem, menor o deslocamento do preço.</p>
+
+  <h3 class="sec" id="s2-4"><span class="n">2.4</span>Automated Market Makers</h3>
+  <p>Um <strong>AMM</strong> é um protocolo em que uma regra matemática substitui o livro de ofertas. Em vez de casar ordens, o contrato mantém uma <strong>função invariante</strong> sobre as reservas e aceita qualquer troca que preserve essa condição. O preço deixa de ser o resultado de ofertas e passa a ser uma propriedade da curva: a cada par de reservas corresponde um preço marginal, dado pela inclinação da curva naquele ponto.</p>
+  <p>Por que isso pode substituir um livro de ofertas? Porque a contraparte passa a estar <strong>sempre disponível</strong>, 24 horas por dia, mesmo para ativos com poucos participantes, e porque o mecanismo é simples de auditar e de executar dentro de uma transação. Manter um livro de ofertas inteiramente on-chain exige registrar e cancelar ordens continuamente, o que historicamente foi caro em redes de baixa capacidade; a existência de livros on-chain na Solana mostra que isso depende da infraestrutura, não de uma impossibilidade <span class="cite">(XU et al., 2021)</span>.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.2 — Três modelos de AMM</caption>
+      <thead><tr><th>Modelo</th><th>Ideia da curva</th><th>Onde a liquidez fica</th><th>Limitação principal</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CPMM</strong><br>produto constante</td><td>x · y = k; a mais simples.</td><td>Distribuída por todos os preços, de zero ao infinito.</td><td>Baixa eficiência de capital: a maior parte atende preços improváveis.</td></tr>
+        <tr><td><strong>Stable-swap</strong></td><td>Combina soma constante e produto constante; um parâmetro de amplificação concentra a liquidez perto de uma paridade <span class="cite">(EGOROV, 2019)</span>.</td><td>Concentrada em torno de uma paridade, de forma passiva.</td><td>Adequada a ativos de preço próximo; perde eficiência se a paridade se rompe.</td></tr>
+        <tr><td><strong>CLMM</strong><br>liquidez concentrada</td><td>Mesma lógica do produto constante, mas dentro de uma faixa [Pa; Pb] escolhida pelo LP.</td><td>Concentrada na faixa escolhida pelo LP.</td><td>Exige gestão ativa da faixa; fora dela, a posição deixa de render.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s2-5"><span class="n">2.5</span>O CPMM e a conta que você precisa saber fazer</h3>
+  <p>O CPMM é o AMM mais conhecido e o ponto de partida para os demais. Sua regra é uma única equação, e dela decorre tudo o que vem a seguir.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 2.1</span><span class="nm">Invariante e preço marginal</span></div>
+    <div class="eq-body"><v>x</v><span class="op">·</span><v>y</v><span class="op">=</span><v>k</v><span style="display:inline-block;width:2.5em"></span><v>P</v><span class="op">=</span><span class="frac"><span><v>y</v></span><span><v>x</v></span></span></div>
+    <div class="eq-legend">
+      <span><b>x</b> — reserva do ativo A (aqui, SOL) · <b>y</b> — reserva do ativo B (aqui, USDC)</span>
+      <span><b>k</b> — o produto das reservas, mantido constante por cada troca</span>
+      <span><b>P</b> — preço de 1 unidade de A em unidades de B, válido para uma operação infinitesimal</span>
+    </div>
+  </div>
+  <p>O gráfico dessa equação é a hipérbole da Figura 2.2. Seu significado econômico é direto: como o produto é fixo, retirar um ativo da pool exige aumentar a reserva do outro de forma <em>mais que proporcional</em>, e as reservas nunca chegam a zero. Quanto mais escasso o ativo que sai, mais caro ele fica.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Curva do produto constante — pool SOL/USDC didática</p>
+      <p class="chart-sub">x · y = k, com k = 150.000.000 · o swap da Tabela 2.1 move o estado ao longo da curva</p>
+      <div id="f2-2"></div>
+    </div>
+    <figcaption><b>Figura 2.2</b> — A operação da Tabela 2.1 sobre a curva x · y = k. Unidades: SOL no eixo horizontal, mil USDC no eixo vertical. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p><strong>Com taxa.</strong> Protocolos no estilo da Uniswap v2 cobram uma taxa proporcional φ sobre o ativo entregue <span class="cite">(ADAMS; ZINSMEISTER; ROBINSON, 2020)</span>. Apenas a parcela γ = 1 − φ entra no cálculo da curva; a taxa fica na pool, para os LPs. Essa única fórmula cobre os dois casos: com φ = 0, ela é a fórmula sem taxa.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 2.2</span><span class="nm">Quantidade recebida em um swap de CPMM</span></div>
+    <div class="eq-body">Δ<v>y</v><span class="op">=</span><span class="frac"><span><v>y</v><span class="op">·</span><v>γ</v><span class="op">·</span>Δ<v>x</v></span><span><v>x</v><span class="op">+</span><v>γ</v><span class="op">·</span>Δ<v>x</v></span></span><span style="display:inline-block;width:1.6em"></span><span style="font-size:.7em;color:var(--ink-3)">com</span><span style="display:inline-block;width:.4em"></span><v>γ</v><span class="op">=</span>1<span class="op">−</span><v>φ</v></div>
+    <div class="eq-legend">
+      <span><b>Δx</b> — quantidade entregue à pool · <b>Δy</b> — quantidade recebida</span>
+      <span><b>x, y</b> — reservas antes da operação (x é o ativo entregue, y o recebido)</span>
+      <span><b>φ</b> — taxa do protocolo (0,003 para 0,30%) · <b>γ</b> — fração do valor entregue que efetivamente move a curva</span>
+    </div>
+  </div>
+
+  <div class="callout exemplo">
+    <h5>Exemplo resolvido <span class="badge sim">simulado</span> — comprar SOL com 3.000 USDC, taxa de 0,30%</h5>
+    <p class="mono">Aqui a entrada é o USDC, então x = 150.000 USDC e y = 1.000 SOL.<br>
+    ① Taxa: 0,30% × 3.000 = <b>9,00 USDC</b>. Entra na curva: 2.991 USDC.<br>
+    ② Δ<i>SOL</i> = 1.000 × 2.991 ÷ (150.000 + 2.991) = 2.991.000 ÷ 152.991 = <b>19,5502 SOL</b>.<br>
+    ③ Reservas finais: 980,4498 SOL e 153.000,00 USDC (os 3.000 ficam na pool, taxa inclusive).<br>
+    ④ Preço médio pago: 3.000 ÷ 19,5502 = <b>153,45</b>. Preço marginal final: <b>156,05</b>.</p>
+    <p style="margin-top:.7rem">É importante <strong>separar a taxa da alteração de preço</strong>. Sem taxa, o usuário receberia 19,6078 SOL; com taxa, recebe 19,5502 — uma redução de 0,0576 SOL (0,29%), que é remuneração paga aos LPs. O deslocamento do preço marginal de 150,00 para 156,05 é outra coisa: decorre da curva e do tamanho da ordem em relação às reservas. Os dois efeitos se somam no custo final, mas têm causas distintas e serão tratados separadamente no Capítulo 3.</p>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <div class="sim">
+    <div class="sim-head">
+      <h5>Simulador · swap em uma pool CPMM</h5>
+      <span class="hint">arraste para ver como o custo cresce <span class="badge sim">simulado</span></span>
+    </div>
+    <div class="sim-body">
+      <div class="sim-ctl">
+        <label for="simOrder">Tamanho da ordem de compra <output id="simOrderOut">3.000 USDC</output></label>
+        <input type="range" id="simOrder" min="100" max="60000" step="100" value="3000">
+      </div>
+      <div class="sim-ctl">
+        <label for="simTVL">Tamanho da pool (TVL) <output id="simTVLOut">US$ 300.000</output></label>
+        <input type="range" id="simTVL" min="100000" max="3000000" step="50000" value="300000">
+      </div>
+      <div class="sim-ctl">
+        <label for="simFee">Taxa do protocolo φ <output id="simFeeOut">0,30%</output></label>
+        <input type="range" id="simFee" min="0" max="100" step="1" value="30">
+      </div>
+      <div class="readout">
+        <div class="ro"><span class="k">SOL recebido</span><span class="v" id="roSol">19,5502</span></div>
+        <div class="ro"><span class="k">Preço médio</span><span class="v" id="roAvg">153,45</span></div>
+        <div class="ro hi"><span class="k">Desvio do preço médio</span><span class="v" id="roSlip">2,30%</span></div>
+        <div class="ro"><span class="k">Preço marginal final</span><span class="v" id="roMarg">156,05</span></div>
+        <div class="ro"><span class="k">Taxa paga aos LPs</span><span class="v" id="roFee">US$ 9,00</span></div>
+        <div class="ro"><span class="k">Custo total vs. 150</span><span class="v" id="roCost">US$ 67,45</span></div>
+      </div>
+      <p style="font-family:var(--mono);font-size:.7rem;color:var(--ink-3);margin:.9rem 0 0;line-height:1.6">Pool SOL/USDC com preço inicial de 150 USDC por SOL. O "custo total" é a diferença entre o que foi pago e o que a mesma quantidade custaria ao preço inicial — isto é, taxa + impacto de preço somados.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s2-6"><span class="n">2.6</span>Liquidez concentrada (CLMM)</h3>
+  <p>No CPMM, cada dólar depositado sustenta a liquidez de <em>todos</em> os preços possíveis — inclusive US$ 1 e US$ 10.000 por SOL, que dificilmente serão negociados. Uma grande parcela do capital fica, na prática, parada. É esse desperdício que o CLMM procura reduzir.</p>
+  <p>No <strong>CLMM</strong>, o LP escolhe uma faixa de preço [<v>Pa</v>; <v>Pb</v>] e sua liquidez só existe dentro dela. A ideia foi popularizada pela Uniswap v3 <span class="cite">(ADAMS et al., 2021)</span>, e pools de liquidez concentrada também existem na Solana <span class="cite">(ORCA, 2026)</span>. Quando o preço está dentro da faixa, a posição negocia como um CPMM com reservas "virtuais" maiores; quando sai, deixa de participar das negociações.</p>
+  <p>A matemática usa a raiz quadrada do preço. A medida de <strong>liquidez</strong> <v>L</v> de uma posição é dada em unidades de √(<v>x</v>·<v>y</v>), e é ela que determina quanta profundidade o capital oferece:</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 2.3</span><span class="nm">Valor de uma posição concentrada (Pa ≤ P ≤ Pb)</span></div>
+    <div class="eq-body"><v>V</v><span class="op">=</span><v>L</v><span class="op">·</span>(2<span class="op">·</span><span class="sq"><span><v>P</v></span></span><span class="op">−</span><span class="frac"><span><v>P</v></span><span><span class="sq"><span><v>Pb</v></span></span></span></span><span class="op">−</span><span class="sq"><span><v>Pa</v></span></span>)</div>
+    <div class="eq-legend">
+      <span><b>V</b> — valor da posição em USDC · <b>L</b> — liquidez da posição · <b>P</b> — preço atual</span>
+      <span><b>Pa, Pb</b> — limites inferior e superior da faixa, múltiplos do espaçamento de <em>ticks</em> da pool</span>
+      <span><b>Como usar</b> — fixado o capital V, inverte-se a fórmula para obter L. Quanto mais estreita a faixa, maior o L para o mesmo V.</span>
+    </div>
+  </div>
+
+  <div class="callout exemplo">
+    <h5>Eficiência de capital <span class="badge sim">simulado</span> — US$ 30.000 a P = 150, três faixas</h5>
+    <p class="mono">Faixa completa (CPMM): L = V ÷ (2·√P) = 30.000 ÷ 24,4949 = <b>1.224,7</b>.<br>
+    Faixa estreita [135; 165]: √150 = 12,2474, √135 = 11,6190, √165 = 12,8452 → V = L × (24,4949 − 11,6775 − 11,6190) = L × 1,1985, logo L = 30.000 ÷ 1,1985 = <b>25.032,1</b>.</p>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.3 — Mesmo capital (US$ 30.000), três faixas de preço <span class="badge sim">simulado</span>; P = 150</caption>
+      <thead><tr><th>Configuração</th><th class="n">Liquidez L</th><th class="n">Fator L ÷ L₀</th><th>Composição inicial</th><th class="n">Profundidade +2% (USDC)</th><th class="n">até +5% (USDC)</th></tr></thead>
+      <tbody>
+        <tr><td>Faixa completa (CPMM)</td><td class="n">1.224,7</td><td class="n">1,00×</td><td>100,00 SOL + 15.000,00 USDC</td><td class="n">149,26</td><td class="n">370,43</td></tr>
+        <tr><td>Faixa ampla [75; 300]</td><td class="n">4.181,5</td><td class="n">3,41×</td><td>100,00 SOL + 15.000,00 USDC</td><td class="n">509,60</td><td class="n">1.264,71</td></tr>
+        <tr><td>Faixa estreita [135; 165]</td><td class="n">25.032,1</td><td class="n"><strong>20,44×</strong></td><td>95,12 SOL + 15.732,61 USDC</td><td class="n">3.050,61</td><td class="n">7.570,99</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">L₀ = liquidez da faixa completa. Fonte: cálculo próprio a partir das fórmulas desta seção.</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Distribuição da liquidez por preço — mesmo capital de US$ 30.000</p>
+      <p class="chart-sub">quanto mais estreita a faixa, mais alta a liquidez local — e mais curto o intervalo em que ela existe</p>
+      <div id="f2-3"></div>
+    </div>
+    <figcaption><b>Figura 2.3</b> — Distribuição da liquidez por preço para o mesmo capital. Unidades: preço em USDC por SOL; L em unidades de √(SOL·USDC). Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>O resultado quantifica a eficiência de capital: com o mesmo dinheiro, a faixa estreita oferece <strong>20,44 vezes</strong> a liquidez da faixa completa <em>enquanto o preço permanecer dentro de [135; 165]</em>. O preço dessa concentração aparece em duas frentes. Primeiro, a posição passa a exigir acompanhamento: se o preço sair da faixa, ela deixa de render e pode ficar toda em um único ativo. Segundo, reposicionar é uma nova operação, com custos de rede e de protocolo. E a perda relativa a simplesmente manter os ativos é mais intensa em faixas estreitas — formalizada no Capítulo 6.</p>
+
+  <h3 class="sec" id="s2-7"><span class="n">2.7</span>TVL, LPs e o que o TVL não diz</h3>
+  <p>O <strong>TVL</strong> (<em class="t">Total Value Locked</em>) é o valor total, em moeda de referência, dos ativos depositados em um protocolo ou pool. Para a pool da Tabela 2.1: 1.000 × 150 + 150.000 × 1 = US$ 300.000. Ele é útil para comparar a escala de pools e protocolos e para avaliar quanto capital estaria exposto a uma falha; agregadores como o DefiLlama publicam séries por rede e por protocolo <span class="cite">(DEFILLAMA, 2026)</span>.</p>
+  <p>Mas o TVL tem limitações sérias: varia com os preços dos ativos mesmo sem depósitos ou saques; depende das convenções de cada agregador; pode contar o mesmo capital mais de uma vez quando ele é reutilizado entre protocolos; e, sobretudo, <strong>não diz como esse capital está distribuído</strong>.</p>
+
+  <div class="callout alerta">
+    <h5>TVL não é profundidade de mercado</h5>
+    <p>Duas pools podem ter o mesmo TVL e capacidades muito diferentes de absorver ordens. <strong>O TVL informa quanto capital existe; a profundidade informa quanta negociação cabe perto do preço atual.</strong> Confundir os dois é o erro mais frequente na leitura de painéis de DeFi.</p>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.4 — Três pools com TVL idêntico e profundidades diferentes <span class="badge sim">simulado</span>; P = 150</caption>
+      <thead><tr><th>Pool</th><th class="n">TVL (US$)</th><th class="n">Profundidade de compra +2%</th><th class="n">Profundidade de venda −2%</th><th class="n">Capital em liquidez ativa</th></tr></thead>
+      <tbody>
+        <tr><td>A — CPMM, faixa completa</td><td class="n">600.000</td><td class="n">2.985,15</td><td class="n">3.015,15</td><td class="n">100%</td></tr>
+        <tr><td>B — CLMM [135; 165]</td><td class="n">600.000</td><td class="n"><strong>61.012,22</strong></td><td class="n">61.625,45</td><td class="n">100%</td></tr>
+        <tr><td>C — CLMM [100; 130] (fora da faixa)</td><td class="n">600.000</td><td class="n neg">0,00</td><td class="n neg">0,00</td><td class="n neg">0%</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Profundidade em USDC, conforme a definição da seção 2.9. A pool C tem todo o seu capital em USDC, abaixo do preço de mercado: existe no painel de TVL e não serve de contraparte a ninguém. Fonte: cálculo próprio.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <p><strong>Os LPs</strong> são os agentes que fornecem as reservas: usuários comuns, protocolos e, cada vez mais, participantes profissionais. Nos AMMs do estilo Uniswap v2, o depósito respeita a proporção atual das reservas e gera <em>tokens</em> de LP fungíveis; nos modelos de liquidez concentrada, gera uma posição individualizada, não fungível <span class="cite">(ADAMS et al., 2021)</span>.</p>
+  <div class="callout exemplo">
+    <h5>Ciclo de um LP <span class="badge sim">simulado</span> — 1% de uma pool CPMM</h5>
+    <p class="mono">Depósito: 10 SOL + 1.500 USDC = US$ 3.000 (1% das reservas).<br>
+    Ocorre o swap da seção 2.5 (3.000 USDC, taxa de 0,30%). A taxa de 9 USDC rende ao LP 1% × 9 = <b>0,09 USDC</b>.<br>
+    Ao retirar 1%: 9,8045 SOL + 1.530,00 USDC, que ao preço marginal de 156,05 valem <b>US$ 3.060,01</b>.<br>
+    Se tivesse apenas mantido os 10 SOL e os 1.500 USDC, teria 10 × 156,05 + 1.500 = <b>US$ 3.060,51</b>.</p>
+    <p style="margin-top:.7rem">A diferença de <strong>US$ 0,51 a menos</strong> é a perda em relação a manter os ativos, já líquida das taxas. A composição também mudou: o LP saiu com menos SOL e mais USDC. Fornecer liquidez é uma <strong>atividade econômica com receita e custos</strong>, não um rendimento automático.</p>
+  </div>
+
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s2-8"><span class="n">2.8</span>Medindo profundidade de mercado</h3>
+  <p>A <strong>profundidade</strong> de uma pool é a quantidade que ela permite negociar sem que o preço se afaste além de um limite. Para medi-la, precisamos de uma faixa de tolerância <v>d</v> em torno do preço inicial e da quantidade negociável dentro dela.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 2.4</span><span class="nm">Profundidade de compra e de venda em um CPMM</span></div>
+    <div class="eq-body"><v>D</v><sup>+</sup>(<v>d</v>)<span class="op">=</span><v>y</v><sub>0</sub><span class="op">·</span>(<span class="sq"><span>1<span class="op">+</span><v>d</v></span></span><span class="op">−</span>1)<span style="display:inline-block;width:2em"></span><v>D</v><sup>−</sup>(<v>d</v>)<span class="op">=</span><v>y</v><sub>0</sub><span class="op">·</span>(1<span class="op">−</span><span class="sq"><span>1<span class="op">−</span><v>d</v></span></span>)</div>
+    <div class="eq-legend">
+      <span><b>D⁺</b> — USDC que devem ser entregues para o preço marginal subir d</span>
+      <span><b>D⁻</b> — USDC recebidos por quem vende SOL até o preço cair d</span>
+      <span><b>y₀</b> — reserva inicial de USDC · <b>d</b> — variação tolerada (0,02 para 2%)</span>
+    </div>
+  </div>
+  <p>Para a pool didática (y₀ = 150.000) e d = 2%: D⁺ = 150.000 × (√1,02 − 1) = <strong>1.492,57 USDC</strong>, e D⁻ = <strong>1.507,58 USDC</strong>. Em palavras: essa pool absorve cerca de US$ 1,5 mil de compras antes de o preço se deslocar 2%.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.5 — Capacidade de absorção por tamanho de ordem <span class="badge sim">simulado</span>; sem taxa</caption>
+      <thead><tr><th>Pool</th><th class="n">Ordem (USDC)</th><th class="n">% de y₀</th><th class="n">SOL recebido</th><th class="n">Preço médio</th><th class="n">Desvio</th><th class="n">Preço marginal final</th></tr></thead>
+      <tbody>
+        <tr><td>S — TVL 300 mil</td><td class="n">300</td><td class="n">0,2%</td><td class="n">1,9960</td><td class="n">150,30</td><td class="n">+0,20%</td><td class="n">150,60</td></tr>
+        <tr><td>S — TVL 300 mil</td><td class="n">3.000</td><td class="n">2,0%</td><td class="n">19,6078</td><td class="n">153,00</td><td class="n">+2,00%</td><td class="n">156,06</td></tr>
+        <tr><td>S — TVL 300 mil</td><td class="n">30.000</td><td class="n">20,0%</td><td class="n">166,6667</td><td class="n">180,00</td><td class="n neg">+20,00%</td><td class="n">216,00</td></tr>
+        <tr><td>D — TVL 600 mil</td><td class="n">300</td><td class="n">0,1%</td><td class="n">1,9980</td><td class="n">150,15</td><td class="n">+0,10%</td><td class="n">150,30</td></tr>
+        <tr><td>D — TVL 600 mil</td><td class="n">3.000</td><td class="n">1,0%</td><td class="n">19,8020</td><td class="n">151,50</td><td class="n">+1,00%</td><td class="n">153,02</td></tr>
+        <tr><td>D — TVL 600 mil</td><td class="n">30.000</td><td class="n">10,0%</td><td class="n">181,8182</td><td class="n">165,00</td><td class="n">+10,00%</td><td class="n">181,50</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fonte: cálculo próprio. Duas observações. Em um CPMM sem taxa, o desvio do preço médio é <b>exatamente Δy ÷ y₀</b>: a ordem que consome 20% da reserva paga em média 20% a mais. E dobrar as reservas reduz o desvio à metade para a mesma ordem. A profundidade não é um número fixo: é a relação entre o tamanho da ordem e o tamanho das reservas <em>naquela faixa de preço</em>.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout aviso">
+    <h5>Como repetir estas medições com dados reais na Solana</h5>
+    <p class="mono">① Escolha uma pool de um protocolo específico e registre a versão da documentação consultada, o endereço da pool e do programa, o slot ou horário UTC da leitura, o nível de confirmação e o provedor de RPC.<br>
+    ② Leia as reservas (em CPMM) ou a liquidez, o preço atual e os limites de ticks (em CLMM).<br>
+    ③ Normalize os tokens pelas casas decimais e aplique as fórmulas deste capítulo.<br>
+    ④ Compare o resultado com uma cotação executável de um agregador para o mesmo tamanho de ordem.<br>
+    ⑤ Marque toda tabela resultante como <b>dados reais</b>, com fonte e data de consulta.</p>
+  </div>
+
+  <h3 class="sec" id="s2-9"><span class="n">2.9</span>Métricas de liquidez e eficiência de pools</h3>
+  <p>Nenhuma métrica isolada descreve a liquidez de uma pool. A Tabela 2.6 reúne as seis que usaremos ao longo do livro, com definição, interpretação e limitações. Nenhuma foi criada para este capítulo: são indicadores de uso corrente ou decorrem diretamente das definições anteriores.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.6 — As seis métricas de liquidez usadas no livro</caption>
+      <thead><tr><th>Métrica</th><th>Definição</th><th>Interpretação</th><th>Limitação</th></tr></thead>
+      <tbody>
+        <tr><td><strong>TVL</strong></td><td>Σ (quantidade × preço) dos ativos da pool.</td><td>Escala do capital comprometido.</td><td>Varia com preços; não mostra a distribuição; pode haver dupla contagem.</td></tr>
+        <tr><td><strong>Volume</strong></td><td>Σ do valor dos swaps no período.</td><td>Atividade de negociação.</td><td>Exige evitar dupla contagem de rotas; sensível a negociações artificiais.</td></tr>
+        <tr><td><strong>Giro</strong></td><td>Volume ÷ TVL, no mesmo período.</td><td>Quantas vezes o capital "girou".</td><td>Um valor alto pode refletir TVL pequeno, e não boa liquidez.</td></tr>
+        <tr><td><strong>Profundidade D±(d)</strong></td><td>USDC negociáveis até o preço variar d.</td><td>Capacidade de absorver ordens perto do preço atual.</td><td>Depende da faixa e do modelo; ignora a recomposição após a ordem.</td></tr>
+        <tr><td><strong>Liquidez ativa</strong></td><td>Soma das posições cuja faixa contém o preço atual.</td><td>Parcela do capital que de fato é contraparte hoje.</td><td>Em CPMM é sempre 100%; muda a cada movimento.</td></tr>
+        <tr><td><strong>Taxas geradas</strong></td><td>φ × Volume; rendimento = taxas ÷ TVL.</td><td>Receita bruta dos LPs no período.</td><td>Não desconta a perda em relação a manter os ativos nem custos.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Exemplo <span class="badge sim">simulado</span>: duas pools com TVL de US$ 300.000 e taxa de 0,30% apresentam, em 24 horas, volumes de US$ 90.000 e US$ 9.000. O giro é 0,30 e 0,03; as taxas geradas, US$ 270 e US$ 27; o rendimento de taxas, 0,090% e 0,009% ao dia. Com o mesmo TVL, uma teve atividade dez vezes maior — o que não prova que seja <em>melhor</em>: as métricas respondem a perguntas diferentes e devem ser lidas em conjunto.</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Profundidade de compra acumulada — mesmo TVL, modelos diferentes</p>
+      <p class="chart-sub">quanto é preciso comprar para empurrar o preço marginal · pools A e B da Tabela 2.4</p>
+      <div id="f2-4"></div>
+    </div>
+    <figcaption><b>Figura 2.4</b> — A pool B (CLMM) absorve 20,44 vezes mais capital por dólar de TVL — <em>até</em> o preço atingir 165, quando sua liquidez se esgota e a curva estaciona. A pool A continua oferecendo SOL a preços crescentes, sem limite. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>Os números mostram diferenças mensuráveis, e cada uma depende de uma condição. A pool B entrega 20,44 vezes a profundidade por dólar de TVL, e uma ordem de US$ 30.000 desloca seu preço médio em 0,49%, contra 10,00% na pool A. Mas essa vantagem vale <strong>dentro da faixa</strong>. A eficiência é, portanto, uma propriedade do par <em>modelo de liquidez + faixa + condição de mercado</em>, e não do modelo em abstrato.</p>
+
+  <h3 class="sec" id="s2-10"><span class="n">2.10</span>Os dois modelos de referência, e seus equivalentes na Solana</h3>
+  <p>A Uniswap v2 e a v3 são as duas referências arquiteturais mais citadas para CPMM e CLMM. Ambas são implementadas para a <em class="t">Ethereum Virtual Machine</em> e <strong>não são protocolos da Solana</strong>: aparecem aqui como modelos de AMM. A Solana tem protocolos com mecanismos análogos, mas suas taxas, parâmetros e estruturas de contas são próprios, e qualquer comparação numérica entre redes exigiria dados reais e metodologia específica.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.7 — Os dois modelos, e onde encontrá-los em cada ecossistema</caption>
+      <thead><tr><th>Aspecto</th><th>CPMM (modelo: Uniswap v2)</th><th>CLMM (modelo: Uniswap v3)</th></tr></thead>
+      <tbody>
+        <tr><td>Liquidez</td><td>Uniforme em toda a curva.</td><td>Concentrada em faixas escolhidas pelo LP.</td></tr>
+        <tr><td>Posição do LP</td><td>Token fungível; fração da pool.</td><td>Posição individual, não fungível, com faixa própria.</td></tr>
+        <tr><td>Taxas do LP</td><td>Acumuladas nas reservas; recebidas na retirada.</td><td>Distribuídas às posições na faixa ativa; não reinvestidas automaticamente.</td></tr>
+        <tr><td>Gestão</td><td>Passiva: depositar e retirar.</td><td>Ativa: escolher faixa, acompanhar e reposicionar.</td></tr>
+        <tr><td>Preço fora da faixa</td><td>Não se aplica.</td><td>A posição fica em um só ativo e deixa de gerar taxas.</td></tr>
+        <tr><td><strong>Equivalentes na Solana</strong></td><td>Pools de produto constante de DEXs como Raydium e Orca (<em>Splash Pools</em>).</td><td>Pools de liquidez concentrada, como as <em>Whirlpools</em> da Orca <span class="cite">(ORCA, 2026)</span>, além de desenhos com faixas discretas.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">A última linha indica <b>onde procurar</b> cada modelo na rede que serve de laboratório ao livro; não é uma equivalência numérica. Parâmetros, taxas e estruturas de conta diferem, e devem ser lidos na documentação de cada protocolo, com versão e data.</p>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 2.8 — Cenário controlado: US$ 1.000.000 em um ativo volátil a P = 100 <span class="badge sim">simulado</span></caption>
+      <thead><tr><th>Medida</th><th class="n">Faixa completa</th><th class="n">Faixa [80; 120]</th><th class="n">Faixa [95; 105]</th></tr></thead>
+      <tbody>
+        <tr><td>Liquidez L</td><td class="n">50.000</td><td class="n">518.936</td><td class="n">2.023.452</td></tr>
+        <tr><td>Fator de eficiência f = L ÷ L₀</td><td class="n">1,00×</td><td class="n">10,38×</td><td class="n"><strong>40,47×</strong></td></tr>
+        <tr><td>Profundidade de compra até +1%</td><td class="n">2.493,78</td><td class="n">25.882,27</td><td class="n">100.920,93</td></tr>
+        <tr><td>Profundidade de compra até +5%</td><td class="n">12.347,54</td><td class="n">128.151,72</td><td class="n">499.693,05</td></tr>
+        <tr><td>Valor final ÷ manter os ativos − 1, com P → 110</td><td class="n neg">−0,11%</td><td class="n neg">−1,18%</td><td class="n neg"><strong>−3,50%</strong></td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fonte: cálculo próprio a partir das fórmulas das seções 2.5 e 2.6; sem taxas. Não há, nesses números, um modelo "melhor": cada um corresponde a uma escolha diferente entre profundidade oferecida, exposição ao movimento do preço e esforço de gestão.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>Vimos que CEX e DEX cumprem as mesmas funções — receber a ordem, encontrar liquidez, formar o preço e liquidar — com componentes diferentes: a primeira concentra custódia e execução em um operador, e a segunda distribui essas tarefas entre carteira, programa, rede, roteadores e oráculos.</p>
+    <p>No <strong>CPMM</strong>, a regra x · y = k oferece liquidez a todos os preços e permite calcular, com uma única fórmula, o que se recebe em uma troca; no <strong>CLMM</strong>, a liquidez é concentrada e a eficiência de capital aumenta ao custo de gestão ativa e de risco de sair da faixa. O <strong>TVL</strong> mede o capital depositado, mas não a <strong>profundidade</strong>, que depende de como esse capital está distribuído em torno do preço.</p>
+    <p>Compreender essa infraestrutura é condição para interpretar qualquer negociação: sem saber onde está a liquidez, o preço pago em um swap parece um número arbitrário. O <strong>Capítulo 3</strong> explica o que acontece quando uma negociação usa essa liquidez — como o preço médio se separa do preço marginal, como se modela o impacto de uma ordem e qual o papel das taxas e da arbitragem.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>CEX / DEX</dt><dd>Exchange centralizada, operada por uma empresa / descentralizada, operada por contratos na blockchain.</dd></div>
+      <div><dt>Pool de liquidez</dt><dd>Reservas de dois ou mais ativos sob um contrato, que servem de contraparte às negociações.</dd></div>
+      <div><dt>AMM</dt><dd>Protocolo em que uma fórmula matemática substitui o livro de ofertas.</dd></div>
+      <div><dt>CPMM</dt><dd>AMM de produto constante, regido por x · y = k.</dd></div>
+      <div><dt>CLMM</dt><dd>AMM de liquidez concentrada, em que o LP escolhe uma faixa de preço.</dd></div>
+      <div><dt>Preço marginal</dt><dd>Preço de uma operação infinitesimal; a inclinação da curva no ponto atual.</dd></div>
+      <div><dt>Profundidade</dt><dd>Quanto se pode negociar antes de o preço se deslocar além de um limite dado.</dd></div>
+      <div><dt>TVL</dt><dd>Valor total dos ativos depositados em uma pool ou protocolo.</dd></div>
+      <div><dt>Liquidez ativa</dt><dd>Parcela do capital cuja faixa contém o preço atual, e que portanto negocia.</dd></div>
+      <div><dt>Giro</dt><dd>Razão entre volume e TVL no mesmo período.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ var k=150000000;
+ var pts=[];for(var x=520;x<=2600;x+=20)pts.push([x,k/x/1000]);
+ CH.line("f2-2",{height:320,xMin:500,xMax:2600,yMin:50,yMax:300,xTicks:5,
+  x:{dec:0},y:{dec:0,suf:" mil"},xLabel:"reserva de SOL (x)",yLabel:"reserva de USDC (y), em mil",
+  series:[{name:"x · y = k",points:pts,color:"var(--c1)",w:2.2}],
+  marks:[{x:1000,y:150,label:"estado inicial|1.000 SOL · P = 150,00",color:"var(--c3)",anchor:"start",dy:-26},
+         {x:980.39,y:153,label:"estado final|980,39 SOL · P = 156,06",color:"var(--c2)",anchor:"start",dy:-62}]});
+
+ function Lof(V,P,pa,pb){var s=Math.sqrt(P);return V/(2*s-P/Math.sqrt(pb)-Math.sqrt(pa));}
+ var V=30000,P=150;
+ CH.steps("f2-3",{height:290,xMin:40,xMax:360,vline:150,vlabel:"preço atual (150)",
+  x:{dec:0},y:{dec:0},xLabel:"preço do SOL (USDC por SOL)",yLabel:"liquidez L",
+  series:[
+   {name:"faixa completa · L = 1.225",color:"var(--c1)",bands:[[40,360,Lof(V,P,1e-9,1e12)]]},
+   {name:"faixa ampla [75; 300] · L = 4.182",color:"var(--c3)",bands:[[75,300,Lof(V,P,75,300)]]},
+   {name:"faixa estreita [135; 165] · L = 25.032",color:"var(--c2)",bands:[[135,165,Lof(V,P,135,165)]]}
+  ]});
+
+ var A=[],B=[],LB=500641,y0=300000,x0=2000;
+ for(var d=0;d<=15;d+=0.25){
+   var pf=150*(1+d/100);
+   A.push([d,y0*(Math.sqrt(1+d/100)-1)/1000]);
+   var cap=LB*(Math.sqrt(Math.min(pf,165))-Math.sqrt(150));
+   B.push([d,cap/1000]);
+ }
+ CH.line("f2-4",{height:300,xMin:0,xMax:15,yMin:0,xTicks:5,mr:40,
+  x:{dec:0,suf:"%"},y:{dec:0,suf:" mil"},
+  xLabel:"variação do preço marginal em relação a 150",yLabel:"USDC necessário (milhares)",
+  series:[{name:"Pool A — CPMM, TVL US$ 600 mil",points:A,color:"var(--c1)"},
+          {name:"Pool B — CLMM [135; 165], TVL US$ 600 mil",points:B,color:"var(--c2)"}],
+  vlines:[{x:10,label:"limite da faixa (165)",color:"var(--c2)"}]});
+
+ var o=document.getElementById("simOrder"),t=document.getElementById("simTVL"),f=document.getElementById("simFee");
+ function upd(){
+  var dy=+o.value, tvl=+t.value, phi=(+f.value)/10000;
+  var y=tvl/2, x=y/150, g=1-phi;
+  var dx=x*g*dy/(y+g*dy);
+  var avg=dy/dx, marg=(y+dy)/(x-dx);
+  document.getElementById("simOrderOut").textContent=CH.fmtNum(dy,0)+" USDC";
+  document.getElementById("simTVLOut").textContent="US$ "+CH.fmtNum(tvl,0);
+  document.getElementById("simFeeOut").textContent=CH.fmtNum(phi*100,2)+"%";
+  document.getElementById("roSol").textContent=CH.fmtNum(dx,4);
+  document.getElementById("roAvg").textContent=CH.fmtNum(avg,2);
+  document.getElementById("roSlip").textContent=CH.fmtNum((avg/150-1)*100,2)+"%";
+  document.getElementById("roMarg").textContent=CH.fmtNum(marg,2);
+  document.getElementById("roFee").textContent="US$ "+CH.fmtNum(dy*phi,2);
+  document.getElementById("roCost").textContent="US$ "+CH.fmtNum(dy-dx*150,2);
+ }
+ [o,t,f].forEach(function(e){e.addEventListener("input",upd);}); upd();
+})();
+</script>
+</section>

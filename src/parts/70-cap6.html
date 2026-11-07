@@ -1,0 +1,238 @@
+<section class="chap" id="cap6">
+<div class="opener"><div class="wrap">
+  <div class="num">6</div>
+  <div>
+    <p class="kicker">Capítulo 6 · Consolidação</p>
+    <h2>Risco, retorno e volatilidade em DeFi</h2>
+    <p class="lede">Os indicadores clássicos de finanças funcionam aqui — desde que você saiba o que eles não medem. E o que eles não medem é justamente o que costuma destruir capital em DeFi.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>medir retorno e volatilidade de uma posição on-chain sem os erros mais comuns de anualização;</li>
+      <li>calcular a <strong>perda em relação a manter os ativos</strong> de um LP e separá-la do resultado das taxas;</li>
+      <li>interpretar Sharpe, Sortino e <em class="t">drawdown</em>, e dizer o que cada um esconde;</li>
+      <li>calcular um VaR e explicar por que ele é insuficiente para riscos de DeFi;</li>
+      <li>avaliar riscos que não são volatilidade: código, oráculo, governança e contraparte;</li>
+      <li>aplicar um <strong>framework de avaliação de protocolo</strong> que integre todos os capítulos anteriores.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Capítulo didático; não é recomendação de investimento. Os indicadores aqui apresentados <strong>descrevem o passado e não preveem o futuro</strong>; em DeFi, as maiores perdas históricas vieram de eventos que nenhum deles capturava. Todos os valores são <span class="badge sim">simulado</span>, com parâmetros declarados. O <em>scorecard</em> da seção 6.7 é uma proposta de autoria própria, não um padrão de mercado.</p>
+  </div>
+
+  <p class="lead">Chegamos ao ponto em que as peças se encaixam. O Capítulo 2 mediu liquidez, o 3 mediu custo de execução, o 4 mediu risco de crédito e o 5 mediu dependência de informação externa. Falta a linguagem comum que permite comparar coisas diferentes: <strong>risco e retorno</strong>.</p>
+  <p>E falta um alerta. A caixa de ferramentas que vamos usar — Markowitz, Sharpe, VaR — foi construída para mercados onde o risco dominante é o preço se mover. Em DeFi, o risco dominante costuma ser outro: um contrato com falha, um oráculo enganado, uma chave administrativa usada. <strong>Aplicar os indicadores clássicos sem essa ressalva produz números tecnicamente corretos e perigosamente incompletos.</strong></p>
+
+  <h3 class="sec" id="s6-1"><span class="n">6.1</span>Medir retorno sem enganar a si mesmo</h3>
+  <p>A primeira armadilha aparece antes de qualquer fórmula. Em um protocolo de crédito, como vimos no Capítulo 4, o rendimento está embutido no preço de um recibo; em uma pool, vem de taxas acumuladas e da mudança de composição da posição. <strong>Em nenhum dos dois casos existe um "pagamento" a somar.</strong> O que se mede é a variação do valor total da posição, marcada a mercado, entre dois instantes.</p>
+  <p>Daí decorrem três cuidados que decidem se o número final significa alguma coisa:</p>
+  <ul>
+    <li><strong>Use retornos logarítmicos</strong> para agregar no tempo. Eles somam, enquanto retornos simples compõem — e somar retornos simples é o erro mais comum em planilhas de DeFi.</li>
+    <li><strong>Mercados on-chain operam 365 dias por ano.</strong> Anualizar com 252 dias úteis, como se faz em bolsa, subestima a volatilidade em cerca de 20%. Declare a convenção adotada.</li>
+    <li><strong>APR não é APY.</strong> Taxa nominal e taxa com capitalização divergem muito em patamares altos: 100% ao ano com capitalização diária vira cerca de 171%. Painéis exibem ora uma, ora outra, raramente com o rótulo correto.</li>
+  </ul>
+  <div class="callout alerta">
+    <h5>O problema da janela curta</h5>
+    <p>Anualizar o rendimento de sete dias multiplicando por 52 é prática corrente nos painéis de DeFi, e é estatisticamente indefensável. Sete dias de uma pool volátil contêm ruído suficiente para produzir qualquer número desejado, e o viés é sistemático: períodos de alta atividade — que geram taxas altas — são precisamente os de maior perda para os LPs. <strong>Rendimentos anualizados a partir de janelas curtas são a principal fonte de números fantasiosos no setor.</strong></p>
+  </div>
+
+  <h3 class="sec" id="s6-2"><span class="n">6.2</span>A perda que o LP tem por fornecer liquidez</h3>
+  <p>Esta é a formalização prometida desde o Capítulo 1. Quando o preço de um ativo em uma pool muda, a composição da posição do LP muda junto: ele termina com <em>menos</em> do ativo que subiu e <em>mais</em> do que caiu. Comparada a simplesmente ter mantido os dois ativos na carteira, a posição vale menos — qualquer que seja a direção do movimento.</p>
+  <p>O nome consagrado, <em class="t">impermanent loss</em>, é infeliz: a perda só é "impermanente" se o preço voltar exatamente ao ponto de partida. Se o LP sacar com o preço deslocado, ela é definitiva. Preferimos chamá-la de <strong>perda em relação a manter os ativos</strong>.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 6.1</span><span class="nm">Perda em relação a manter os ativos, em um CPMM</span></div>
+    <div class="eq-body">perda<span class="op">=</span><span class="frac"><span>2<span class="op">·</span><span class="sq"><span><v>r</v></span></span></span><span>1<span class="op">+</span><v>r</v></span></span><span class="op">−</span>1</div>
+    <div class="eq-legend">
+      <span><b>r</b> — razão entre o preço final e o preço inicial (1,25 para uma alta de 25%)</span>
+      <span><b>Propriedade central</b> — a perda é <em>simétrica em r e 1/r</em>: dobrar de preço e cair pela metade produzem exatamente a mesma perda de 5,72%.</span>
+      <span><b>Não inclui taxas.</b> O resultado líquido do LP é esta perda somada às taxas recebidas no período.</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Quanto o LP perde só por ser LP</p>
+      <p class="chart-sub">perda em relação a manter os ativos, antes das taxas · CPMM de faixa completa</p>
+      <div id="f6-1"></div>
+    </div>
+    <figcaption><b>Figura 6.1</b> — A curva é simétrica e achatada perto de r = 1: para movimentos pequenos, a perda é quase nula, e é por isso que pools de ativos correlacionados funcionam bem. Ela acelera nas pontas — um ativo que quadruplica custa 20% ao LP. Em pools de liquidez concentrada, o mesmo efeito é amplificado pelo fator de eficiência do Capítulo 2. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <div class="callout nota">
+    <h5>O fecho do argumento do Capítulo 3</h5>
+    <p>A Fórmula 6.1 e a Fórmula 3.2 descrevem o mesmo fenômeno por ângulos diferentes. A perda do LP <em>é</em> o lucro do arbitrador; o giro mínimo da Fórmula 3.2 é a condição para que as taxas a compensem. Fornecer liquidez é, portanto, vender uma opção: <strong>o LP recebe um prêmio constante — as taxas — em troca de absorver movimentos de preço</strong>. Como qualquer vendedor de opção, ganha com frequência e perde com magnitude.</p>
+  </div>
+
+  <h3 class="sec" id="s6-3"><span class="n">6.3</span>Indicadores de risco-retorno, e o que cada um esconde</h3>
+  <p>Os três indicadores a seguir são padrão em finanças e funcionam em DeFi, desde que lidos com as ressalvas corretas.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 6.2</span><span class="nm">Índice de Sharpe e índice de Sortino</span></div>
+    <div class="eq-body">Sharpe<span class="op">=</span><span class="frac"><span><v>R</v><span class="op">−</span><v>R</v><sub>f</sub></span><span><v>σ</v></span></span><span style="display:inline-block;width:2.6em"></span>Sortino<span class="op">=</span><span class="frac"><span><v>R</v><span class="op">−</span><v>R</v><sub>f</sub></span><span><v>σ</v><sub>baixa</sub></span></span></div>
+    <div class="eq-legend">
+      <span><b>R</b> — retorno do período · <b>R<sub>f</sub></b> — retorno livre de risco · <b>σ</b> — desvio-padrão dos retornos</span>
+      <span><b>σ<sub>baixa</sub></b> — desvio-padrão apenas dos retornos abaixo do alvo <span class="cite">(SORTINO; PRICE, 1994)</span></span>
+      <span><b>A diferença que importa</b> — o Sharpe <span class="cite">(SHARPE, 1994)</span> penaliza a volatilidade para cima tanto quanto para baixo. O Sortino só penaliza a que machuca.</span>
+    </div>
+  </div>
+  <p>O <strong>drawdown máximo</strong> completa o quadro: a maior queda percentual do valor da posição em relação a um pico anterior. Ele responde a uma pergunta que média e desvio-padrão não respondem — <em>qual foi o pior momento?</em> — e é o indicador que melhor se correlaciona com a decisão real de abandonar uma estratégia.</p>
+
+  <div class="callout alerta">
+    <h5>Três razões para desconfiar de um Sharpe alto em DeFi</h5>
+    <p><strong>1. Rendimento de incentivos infla o numerador.</strong> Uma estratégia paga em token do protocolo exibe retorno alto e volatilidade baixa <em>enquanto o token não é vendido</em>. Marque a mercado, com o impacto de preço de sair da posição (Capítulo 3).</p>
+    <p><strong>2. Estratégias de carry escondem a cauda.</strong> Receber funding todo dia produz uma série quase plana, com Sharpe excelente — até o dia da liquidação. É o perfil clássico de "catar moedas na frente do trator": muitos ganhos pequenos e uma perda que apaga todos.</p>
+    <p><strong>3. Viés de sobrevivência.</strong> Protocolos que falharam saem dos painéis. Um Sharpe médio calculado sobre os que restaram descreve os sobreviventes, não a decisão que estava disponível no início do período.</p>
+  </div>
+
+  <h3 class="sec" id="s6-4"><span class="n">6.4</span>VaR e por que ele não basta</h3>
+  <p>O <strong>Value at Risk</strong> responde: qual a perda que não será excedida em 95% dos dias? É a medida de risco mais usada no mercado tradicional <span class="cite">(JORION, 2007)</span>, e tem uma limitação conhecida que, em DeFi, se torna decisiva.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 6.3</span><span class="nm">Value at Risk e Expected Shortfall</span></div>
+    <div class="eq-body">VaR<sub>α</sub><span class="op">=</span>quantil<sub>α</sub> das perdas<span style="display:inline-block;width:2em"></span>ES<sub>α</sub><span class="op">=</span>média das perdas <span class="op">&gt;</span> VaR<sub>α</sub></div>
+    <div class="eq-legend">
+      <span><b>VaR</b> — a perda no limite do cenário "ruim", que não será excedida com probabilidade α</span>
+      <span><b>ES</b> — a perda <em>média</em> nos casos em que o VaR é excedido; responde "e se der errado, quão errado?"</span>
+      <span><b>Por que o ES é preferível</b> — o VaR não é uma medida coerente de risco: pode indicar que dividir uma carteira em duas reduz o risco total <span class="cite">(ARTZNER et al., 1999)</span>. O ES não tem esse defeito.</span>
+    </div>
+  </div>
+  <p>A diferença não é acadêmica. O VaR diz onde começa a cauda; o ES diz o que há dentro dela. Para uma posição cuja distribuição de perdas tem uma cauda longa — exatamente o caso de uma estratégia alavancada ou de um LP exposto a liquidações —, dois ativos podem ter o mesmo VaR e um deles perder três vezes mais quando o cenário ruim acontece.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Dois perfis com o mesmo VaR e riscos muito diferentes</p>
+      <p class="chart-sub">distribuição de perdas diárias · VaR a 95% idêntico, Expected Shortfall distinto</p>
+      <div id="f6-2"></div>
+    </div>
+    <figcaption><b>Figura 6.2</b> — As duas distribuições têm o mesmo VaR de 95%, marcado pela linha tracejada. Mas a estratégia de cauda pesada perde muito mais <em>quando</em> perde: seu Expected Shortfall é mais que o dobro. Um relatório de risco que informe apenas o VaR trata as duas como equivalentes. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s6-5"><span class="n">6.5</span>Os riscos que nenhuma série temporal contém</h3>
+  <p>Aqui está o limite de toda a seção anterior. Os indicadores acima são calculados sobre retornos observados. Um protocolo que funcionou perfeitamente por dois anos tem uma série temporal excelente — e isso não diz <em>nada</em> sobre a probabilidade de seu contrato ter uma falha ainda não explorada.</p>
+  <p>Esses riscos são <strong>binários e não amostrados</strong>: ou não acontecem, ou destroem a posição. Não há como estimá-los a partir do histórico de preços, e tratá-los como ausentes porque não aparecem nos dados é o erro mais caro em DeFi.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 6.1 — Riscos não capturados por indicadores de preço, e como avaliá-los</caption>
+      <thead><tr><th>Risco</th><th>Pergunta que o revela</th><th>Evidência verificável</th><th>Capítulo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Código</strong></td><td>Quem auditou, quando, e o escopo cobriu a versão atual?</td><td>Relatórios de auditoria com data e commit; tempo em produção; valor histórico máximo protegido.</td><td>1</td></tr>
+        <tr><td><strong>Oráculo</strong></td><td>Qual o custo de mover o preço que este protocolo lê?</td><td>Profundidade da fonte vs. capital exposto (Fórmula 5.4); número de publicadores independentes.</td><td>5</td></tr>
+        <tr><td><strong>Governança</strong></td><td>Quem pode mudar os parâmetros, e em quanto tempo?</td><td>Existência de <em>timelock</em> e sua duração; concentração de votos; chaves administrativas ativas.</td><td>1</td></tr>
+        <tr><td><strong>Liquidez</strong></td><td>Consigo sair da posição no tamanho que tenho?</td><td>Profundidade D±(d) vs. tamanho da posição (Fórmula 2.4); liquidez ativa.</td><td>2 e 3</td></tr>
+        <tr><td><strong>Crédito</strong></td><td>A liquidação funciona sob estresse?</td><td>Razão entre profundidade de venda e colateral total (Tabela 4.3); histórico de dívida incobrável.</td><td>4</td></tr>
+        <tr><td><strong>Contraparte</strong></td><td>Existe um emissor que pode congelar ou não honrar o resgate?</td><td>Extensões de token ativas; termos de resgate; jurisdição e regulação do emissor.</td><td>0 e 4</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Elaboração própria. Note que a coluna de evidência é inteiramente composta de <b>medidas definidas nos capítulos anteriores</b>. Essa é a tese do livro em uma tabela: avaliação de risco em DeFi é um exercício de medição, não de impressão.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s6-6"><span class="n">6.6</span>Um framework para avaliar um protocolo</h3>
+  <p>Reunimos aqui, em um procedimento único, as medidas desenvolvidas ao longo do livro. A proposta é de autoria própria e tem uma regra de desenho deliberada: <strong>cada critério exige um número verificável, e nenhum admite impressão qualitativa</strong>. Onde o dado não existe, a nota não é "média" — é "não avaliável", e isso é, por si só, uma informação sobre o protocolo.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 6.2 — Framework de avaliação em seis dimensões <span class="badge sim">proposta de autoria própria</span></caption>
+      <thead><tr><th>Dimensão</th><th>Medida</th><th>Faixa favorável</th><th>Faixa de alerta</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1. Liquidez</strong></td><td>Profundidade a ±2% ÷ tamanho da sua posição</td><td>acima de 10×</td><td class="neg">abaixo de 2×</td></tr>
+        <tr><td><strong>2. Sustentabilidade do LP</strong></td><td>Giro observado ÷ giro mínimo pela Fórmula 3.2</td><td>acima de 1,5×</td><td class="neg">abaixo de 1,0×</td></tr>
+        <tr><td><strong>3. Composição do rendimento</strong></td><td>Parcela orgânica do rendimento total</td><td>acima de 70%</td><td class="neg">abaixo de 30%</td></tr>
+        <tr><td><strong>4. Segurança do oráculo</strong></td><td>Custo de mover o preço em 30% ÷ capital exposto</td><td>acima de 1,0×</td><td class="neg">abaixo de 0,2×</td></tr>
+        <tr><td><strong>5. Resiliência do crédito</strong></td><td>Profundidade de venda ÷ colateral total do mercado</td><td>acima de 1,0×</td><td class="neg">abaixo de 0,3×</td></tr>
+        <tr><td><strong>6. Governança</strong></td><td>Duração do <em>timelock</em> para mudanças de parâmetro</td><td>acima de 48 h</td><td class="neg">sem timelock</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Os limiares são escolhas dos autores, calibradas pelos exemplos deste livro, e devem ser ajustados ao apetite de risco de quem usa. O que não é negociável é a <b>estrutura</b>: seis dimensões independentes, cada uma com um número, cada um rastreável a uma fórmula do livro.</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Dois protocolos hipotéticos no mesmo framework</p>
+      <p class="chart-sub">razão entre a medida observada e o limiar favorável · valores acima de 1,0 estão na faixa favorável</p>
+      <div id="f6-3"></div>
+    </div>
+    <figcaption><b>Figura 6.3</b> — O protocolo B exibe rendimento anunciado maior, mas falha em quatro das seis dimensões: depende de incentivos, lê um oráculo barato de manipular e não tem profundidade para liquidar seu próprio colateral. <strong>Um único eixo abaixo de 0,2 costuma dominar todos os demais</strong>, porque esses riscos não se diversificam — eles se realizam juntos. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <div class="callout nota">
+    <h5>Como usar o framework na prática</h5>
+    <p>Preencha as seis dimensões <em>antes</em> de olhar o rendimento anunciado. A ordem importa: o número de rendimento é âncora cognitiva poderosa, e quem o lê primeiro tende a justificar as notas seguintes. Depois, aplique a regra do elo mais fraco — a nota do protocolo é a <strong>menor</strong> das seis, não a média. Riscos em DeFi tendem a se realizar de forma correlacionada: a queda de preço que aciona liquidações é a mesma que esvazia a pool que o oráculo lê.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>Os indicadores clássicos de risco e retorno são aplicáveis a DeFi e exigem três correções: retornos logarítmicos, convenção de 365 dias e desconfiança sistemática de rendimentos anualizados a partir de janelas curtas. A perda do LP em relação a manter os ativos tem forma fechada, é simétrica a altas e quedas, e completa o argumento iniciado no Capítulo 3 — fornecer liquidez é vender uma opção.</p>
+    <p>A limitação mais séria, porém, não é de cálculo. Sharpe, Sortino, drawdown e VaR descrevem o que foi amostrado; os riscos que mais destroem capital em DeFi — código, oráculo, governança, contraparte — são binários e não aparecem na série histórica. O framework da seção 6.6 existe para forçar a avaliação deles com números, e não com impressões.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>Retorno logarítmico</dt><dd>ln(P₁ ÷ P₀); soma no tempo, ao contrário do retorno simples.</dd></div>
+      <div><dt>APR / APY</dt><dd>Taxa nominal anual / taxa anual com capitalização. Divergem muito em patamares altos.</dd></div>
+      <div><dt>Perda vs. manter</dt><dd>Diferença entre o valor da posição de LP e o de simplesmente ter mantido os ativos.</dd></div>
+      <div><dt>Sharpe</dt><dd>Retorno excedente por unidade de volatilidade total.</dd></div>
+      <div><dt>Sortino</dt><dd>Retorno excedente por unidade de volatilidade apenas de baixa.</dd></div>
+      <div><dt>Drawdown máximo</dt><dd>Maior queda do valor em relação a um pico anterior.</dd></div>
+      <div><dt>VaR</dt><dd>Perda que não será excedida com uma dada probabilidade.</dd></div>
+      <div><dt>Expected Shortfall</dt><dd>Perda média nos casos em que o VaR é excedido; medida coerente de risco.</dd></div>
+      <div><dt>Risco binário</dt><dd>Risco que não se manifesta em variações graduais: ou não ocorre, ou é severo.</dd></div>
+      <div><dt>Timelock</dt><dd>Atraso obrigatório entre aprovar e executar uma mudança de parâmetro.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ var il=[];for(var r=0.2;r<=3.0;r+=0.02){il.push([r,(2*Math.sqrt(r)/(1+r)-1)*100]);}
+ CH.line("f6-1",{height:300,xMin:0.2,xMax:3,yMin:-25,yMax:1,xTicks:7,mr:28,
+  x:{dec:1},y:{dec:0,suf:"%"},
+  xLabel:"razão entre preço final e inicial (r)",yLabel:"perda vs. manter os ativos",
+  series:[{name:"perda",points:il,color:"var(--c5)",area:true}],
+  marks:[{x:2,y:-5.72,label:"dobrou de preço|−5,72%",color:"var(--c2)",anchor:"start",dy:14},
+         {x:0.5,y:-5.72,label:"caiu à metade|−5,72%",color:"var(--c2)",anchor:"start",dy:14},
+         {x:1,y:0,label:"sem perda",color:"var(--c3)",anchor:"start",dy:-10}]});
+
+ CH.bars("f6-2",{height:300,mb:56,barMax:40,
+  cats:["0 a −1%","−1 a −2%","−2 a −3%","−3 a −5%","−5 a −8%","−8 a −15%","abaixo|de −15%"],
+  y:{dec:1,suf:"%"},yLabel:"frequência dos dias (%)",xLabel:"faixa de perda diária",labels:false,
+  series:[
+   {name:"Estratégia A — cauda leve",color:"var(--c1)",values:[62,22,9,5,1.6,0.4,0]},
+   {name:"Estratégia B — cauda pesada",color:"var(--c5)",values:[70,17,6,2,2.2,1.6,1.2]}
+  ]});
+
+ CH.bars("f6-3",{height:320,mb:72,barMax:38,
+  cats:["Liquidez","Sustentab.|do LP","Rendimento|orgânico","Segurança|do oráculo","Resiliência|do crédito","Governança"],
+  y:{dec:1,suf:"×"},yLabel:"medida observada ÷ limiar favorável",xLabel:"dimensão do framework",
+  series:[
+   {name:"Protocolo A — rendimento anunciado de 9% a.a.",color:"var(--c3)",values:[1.8,1.4,1.2,2.1,1.3,1.5]},
+   {name:"Protocolo B — rendimento anunciado de 34% a.a.",color:"var(--c5)",values:[0.6,0.4,0.2,0.15,0.3,1.1]}
+  ]});
+})();
+</script>
+</section>

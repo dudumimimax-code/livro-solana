@@ -1,0 +1,561 @@
+<section class="chap" id="cap8">
+<div class="opener"><div class="wrap">
+  <div class="num">8</div>
+  <div>
+    <p class="kicker">Capítulo 8 · Comparação</p>
+    <h2>Cripto contra o resto: uma década em números</h2>
+    <p class="lede">R$ 1.000 no CDI, na bolsa, em fundos imobiliários ou em cripto, de 2016 até hoje. A resposta depende menos do ativo do que de uma pergunta que quase ninguém faz: começando quando?</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>comparar investimentos de naturezas diferentes na mesma moeda, no mesmo período e com o mesmo critério;</li>
+      <li>reconhecer o viés de sobrevivência e o viés de data de início nas comparações que circulam na internet;</li>
+      <li>separar retorno de risco usando volatilidade, pior ano e maior queda (Capítulo 6);</li>
+      <li>medir o efeito do rendimento on-chain e da alavancagem sobre uma posição em cripto;</li>
+      <li>identificar seu perfil de risco e explorar a comparação que corresponde a ele.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Rentabilidade passada não garante rentabilidade futura — e, neste capítulo, essa frase não é protocolo: a seção 8.3 mostra que a mesma década produz conclusões opostas conforme o mês de entrada. As séries de preço são <span class="badge real">real</span>, com fontes na Tabela 8.1, e vão até <strong>31 de outubro de 2026</strong>. O rendimento de staking e de Earn e os parâmetros de alavancagem são <span class="badge sim">simulado</span> e ajustáveis. O questionário da seção 8.5 é didático e <strong>não substitui a análise de perfil (suitability)</strong> que corretoras e bancos são obrigados a fazer.</p>
+  </div>
+
+  <p class="lead">Este capítulo responde à pergunta que todo leitor de um livro sobre cripto acaba fazendo: <strong>teria valido a pena?</strong> A resposta honesta tem três partes. Depende de quando você entrou. Depende de quanto você aguentaria ver o saldo cair sem vender. E depende de comparar coisas comparáveis, o que quase nenhum gráfico de rede social faz.</p>
+
+  <h3 class="sec" id="s8-1"><span class="n">8.1</span>Como comparar de forma justa</h3>
+  <p>Três regras tornam a comparação defensável:</p>
+  <ul>
+    <li><strong>Mesma moeda.</strong> Tudo em reais. Bitcoin, Ethereum, Solana e Nasdaq são cotados em dólar e foram convertidos pela taxa de câmbio do mesmo dia. Para o brasileiro, a variação do dólar faz parte do resultado — e ajudou muito em 2020 e 2024.</li>
+    <li><strong>Mesmas datas.</strong> Fechamento do último dia útil de cada ano, de dezembro de 2015 a dezembro de 2025, mais 31 de outubro de 2026. Ninguém escolhe a melhor data para cada ativo.</li>
+    <li><strong>Mesmo critério de rendimento.</strong> CDI, Ibovespa e IFIX já incorporam juros, dividendos e rendimentos reinvestidos. A Nasdaq Composite usada aqui é índice de preço, sem dividendos, o que a subestima em menos de 1 ponto percentual ao ano. Cripto não paga nada — a menos que você faça staking, que tratamos à parte.</li>
+  </ul>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 8.1 — Séries usadas no capítulo <span class="badge real">real</span></caption>
+      <thead><tr><th>Ativo</th><th>Série</th><th>Fonte</th><th>Desde</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CDI</strong></td><td>Taxa acumulada no ano</td><td>Meus Dividendos (2026a), a partir do Banco Central</td><td>2016</td></tr>
+        <tr><td><strong>Ibovespa</strong></td><td>Pontos no fechamento do ano</td><td>Meus Dividendos (2026b)</td><td>2016</td></tr>
+        <tr><td><strong>IFIX</strong></td><td>Pontos no fechamento do ano</td><td>Meus Dividendos (2026c)</td><td>2016</td></tr>
+        <tr><td><strong>Nasdaq Composite</strong></td><td>Fechamento anual e de outubro/2026, em US$</td><td>StatMuse Money (2026b, 2026c)</td><td>2016</td></tr>
+        <tr><td><strong>Bitcoin</strong></td><td>Fechamento anual e diário, em US$</td><td>StatMuse Money (2026a, 2026d)</td><td>2016</td></tr>
+        <tr><td><strong>Ethereum, Solana</strong></td><td>Fechamento anual e mensal, em US$</td><td>CoinLore (2026a, 2026b)</td><td>2016 · 2021</td></tr>
+        <tr><td><strong>Dólar</strong></td><td>PTAX de venda, variação mensal (série BCB nº 1)</td><td>Numerando (2026)</td><td>2016</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">A série de Solana começa em janeiro de 2021, sobre o fechamento de 2020, aproximado em US$ 1,51 a partir do preço de cerca de US$ 1,50 registrado em 1º/1/2021 (TradingView, 2026) <span class="badge est">estimado</span>. O dólar de dezembro de 2015, R$ 3,9048, é o ponto de partida; os demais saem das variações da série. Fontes agregadoras podem divergir em centavos entre si: o Bitcoin, por exemplo, fechou 2025 a US$ 87.508 em uma e US$ 87.640 em outra.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout alerta">
+    <h5>O viés que os gráficos de "se você tivesse investido" escondem</h5>
+    <p>Bitcoin e Ethereum estão neste capítulo <strong>porque sobreviveram</strong>. Em 2016, o Ethereum era um projeto experimental de um ano de idade, e muitas das criptomoedas que dividiam com ele as primeiras posições do mercado naquela época perderam quase todo o valor desde então. Escolher hoje as moedas que deram certo e perguntar quanto teriam rendido é o <strong>viés de sobrevivência</strong>: a comparação honesta seria com uma carteira das maiores cripto de 2016, escolhidas com a informação de 2016. Os números abaixo são reais — mas a decisão de olhar para eles é feita com o benefício do resultado.</p>
+  </div>
+
+  <h3 class="sec" id="s8-2"><span class="n">8.2</span>O simulador: R$ 1.000 desde quando você quiser</h3>
+  <p>O simulador abaixo usa as séries da Tabela 8.1. Todo cenário começa com R$ 1.000; escolha o mês de entrada, os ativos e, se quiser, um aporte extra a cada janeiro — o que muda bastante a história, porque quem aporta todo ano compra também nas quedas. Os atalhos montam as comparações clássicas. A escala é logarítmica por padrão: nela, a mesma inclinação significa a mesma taxa de crescimento, e um ativo que multiplicou por 250 não esmaga visualmente os que multiplicaram por 3.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="sim" id="cmpSim">
+    <div class="sim-head">
+      <h5>Simulador · uma década em reais</h5>
+      <span class="hint">dados reais até 31/10/2026 <span class="badge real">real</span></span>
+    </div>
+    <div class="sim-body">
+      <div class="presets" role="group" aria-label="Comparações prontas">
+        <button type="button" data-p="CDI,BTC,ETH" class="on">CDB × cripto</button>
+        <button type="button" data-p="IXIC,BTC">Nasdaq × Bitcoin</button>
+        <button type="button" data-p="IBOV,ETH">Ibovespa × Ethereum</button>
+        <button type="button" data-p="IFIX,SOL">FIIs × Solana</button>
+        <button type="button" data-p="CDI,IBOV,IFIX,IXIC,BTC,ETH,SOL">Todos</button>
+      </div>
+      <div class="assets" id="cmpAssets"></div>
+      <div class="sim-grid">
+        <div class="sim-ctl">
+          <label for="cmpAmt">Aporte extra todo janeiro <output id="cmpAmtOut">R$ 0</output></label>
+          <input type="range" id="cmpAmt" min="0" max="12000" step="500" value="0">
+        </div>
+        <div class="sim-ctl">
+          <label for="cmpStart">Entrada em <output id="cmpStartOut">jan/2016</output></label>
+          <input type="range" id="cmpStart" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="sim-ctl">
+          <label for="cmpStk"><span><input type="checkbox" id="cmpStkOn"> Solana com staking</span><output id="cmpStkOut">6,0% a.a.</output></label>
+          <input type="range" id="cmpStk" min="0" max="10" step="0.5" value="6">
+        </div>
+        <div class="sim-ctl">
+          <label><span><input type="checkbox" id="cmpLog" checked> Escala logarítmica</span></label>
+        </div>
+      </div>
+      <p class="chart-title" style="margin-top:.4rem">Quanto valeria hoje</p>
+      <div id="f8-1"></div>
+      <div class="readout" id="cmpOut" style="margin-top:1rem"></div>
+      <p class="sim-note" id="cmpNote">Sem impostos e sem custos de compra. CDI bruto. A série de Solana começa em jan/2021: com ela selecionada, a entrada mínima passa a ser jan/2021 — desmarque Solana para voltar a 2016.</p>
+    </div>
+  </div>
+  <p class="figcap-inline"><b>Figura 8.1</b> — Simulador interativo. Fonte: elaboração própria a partir das séries da Tabela 8.1. <span class="badge real">real</span></p>
+</div>
+
+<div class="wrap col">
+  <p>Com a entrada em janeiro de 2016, o resultado é o que circula nas redes: R$ 1.000 viraram R$ 2.727 no CDI, R$ 3.874 no Ibovespa, R$ 7.053 na Nasdaq — e cerca de R$ 250 mil em Bitcoin e R$ 3,4 milhões em Ethereum. Mova o controle de entrada para janeiro de 2022 e a história se inverte.</p>
+  <p>Agora acrescente um aporte de R$ 1.000 todo janeiro, a partir de 2022. Com cinco parcelas, o Bitcoin termina em 2,03 vezes o total investido, contra 1,44 vez no CDI. A razão é a queda de 2022: quem aportava todo ano comprou Bitcoin barato no começo de 2023. <strong>Aportes regulares não mudam o ativo; mudam o preço médio pago por ele</strong> — e por isso a mesma janela pode favorecer o CDI para quem investiu uma vez e o Bitcoin para quem investiu todo ano.</p>
+
+  <h3 class="sec" id="s8-3"><span class="n">8.3</span>Quando você entrou importa mais do que em quê</h3>
+  <p>A Figura 8.2 repete a comparação para cada mês de janeiro possível, sempre até outubro de 2026, e mostra a <strong>rentabilidade anualizada</strong> — o retorno composto por ano que leva do valor inicial ao final.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Retorno anualizado até out/2026, conforme o ano de entrada</p>
+      <p class="chart-sub">em reais, % ao ano · entrada em janeiro de cada ano</p>
+      <div id="f8-2"></div>
+    </div>
+    <figcaption><b>Figura 8.2</b> — Quem entrou em 2016, 2017, 2019 ou 2020 teve no Bitcoin um retorno que nenhum outro ativo chegou perto. Quem entrou em janeiro de 2022 teria feito melhor no CDI (12,9% a.a.) do que no Bitcoin (10,6% a.a.), na Nasdaq (9,9% a.a.) ou no Ibovespa (10,2% a.a.). E quem entrou em 2025 ou 2026 está perdendo cerca de 15% ao ano em Bitcoin, enquanto o CDI pagou mais de 14%. Fonte: elaboração própria a partir da Tabela 8.1. <span class="badge real">real</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>Ethereum e Solana tornam o contraste ainda mais nítido: entrando em janeiro de 2022, R$ 1.000 em Ethereum valeriam cerca de R$ 596 em outubro de 2026, e em Solana, cerca de R$ 545. No mesmo período, o CDI transformou R$ 1.000 em R$ 1.799. <strong>A década de ouro da cripto contém um período de quase cinco anos em que ela perdeu para a renda fixa brasileira.</strong></p>
+  <p>Isso não é acaso. Com a Selic perto de 15%, a renda fixa brasileira cobra um custo de oportunidade raro no mundo: para valer a pena, um ativo de risco precisa render bem acima de 14% ao ano em reais. É a mesma lógica do giro mínimo do LP no Capítulo 3 — o retorno tem de pagar, antes, o que você deixou de ganhar.</p>
+
+  <h3 class="sec" id="s8-4"><span class="n">8.4</span>O risco que o gráfico de linha esconde</h3>
+  <p>Retorno sem risco é metade da informação. A Tabela 8.2 aplica as medidas do Capítulo 6 às mesmas séries, com entrada em janeiro de 2016.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 8.2 — Retorno e risco em reais, jan/2016 a out/2026 <span class="badge real">real</span></caption>
+      <thead><tr><th>Ativo</th><th class="n">Retorno anualizado</th><th class="n">Volatilidade anual</th><th>Pior ano civil</th><th class="n">Anos acima do CDI</th><th>Maior queda dentro do ciclo (US$)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CDI</strong></td><td class="n">9,7%</td><td class="n">3,9%</td><td>+2,8% (2020)</td><td class="n">—</td><td>—</td></tr>
+        <tr><td><strong>Ibovespa</strong></td><td class="n">13,3%</td><td class="n">16,5%</td><td class="neg">−11,9% (2021)</td><td class="n">7 de 10</td><td>—</td></tr>
+        <tr><td><strong>IFIX</strong></td><td class="n">9,2%</td><td class="n">14,3%</td><td class="neg">−10,2% (2020)</td><td class="n">5 de 10</td><td>—</td></tr>
+        <tr><td><strong>Nasdaq</strong></td><td class="n">19,8%</td><td class="n">31,0%</td><td class="neg">−37,4% (2022)</td><td class="n">7 de 10</td><td class="neg">−37,8% (2021→2022)</td></tr>
+        <tr><td><strong>Bitcoin</strong></td><td class="n">66,5%</td><td class="n">117%</td><td class="neg">−69,0% (2018)</td><td class="n">7 de 10</td><td class="neg">−84,1% (2017→2018)<br>−77,3% (2021→2022)</td></tr>
+        <tr><td><strong>Ethereum</strong></td><td class="n">111,6%</td><td class="n">180%</td><td class="neg">−79,4% (2018)</td><td class="n">6 de 10</td><td>—</td></tr>
+        <tr><td><strong>Solana</strong> <small>desde 2021</small></td><td class="n">105,1%</td><td class="n">290%</td><td class="neg">−94,5% (2022)</td><td class="n">3 de 5</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Volatilidade: desvio-padrão dos retornos anuais logarítmicos de 2016 a 2025. "Anos acima do CDI": anos civis completos em que o ativo rendeu mais que o CDI. Maior queda dentro do ciclo: da máxima de um ano à mínima do ano seguinte, em dólar, pelas máximas e mínimas anuais da StatMuse Money (2026a, 2026b). Fonte: elaboração própria.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <p>A coluna que decide é a última. O retorno anualizado de 66,5% do Bitcoin só existiu para quem atravessou <strong>duas quedas de mais de 75%</strong> sem vender. Uma queda de 84% exige que o ativo suba 525% para voltar ao ponto de partida. Na prática, a maioria das pessoas que compram perto do topo vende perto do fundo — e transforma um ativo que rendeu 66% ao ano numa perda realizada.</p>
+  <p>Esse é o motivo de a próxima seção perguntar quem você é antes de mostrar mais números.</p>
+
+  <h3 class="sec" id="s8-5"><span class="n">8.5</span>Qual é o seu perfil?</h3>
+  <p>Cinco perguntas, sem resposta certa. O resultado libera, na seção 8.6, a comparação feita para o seu perfil — e você pode abrir as outras depois.</p>
+
+  <form class="quiz" id="quiz">
+    <fieldset>
+      <legend><span>1</span>Quando você pode precisar deste dinheiro?</legend>
+      <label><input type="radio" name="q1" value="1"> Em menos de um ano</label>
+      <label><input type="radio" name="q1" value="2"> Entre um e cinco anos</label>
+      <label><input type="radio" name="q1" value="3"> Daqui a mais de cinco anos</label>
+    </fieldset>
+    <fieldset>
+      <legend><span>2</span>Seu investimento cai 30% em um mês. O que você faz?</legend>
+      <label><input type="radio" name="q2" value="1"> Vendo, para não perder mais</label>
+      <label><input type="radio" name="q2" value="2"> Mantenho e espero recuperar</label>
+      <label><input type="radio" name="q2" value="3"> Compro mais, aproveitando o preço</label>
+    </fieldset>
+    <fieldset>
+      <legend><span>3</span>Qual é o seu objetivo principal?</legend>
+      <label><input type="radio" name="q3" value="1"> Preservar o que tenho, com rendimento acima da inflação</label>
+      <label><input type="radio" name="q3" value="2"> Crescer o patrimônio, aceitando algumas oscilações</label>
+      <label><input type="radio" name="q3" value="3"> Buscar o maior retorno possível, aceitando perdas grandes</label>
+    </fieldset>
+    <fieldset>
+      <legend><span>4</span>Com que você já investiu?</legend>
+      <label><input type="radio" name="q4" value="1"> Poupança, CDB ou Tesouro Direto</label>
+      <label><input type="radio" name="q4" value="2"> Ações, fundos imobiliários ou ETFs</label>
+      <label><input type="radio" name="q4" value="3"> Cripto, opções ou operações alavancadas</label>
+    </fieldset>
+    <fieldset>
+      <legend><span>5</span>Você tem reserva de emergência, e que parte do patrimônio este valor representa?</legend>
+      <label><input type="radio" name="q5" value="1"> Ainda não tenho reserva de emergência</label>
+      <label><input type="radio" name="q5" value="2"> Tenho reserva; este valor é uma parte relevante do que sobra</label>
+      <label><input type="radio" name="q5" value="3"> Tenho reserva; é uma parte pequena, que eu poderia perder</label>
+    </fieldset>
+    <div class="quiz-foot">
+      <button type="submit" class="btn-main">Ver meu perfil</button>
+      <span class="quiz-msg" id="quizMsg" role="status"></span>
+    </div>
+  </form>
+
+  <div class="perfil" id="perfil" hidden>
+    <p class="perfil-k">Seu perfil, pelas respostas</p>
+    <p class="perfil-v" id="perfilNome"></p>
+    <p class="perfil-d" id="perfilDesc"></p>
+  </div>
+
+  <h3 class="sec" id="s8-6"><span class="n">8.6</span>A comparação para o seu perfil</h3>
+  <div class="lock" id="lock">
+    <p><b>Seção bloqueada.</b> Responda às cinco perguntas acima para liberar a comparação do seu perfil.</p>
+    <button type="button" class="btn-ghost" id="unlockAll">Prefiro ver as três</button>
+  </div>
+</div>
+
+<div class="trilhas" id="trilhas">
+<!-- ================= CONSERVADOR ================= -->
+<div class="trilha" data-perfil="conservador" hidden>
+  <div class="wrap col">
+    <p class="trilha-tag">Trilha A · Conservador</p>
+    <h4 class="sub" style="margin-top:.3rem">CDB × cripto: quanto risco cabe numa carteira de renda fixa</h4>
+    <p>Para quem prioriza preservar o patrimônio, a pergunta útil não é "CDB ou Bitcoin?", e sim <strong>"quanto de Bitcoin numa carteira de CDB?"</strong>. Uma fatia pequena de um ativo muito volátil, rebalanceada uma vez por ano, muda o retorno da carteira de forma desproporcional ao risco que acrescenta — ou, entrando na hora errada, apenas acrescenta risco. O simulador mostra as duas coisas.</p>
+    <p>O rebalanceamento anual é o mecanismo: quando o Bitcoin dispara, você vende o excedente e volta ao percentual escolhido; quando ele despenca, compra até voltar. A regra força a vender caro e comprar barato sem exigir previsão.</p>
+  </div>
+  <div class="wrap plate-w">
+    <div class="sim">
+      <div class="sim-head"><h5>Simulador · CDB com uma fatia de Bitcoin</h5><span class="hint">séries reais, parâmetros seus <span class="badge real">real</span></span></div>
+      <div class="sim-body">
+        <div class="sim-grid">
+          <div class="sim-ctl"><label for="aStart">Entrada em <output id="aStartOut">jan/2016</output></label><input type="range" id="aStart" min="0" max="10" step="1" value="0"></div>
+          <div class="sim-ctl"><label for="aPct">CDB rende <output id="aPctOut">100% do CDI</output></label><input type="range" id="aPct" min="80" max="120" step="5" value="100"></div>
+          <div class="sim-ctl"><label for="aBtc">Fatia em Bitcoin <output id="aBtcOut">5%</output></label><input type="range" id="aBtc" min="0" max="20" step="1" value="5"></div>
+          <div class="sim-ctl"><label><span><input type="checkbox" id="aReb" checked> Rebalancear todo janeiro</span></label></div>
+        </div>
+        <div id="fA"></div>
+        <div class="readout" id="aOut" style="margin-top:1rem"></div>
+        <p class="sim-note">Valor inicial de R$ 10.000. CDB com rendimento proporcional ao CDI em dias úteis. Imposto de renda do CDB pela tabela regressiva, aplicado no resgate final; ganhos com Bitcoin isentos supondo vendas mensais até R$ 35 mil (seção 7.8). Sem custos de negociação.</p>
+      </div>
+    </div>
+  </div>
+  <div class="wrap col">
+    <div class="callout nota">
+      <h5>O que o simulador ensina</h5>
+      <p>Com entrada em 2016 e 5% em Bitcoin rebalanceados, a carteira termina 125% acima do CDB puro, e nenhum ano dela fica negativo. Com entrada em 2022, o Bitcoin perdeu para o CDI — e ainda assim a carteira terminou 7% acima do CDB, porque o rebalanceamento comprou Bitcoin barato no início de 2023. Com entrada em 2025, ela termina 2,4% abaixo. <strong>A fatia pequena limita o estrago quando a aposta dá errado; ela não garante que a aposta dê certo.</strong> Para o perfil conservador, essa assimetria — perda pequena e limitada contra ganho potencialmente grande — é o único argumento defensável para ter cripto.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODERADO ================= -->
+<div class="trilha" data-perfil="moderado" hidden>
+  <div class="wrap col">
+    <p class="trilha-tag">Trilha B · Moderado</p>
+    <h4 class="sub" style="margin-top:.3rem">Fundos imobiliários × cripto com rendimento on-chain</h4>
+    <p>O investidor moderado costuma buscar renda: aluguel distribuído por fundos imobiliários, por exemplo. O equivalente em cripto é o <strong>rendimento on-chain</strong> do Capítulo 7 — staking de SOL ou empréstimo de stablecoins. A comparação natural é entre três fontes de renda com riscos muito diferentes:</p>
+    <ul>
+      <li><strong>IFIX:</strong> renda de aluguéis e recebíveis, em reais, com risco imobiliário e de juros;</li>
+      <li><strong>USDT com Earn:</strong> renda em dólar, sem risco de preço da cripto, mas com risco de contraparte ou de protocolo (seção 7.7);</li>
+      <li><strong>SOL com staking:</strong> renda paga em SOL, sujeita a toda a volatilidade do ativo.</li>
+    </ul>
+  </div>
+  <div class="wrap plate-w">
+    <div class="sim">
+      <div class="sim-head"><h5>Simulador · três fontes de renda</h5><span class="hint">rendimentos simulados sobre preços reais <span class="badge sim">simulado</span></span></div>
+      <div class="sim-body">
+        <div class="sim-grid">
+          <div class="sim-ctl"><label for="bStart">Entrada em <output id="bStartOut">jan/2021</output></label><input type="range" id="bStart" min="5" max="10" step="1" value="5"></div>
+          <div class="sim-ctl"><label for="bStk">Staking de SOL <output id="bStkOut">6,0% a.a.</output></label><input type="range" id="bStk" min="0" max="10" step="0.5" value="6"></div>
+          <div class="sim-ctl"><label for="bUsd">Earn em USDT <output id="bUsdOut">5,0% a.a.</output></label><input type="range" id="bUsd" min="0" max="12" step="0.5" value="5"></div>
+        </div>
+        <div id="fB"></div>
+        <div class="readout" id="bOut" style="margin-top:1rem"></div>
+        <p class="sim-note">Valor inicial de R$ 10.000. IFIX com rendimentos reinvestidos (índice de retorno total). USDT acompanha o dólar PTAX, com o rendimento composto em dólar. Staking composto em SOL. Taxas de staking e Earn são hipóteses: a faixa de 2026 está na Tabela 7.5. A comparação começa em 2021 porque a série de Solana começa ali.</p>
+      </div>
+    </div>
+  </div>
+  <div class="wrap col">
+    <div class="callout nota">
+      <h5>O que o simulador ensina</h5>
+      <p>O staking não muda o destino de quem comprou SOL na hora errada: 6% ao ano não compensam uma queda de 95%. Ele muda a <em>quantidade</em> de SOL que você tem quando o preço volta. Já o USDT com Earn se comporta como um título em dólar — e por isso, para o brasileiro, o resultado depende tanto do câmbio quanto da taxa. <strong>Renda em cripto só é comparável à renda de um FII quando o principal não oscila 90%; fora isso, é uma posição de preço com um bônus.</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ARROJADO ================= -->
+<div class="trilha" data-perfil="arrojado" hidden>
+  <div class="wrap col">
+    <p class="trilha-tag">Trilha C · Arrojado</p>
+    <h4 class="sub" style="margin-top:.3rem">Não existe dinheiro fácil</h4>
+    <p>O perfil arrojado aceita perdas grandes em troca de retorno alto — e é exatamente por isso que é o alvo preferido de duas armadilhas: a <strong>alavancagem</strong>, que transforma um bom ativo numa conta zerada, e a <strong>promessa de rendimento garantido</strong>, que transforma confiança em pirâmide. Esta trilha não tem simulador de propósito. Para o arrojado, o número mais importante não é quanto se pode ganhar, e sim quanto se aguenta perder sem sair do jogo.</p>
+
+    <h4 class="sub">1. A matemática da alavancagem</h4>
+    <p>Se o Bitcoin rendeu 66% ao ano desde 2016, uma alavancagem de 3× não rende 200% ao ano. Uma posição alavancada em L vezes é liquidada quando o ativo cai cerca de 1/L a partir da entrada: 50% para 2×, 33% para 3×, 20% para 5×. E a liquidação é definitiva — não importa quanto o ativo suba depois. A pergunta certa, então, é: <strong>em quantos anos o ativo caiu o suficiente, em algum momento do ano, para liquidar quem entrou em janeiro?</strong></p>
+  </div>
+  <div class="wrap plate-w">
+    <div class="tablewrap">
+      <table>
+        <caption>Tabela 8.3 — Maior queda dentro de cada ano, a partir do preço de janeiro, e quem ela liquidaria <span class="badge real">real</span></caption>
+        <thead><tr><th>Ano</th><th class="n">Bitcoin</th><th>Liquidaria</th><th class="n">Nasdaq</th><th>Liquidaria</th></tr></thead>
+        <tbody>
+        <tr><td>2016</td><td class="n">−17,6%</td><td>—</td><td class="n">−14,0%</td><td>—</td></tr>
+        <tr><td>2017</td><td class="n">−21,6%</td><td>5×</td><td class="n">−0,5%</td><td>—</td></tr>
+        <tr><td>2018</td><td class="n">−77,4%</td><td>2×, 3×, 5×</td><td class="n">−10,8%</td><td>—</td></tr>
+        <tr><td>2019</td><td class="n">−9,5%</td><td>—</td><td class="n">−0,8%</td><td>—</td></tr>
+        <tr><td>2020</td><td class="n">−42,9%</td><td>3×, 5×</td><td class="n">−26,6%</td><td>5×</td></tr>
+        <tr><td>2021</td><td class="n">−0,9%</td><td>—</td><td class="n">−4,3%</td><td>—</td></tr>
+        <tr><td>2022</td><td class="n">−66,3%</td><td>2×, 3×, 5×</td><td class="n">−35,9%</td><td>3×, 5×</td></tr>
+        <tr><td>2023</td><td class="n">−0,2%</td><td>—</td><td class="n">−2,8%</td><td>—</td></tr>
+        <tr><td>2024</td><td class="n">−8,9%</td><td>—</td><td class="n">−2,7%</td><td>—</td></tr>
+        <tr><td>2025</td><td class="n">−20,3%</td><td>5×</td><td class="n">−23,8%</td><td>5×</td></tr>
+        <tr><td>2026 <small>até nov.</small></td><td class="n">−34,0%</td><td>3×, 5×</td><td class="n">−11,9%</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <p class="tnote">Queda = mínima do ano ÷ abertura do ano − 1, em dólar. Considera-se liquidada a posição cuja queda ultrapassa 90% de 1/L (a margem de manutenção consome o resto). Fonte: elaboração própria a partir de StatMuse Money (2026a, 2026b).</p>
+    </div>
+  </div>
+  <div class="wrap col">
+    <p>Em 11 anos, uma posição de 2× em Bitcoin aberta em janeiro teria sido liquidada em 2 deles; de 3×, em 4; de 5×, em 6 — mais da metade. Basta uma liquidação para a conta ir a zero, e por isso quem usou 2× desde 2016 não viu o Bitcoin multiplicar por mais de 170 vezes: saiu em 2018. Na Nasdaq, que cai menos, 2× nunca foi liquidado, mas 5× teria sido em três anos.</p>
+    <p>Alavancagem que sobrevive existe, mas tem outra forma: arriscar só uma fatia do patrimônio em <strong>margem isolada</strong>, de modo que uma liquidação custe a fatia e não a conta. É a mesma ideia da trilha conservadora vista do lado oposto: <strong>o tamanho da posição importa mais do que a escolha do ativo</strong>.</p>
+
+    <h4 class="sub">2. Quando o rendimento é bom demais</h4>
+    <p>O melhor ativo da década neste capítulo, o Bitcoin, rendeu 66,5% ao ano — com duas quedas de mais de 75% no caminho. Agora compare com a GAS Consultoria Bitcoin, de Cabo Frio, que prometia <strong>rendimento fixo de 10% ao mês</strong> sobre aplicações "em Bitcoin". Composto, isso dá 214% ao ano, todo ano, sem queda nenhuma. Segundo o Ministério Público Federal, o grupo movimentou cerca de R$ 38,2 bilhões desde 2015; seu líder foi preso em agosto de 2021 e denunciado por organização criminosa, gestão fraudulenta e operação de instituição financeira sem autorização <span class="cite">(SUNO NOTÍCIAS, 2021)</span>.</p>
+    <p>A conta já denunciava a fraude antes da polícia: nenhum ativo real paga mais que o melhor ativo do mundo, todo mês, sem oscilar. Quando isso acontece, o rendimento de quem entrou antes está sendo pago com o dinheiro de quem entrou depois.</p>
+
+    <div class="callout alerta">
+      <h5>Cinco sinais de dinheiro fácil</h5>
+      <p>1. <strong>Rendimento fixo e alto</strong> em um ativo que oscila — cripto não paga juros fixos. 2. <strong>Bônus por indicar</strong> outras pessoas. 3. <strong>Robôs, sinais ou "trader profissional"</strong> com resultados que só aparecem em print. 4. <strong>Saque difícil</strong>, com prazos, carências ou "taxas de liberação". 5. <strong>Empresa sem autorização</strong> do Banco Central ou da CVM (seção 7.1). Um único sinal já basta para não entrar.</p>
+    </div>
+
+    <h4 class="sub">3. Regras para quem quer correr risco de verdade</h4>
+    <ol>
+      <li><strong>Defina antes quanto pode perder</strong> — em reais, não em porcentagem — e nunca coloque como garantia mais do que isso.</li>
+      <li><strong>Prefira margem isolada a margem cruzada</strong>, para que um erro custe uma operação e não a conta.</li>
+      <li><strong>Leia a Tabela 8.3 antes de escolher a alavancagem.</strong> Se o ativo já caiu 40% dentro de um ano, 3× não é estratégia; é aposta.</li>
+      <li><strong>Some todos os custos</strong>: o funding de cripto já passou de 20% ao ano em períodos de euforia, e ele é cobrado esteja você ganhando ou perdendo.</li>
+      <li><strong>Lembre do risco que não aparece no preço</strong>: a corretora (seção 7.6) e a regulação — em outubro de 2026, a Binance restringiu novas posições de margem a brasileiros.</li>
+    </ol>
+    <div class="callout nota">
+      <h5>A lição da trilha</h5>
+      <p>As trilhas A e B mostram que o retorno vem de manter uma posição por tempo suficiente. A trilha C mostra o outro lado: <strong>no longo prazo, só ganha quem continua no jogo</strong>. Alavancagem alta e promessas de rendimento fixo têm em comum o fato de tirarem o investidor do jogo antes que o longo prazo chegue.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="wrap col">
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>De janeiro de 2016 a outubro de 2026, Bitcoin, Ethereum e Solana renderam mais que qualquer alternativa brasileira ou americana — para quem entrou cedo, escolheu as moedas que sobreviveram e atravessou quedas de 75% a 95% sem vender. Para quem entrou em janeiro de 2022, o CDI venceu todos os ativos de risco do capítulo. As duas afirmações são verdadeiras, e um gráfico que mostre só uma delas está escolhendo a conclusão antes dos dados.</p>
+    <p>As trilhas da seção 8.6 mostram três formas de lidar com isso: limitar a fatia (conservador), separar renda de preço (moderado) e desconfiar de qualquer atalho, da alavancagem à promessa de rendimento fixo (arrojado). Nenhuma delas é recomendação. Todas são aplicações das ferramentas que o livro construiu.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>CDI</dt><dd>Taxa dos empréstimos entre bancos, que acompanha a Selic; referência da renda fixa brasileira.</dd></div>
+      <div><dt>CDB</dt><dd>Título de dívida emitido por banco, em geral remunerado como percentual do CDI.</dd></div>
+      <div><dt>IFIX</dt><dd>Índice dos fundos imobiliários negociados na B3, com rendimentos reinvestidos.</dd></div>
+      <div><dt>Retorno anualizado</dt><dd>Taxa composta por ano que leva do valor inicial ao final.</dd></div>
+      <div><dt>Viés de sobrevivência</dt><dd>Analisar só o que sobreviveu e concluir sobre todo o conjunto.</dd></div>
+      <div><dt>Viés de data de início</dt><dd>Escolher o ponto de partida que favorece a conclusão desejada.</dd></div>
+      <div><dt>Rebalanceamento</dt><dd>Vender o que subiu e comprar o que caiu para voltar às proporções-alvo.</dd></div>
+      <div><dt>Suitability</dt><dd>Análise obrigatória de perfil do investidor, feita por quem distribui investimentos.</dd></div>
+      <div><dt>Funding</dt><dd>Pagamento periódico entre comprados e vendidos em contratos perpétuos; custo de manter alavancagem em cripto.</dd></div>
+    </dl>
+  </div>
+</div>
+
+<script>
+(function(){
+ function NARROW(){ var e=document.querySelector("#cap8 .col"); return !!e&&e.clientWidth>0&&e.clientWidth<560; }
+ /* ---- data: year-end closes (Dec/2015 … Dec/2025) + 31/10/2026; see Tabela 8.1 ---- */
+ var X=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2026+10/12];
+ var LBL=["jan/2016","jan/2017","jan/2018","jan/2019","jan/2020","jan/2021","jan/2022","jan/2023","jan/2024","jan/2025","jan/2026"];
+ var FX=[3.9048,3.2589,3.3078,3.8745,4.0302,5.1962,5.5802,5.2174,4.8413,6.1925,5.5026,5.4218];
+ var CDIy=[14.00,9.93,6.42,5.96,2.76,4.42,12.39,13.04,10.88,14.32,11.69];
+ var USD={BTC:[430.57,963.74,14156.40,3742.70,7193.60,29001.72,46306.45,16547.50,42265.19,93429.20,87508.83,77434.75],
+          ETH:[0.9335,7.97,756.73,133.37,130.20,737.11,3679,1196,2281,3340,2971,2255],
+          SOL:[null,null,null,null,null,1.51,170.31,9.96,101.44,189.64,124.66,95.47],
+          IXIC:[5007.41,5383.12,6903.39,6635.28,8972.60,12888.28,15644.97,10466.48,15011.35,19310.79,23241.99,25437.00]};
+ var S={IBOV:[43350,60227,76402,87887,115645,119017,104822,109735,134185,120283,161125,167922],
+        IFIX:[1409.01,1864.61,2226.46,2351.59,3197.58,2870.15,2804.79,2867.13,3311.43,3116.28,3775.31,3646.62]};
+ var c=[1]; CDIy.forEach(function(r){ c.push(c[c.length-1]*(1+r/100)); }); S.CDI=c;
+ Object.keys(USD).forEach(function(k){ S[k]=USD[k].map(function(v,i){ return v===null?null:v*FX[i]; }); });
+ var META={CDI:{n:"CDI",c:"var(--ink-3)"},IBOV:{n:"Ibovespa",c:"var(--c1)"},IXIC:{n:"Nasdaq",c:"var(--c3)"},
+   IFIX:{n:"IFIX",c:"var(--c1)",dash:"6 4"},BTC:{n:"Bitcoin",c:"var(--c2)"},ETH:{n:"Ethereum",c:"var(--c5)"},SOL:{n:"Solana",c:"var(--c4)"}};
+ var ORDER=["CDI","IBOV","IFIX","IXIC","BTC","ETH","SOL"];
+ function brl(v){ return "R$ "+CH.fmtNum(v,v<10?2:0); }
+ function yrs(i){ return X[X.length-1]-X[i]; }
+ function pct(v,d){ return (v>=0?"+":"−")+CH.fmtNum(Math.abs(v*100),d===undefined?1:d)+"%"; }
+ function yTick(v){ var y=Math.round(v); return y>=2027?"":String(y); }
+ function compact(pre){ return function(v){ var a=Math.abs(v);
+   if(a>=1e6) return pre+CH.fmtNum(v/1e6,v/1e6<10&&v%1e6?1:0)+" mi";
+   if(a>=1e3) return pre+CH.fmtNum(v/1e3,v/1e3<10&&v%1e3?1:0)+" mil";
+   return pre+CH.fmtNum(v,v<10&&v%1?2:0); }; }
+
+ /* ---------- main simulator ---------- */
+ var sel={CDI:1,BTC:1,ETH:1};
+ var box=document.getElementById("cmpAssets");
+ ORDER.forEach(function(k){ var l=document.createElement("label"); l.className="chip";
+   l.innerHTML='<input type="checkbox" value="'+k+'"><i style="background:'+META[k].c+'"></i>'+META[k].n; box.appendChild(l); });
+ function syncChips(){ box.querySelectorAll("input").forEach(function(i){ i.checked=!!sel[i.value]; }); }
+ box.addEventListener("change",function(e){ sel[e.target.value]=e.target.checked?1:0;
+   document.querySelectorAll("#cmpSim .presets button").forEach(function(b){ b.classList.remove("on"); }); draw(); });
+ document.querySelectorAll("#cmpSim .presets button").forEach(function(b){ b.addEventListener("click",function(){
+   sel={}; b.dataset.p.split(",").forEach(function(k){ sel[k]=1; });
+   document.querySelectorAll("#cmpSim .presets button").forEach(function(x){ x.classList.toggle("on",x===b); });
+   syncChips(); draw(); }); });
+ var amt=document.getElementById("cmpAmt"), st=document.getElementById("cmpStart"), stk=document.getElementById("cmpStk"),
+     stkOn=document.getElementById("cmpStkOn"), lg=document.getElementById("cmpLog");
+ var A0=1000;
+ /* value path with an extra contribution C every January after the entry; compounding is the series itself */
+ function path(k,i0,C,stake){ var s=S[k]; if(s[i0]===null) return null;
+   var v=A0, out=[[X[i0],v]], worst=Infinity;
+   for(var i=i0+1;i<X.length;i++){ var g=s[i]/s[i-1]*(stake?Math.pow(1+stake,X[i]-X[i-1]):1);
+     worst=Math.min(worst,g-1); v*=g; if(i<X.length-1) v+=C; out.push([X[i],v]); }
+   out.worst=worst; return out; }
+ function invested(i0,C){ var v=A0, out=[[X[i0],v]]; for(var i=i0+1;i<X.length;i++){ if(i<X.length-1) v+=C; out.push([X[i],v]); } return out; }
+ function draw(){
+  var minI=sel.SOL?5:0; st.min=minI; if(+st.value<minI) st.value=minI;
+  var A=+amt.value, i0=+st.value, sk=stkOn.checked?(+stk.value/100):0;
+  var C=A; document.getElementById("cmpAmtOut").textContent=C?brl(C)+" / ano":"sem aporte";
+  document.getElementById("cmpStartOut").textContent=LBL[i0];
+  document.getElementById("cmpStkOut").textContent=CH.fmtNum(+stk.value,1)+"% a.a.";
+  var series=[], rows=[];
+  ORDER.forEach(function(k){ if(!sel[k]) return;
+    var stake=(k==="SOL"?sk:0), p=path(k,i0,C,stake);
+    if(!p){ rows.push('<div class="ro"><span class="k">'+META[k].n+'</span><span class="v"><small>sem dados antes de jan/2021</small></span></div>'); return; }
+    var name=META[k].n+(stake?" + staking":"");
+    series.push({name:name,short:META[k].n,color:META[k].c,dash:META[k].dash,points:p});
+    var fin=p[p.length-1][1], T=yrs(i0), inv=invested(i0,C), tot=inv[inv.length-1][1], m=fin/tot;
+    var extra=C?(' <small>'+CH.fmtNum(m,m<10?2:0)+'× o investido</small>'):(' <small>'+CH.fmtNum(m,m<10?2:0)+'× · '+pct(Math.pow(m,1/T)-1)+' a.a.</small>');
+    rows.push('<div class="ro"><span class="k"><i class="sw" style="background:'+META[k].c+'"></i>'+name+'</span><span class="v">'+brl(fin)+extra+
+      '</span><span class="k2">pior ano do ativo: '+(p.length>2?pct(p.worst,0):"—")+'</span></div>'); });
+  if(C&&series.length){ var inv0=invested(i0,C);
+    series.push({name:"Total investido",short:"investido",color:"var(--ink)",dash:"2 3",w:1.3,points:inv0});
+    rows.unshift('<div class="ro"><span class="k">Total investido</span><span class="v">'+brl(inv0[inv0.length-1][1])+' <small>R$ 1.000 + '+(inv0.length-2)+' aportes</small></span></div>'); }
+  var logOn=lg.checked;
+  if(series.length){
+   CH.line("f8-1",{W:NARROW()?440:720,height:NARROW()?323:340,logY:logOn,yMin:logOn?undefined:0,xMin:X[i0],xMax:2027,xTicks:Math.min(11-i0,11)||1,mr:86,ml:NARROW()?80:94,endLabels:true,
+    x:{dec:0},y:{pre:"R$ ",dec:0},yTickFmt:compact("R$ "),xTickFmt:yTick,
+    xFmt:function(v){ var y=Math.floor(v+1e-6); return v>2026.5?"out/2026":"jan/"+y; },
+    yLabel:"valor da posição (R$)",series:series});
+  } else document.getElementById("f8-1").innerHTML='<p class="sim-note">Selecione ao menos um ativo.</p>';
+  document.getElementById("cmpOut").innerHTML=rows.join("");
+ }
+ [amt,st,stk,stkOn,lg].forEach(function(e){ e.addEventListener("input",draw); });
+ syncChips(); draw();
+
+ /* ---------- figure 8.2: annualized return by entry year ---------- */
+ function cagrFrom(k,i){ var s=S[k]; return (Math.pow(s[s.length-1]/s[i],1/yrs(i))-1)*100; }
+ var idx=[0,1,2,3,4,5,6,7,8,9];
+ CH.bars("f8-2",{height:320,mb:52,barMax:14,labels:false,ml:52,min:-25,max:75,
+  cats:idx.map(function(i){ return String(2016+i); }),
+  y:{dec:0,suf:"%"},yLabel:"retorno anualizado (% a.a.)",xLabel:"ano de entrada (janeiro)",
+  series:[
+   {name:"CDI",color:"var(--ink-3)",values:idx.map(function(i){ return cagrFrom("CDI",i); })},
+   {name:"Ibovespa",color:"var(--c1)",values:idx.map(function(i){ return cagrFrom("IBOV",i); })},
+   {name:"Nasdaq (em R$)",color:"var(--c3)",values:idx.map(function(i){ return cagrFrom("IXIC",i); })},
+   {name:"Bitcoin (em R$)",color:"var(--c2)",values:idx.map(function(i){ return cagrFrom("BTC",i); })}
+  ]});
+
+ /* ---------- quiz ---------- */
+ var PERF={
+  conservador:{n:"Conservador",d:"Você prioriza preservar o capital e pode precisar dele em breve, ou ainda não tem reserva de emergência. A trilha A mostra quanto — e se — uma fatia pequena de cripto cabe numa carteira de renda fixa."},
+  moderado:{n:"Moderado",d:"Você aceita oscilações em troca de crescimento e tem horizonte de alguns anos. A trilha B compara fontes de renda: fundos imobiliários, stablecoins com rendimento e staking de SOL."},
+  arrojado:{n:"Arrojado",d:"Você tem horizonte longo, experiência com risco e aceita perdas grandes. A trilha C mostra por que não existe dinheiro fácil: o que a alavancagem faz numa década real e como reconhecer uma promessa de rendimento boa demais."}};
+ var trilhas=document.querySelectorAll(".trilha"), lock=document.getElementById("lock");
+ function show(p,all){
+   trilhas.forEach(function(t){ t.hidden=!(all||t.dataset.perfil===p); });
+   lock.hidden=true;
+   var more=document.getElementById("trilhaMore");
+   if(!more){ more=document.createElement("div"); more.id="trilhaMore"; more.className="wrap col trilha-more";
+     document.getElementById("trilhas").after(more); }
+   more.innerHTML=all?"":'<button type="button" class="btn-ghost">Ver também as outras duas trilhas</button>';
+   var b=more.querySelector("button"); if(b) b.addEventListener("click",function(){ show(p,true); });
+   renderAll();
+ }
+ function setPerfil(p){
+   var box=document.getElementById("perfil"); box.hidden=false;
+   box.dataset.p=p;
+   document.getElementById("perfilNome").textContent=PERF[p].n;
+   document.getElementById("perfilDesc").textContent=PERF[p].d;
+   show(p,false);
+ }
+ document.getElementById("quiz").addEventListener("submit",function(e){ e.preventDefault();
+   var f=e.target, sc=0, miss=0, v={};
+   for(var q=1;q<=5;q++){ var r=f.querySelector('input[name="q'+q+'"]:checked'); if(!r) miss++; else { v[q]=+r.value; sc+=v[q]; } }
+   var msg=document.getElementById("quizMsg");
+   if(miss){ msg.textContent="Faltam "+miss+" resposta"+(miss>1?"s":"")+"."; return; }
+   var p=sc<=8?"conservador":(sc<=12?"moderado":"arrojado");
+   if((v[1]===1||v[5]===1)&&p!=="conservador"){ p="conservador"; msg.textContent="Horizonte curto ou sem reserva de emergência: o perfil fica conservador, qualquer que seja a soma."; }
+   else msg.textContent="Pontuação: "+sc+" de 15.";
+   try{ localStorage.setItem("defi-livro-perfil",p); }catch(err){}
+   setPerfil(p);
+   document.getElementById("perfil").scrollIntoView({behavior:"smooth",block:"center"});
+ });
+ document.getElementById("unlockAll").addEventListener("click",function(){ show(null,true); });
+ try{ var saved=localStorage.getItem("defi-livro-perfil"); if(saved&&PERF[saved]) setPerfil(saved); }catch(err){}
+ window.addEventListener("beforeprint",function(){ trilhas.forEach(function(t){ t.hidden=false; }); renderAll(); });
+
+ /* ---------- trilha A: CDB + BTC ---------- */
+ function cdbFactor(i,p){ var r=CDIy[i]/100, d=(i===10?210:252); return Math.pow(1+(Math.pow(1+r,1/d)-1)*p,d); }
+ function irRate(T){ var days=T*365; return days<=180?0.225:days<=360?0.20:days<=720?0.175:0.15; }
+ function simA(){
+   var i0=+aS.value, p=+aP.value/100, w=+aB.value/100, reb=aR.checked, V0=10000;
+   document.getElementById("aStartOut").textContent=LBL[i0];
+   document.getElementById("aPctOut").textContent=Math.round(p*100)+"% do CDI";
+   document.getElementById("aBtcOut").textContent=Math.round(w*100)+"%";
+   var cdb=V0, fx=V0*(1-w), bt=V0*w, P1=[[X[i0],V0]], P2=[[X[i0],V0]], worst1=Infinity, worst2=Infinity;
+   for(var i=i0;i<11;i++){
+     var f=cdbFactor(i,p), rb=S.BTC[i+1]/S.BTC[i];
+     var prev2=fx+bt; cdb*=f; fx*=f; bt*=rb; var tot=fx+bt;
+     worst1=Math.min(worst1,f-1); worst2=Math.min(worst2,tot/prev2-1);
+     if(reb){ fx=tot*(1-w); bt=tot*w; }
+     P1.push([X[i+1],cdb]); P2.push([X[i+1],tot]); }
+   var T=yrs(i0), net=V0+(cdb-V0)*(1-irRate(T)), top=0; P2.concat(P1).forEach(function(q){ if(q[1]>top) top=q[1]; });
+   var raw=top/4, p10=Math.pow(10,Math.floor(Math.log10(raw))), step=[1,2,2.5,5,10].map(function(m){ return m*p10; }).filter(function(v){ return v>=raw; })[0], yTop=4*step;
+   var fin2=P2[P2.length-1][1];
+   CH.line("fA",{W:NARROW()?440:720,height:NARROW()?266:280,xMin:X[i0],xMax:2027,xTicks:Math.min(11-i0,11)||1,mr:90,ml:NARROW()?80:94,endLabels:true,yMin:0,yMax:yTop,
+     x:{dec:0},y:{pre:"R$ ",dec:0},yTickFmt:compact("R$ "),xTickFmt:yTick,xFmt:function(v){ return v>2026.5?"out/2026":"jan/"+Math.floor(v+1e-6); },
+     yLabel:"valor (R$)",series:[{name:"100% CDB (bruto)",short:"100% CDB",color:"var(--ink-3)",points:P1},
+       {name:"CDB + "+Math.round(w*100)+"% Bitcoin",short:"CDB + BTC",color:"var(--c2)",points:P2}]});
+   document.getElementById("aOut").innerHTML=
+     '<div class="ro"><span class="k">100% CDB, bruto</span><span class="v">'+brl(cdb)+'</span></div>'+
+     '<div class="ro"><span class="k">100% CDB, líquido de IR</span><span class="v">'+brl(net)+' <small>IR de '+CH.fmtNum(irRate(T)*100,1)+'%</small></span></div>'+
+     '<div class="ro hi"><span class="k">CDB + '+Math.round(w*100)+'% BTC, bruto</span><span class="v">'+brl(fin2)+' <small>'+pct(fin2/cdb-1)+' vs. CDB</small></span></div>'+
+     '<div class="ro"><span class="k">Pior período da carteira</span><span class="v">'+pct(worst2)+'</span></div>';
+ }
+ var aS=document.getElementById("aStart"), aP=document.getElementById("aPct"), aB=document.getElementById("aBtc"), aR=document.getElementById("aReb");
+ [aS,aP,aB,aR].forEach(function(e){ e.addEventListener("input",simA); });
+
+ /* ---------- trilha B: IFIX × USDT Earn × SOL staking ---------- */
+ function simB(){
+   var i0=+bS.value, sk=+bK.value/100, ue=+bU.value/100, V0=10000;
+   document.getElementById("bStartOut").textContent=LBL[i0];
+   document.getElementById("bStkOut").textContent=CH.fmtNum(sk*100,1)+"% a.a.";
+   document.getElementById("bUsdOut").textContent=CH.fmtNum(ue*100,1)+"% a.a.";
+   function mk(fn){ var o=[]; for(var i=i0;i<X.length;i++) o.push([X[i],fn(i)]); return o; }
+   var ifx=mk(function(i){ return V0*S.IFIX[i]/S.IFIX[i0]; }),
+       usd=mk(function(i){ return V0*FX[i]/FX[i0]*Math.pow(1+ue,X[i]-X[i0]); }),
+       sol=mk(function(i){ return V0*S.SOL[i]/S.SOL[i0]*Math.pow(1+sk,X[i]-X[i0]); }),
+       sol0=mk(function(i){ return V0*S.SOL[i]/S.SOL[i0]; });
+   CH.line("fB",{W:NARROW()?440:720,height:NARROW()?285:300,logY:true,xMin:X[i0],xMax:2027,xTicks:Math.min(11-i0,11)||1,mr:96,ml:NARROW()?80:94,endLabels:true,
+     x:{dec:0},y:{pre:"R$ ",dec:0},yTickFmt:compact("R$ "),xTickFmt:yTick,xFmt:function(v){ return v>2026.5?"out/2026":"jan/"+Math.floor(v+1e-6); },
+     yLabel:"valor (R$, escala log)",series:[
+      {name:"IFIX",color:"var(--c1)",dash:"6 4",points:ifx},
+      {name:"USDT + Earn",short:"USDT + Earn",color:"var(--ink-2)",points:usd},
+      {name:"SOL + staking",color:"var(--c4)",points:sol},
+      {name:"SOL sem staking",short:"SOL puro",color:"var(--c4)",dash:"4 4",w:1.4,points:sol0}]});
+   function last(a){ return a[a.length-1][1]; }
+   var solUnits=Math.pow(1+sk,yrs(i0));
+   document.getElementById("bOut").innerHTML=
+     '<div class="ro"><span class="k">IFIX</span><span class="v">'+brl(last(ifx))+'</span></div>'+
+     '<div class="ro"><span class="k">USDT + Earn</span><span class="v">'+brl(last(usd))+'</span></div>'+
+     '<div class="ro hi"><span class="k">SOL + staking</span><span class="v">'+brl(last(sol))+'</span></div>'+
+     '<div class="ro"><span class="k">SOL a mais pelo staking</span><span class="v">'+pct(solUnits-1)+' <small>em quantidade</small></span></div>';
+ }
+ var bS=document.getElementById("bStart"), bK=document.getElementById("bStk"), bU=document.getElementById("bUsd");
+ [bS,bK,bU].forEach(function(e){ e.addEventListener("input",simB); });
+
+ function renderAll(){ trilhas.forEach(function(t){ if(t.hidden) return;
+   var p=t.dataset.perfil; if(p==="conservador") simA(); else if(p==="moderado") simB(); }); }
+})();
+</script>
+</section>

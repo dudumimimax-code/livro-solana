@@ -1,0 +1,242 @@
+<section class="chap" id="cap3">
+<div class="opener"><div class="wrap">
+  <div class="num">3</div>
+  <div>
+    <p class="kicker">Capítulo 3 · Análise quantitativa</p>
+    <h2>Mecânica de mercado: swaps, slippage e price impact</h2>
+    <p class="lede">O Capítulo 2 mostrou onde está a liquidez. Agora medimos o que acontece quando alguém a consome — e descobrimos que o preço cotado na tela quase nunca é o preço pago.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>descrever, passo a passo, o que ocorre em um swap em uma pool de liquidez;</li>
+      <li>distinguir <strong>preço marginal</strong>, <strong>preço médio de execução</strong>, <strong>price impact</strong>, <strong>slippage</strong> e <strong>taxa</strong>;</li>
+      <li>calcular o custo real de uma troca em um AMM de produto constante;</li>
+      <li>explicar por que a arbitragem alinha o preço da pool e por que desvios pequenos persistem;</li>
+      <li>interpretar quanto giro uma pool precisa para que o LP não tenha prejuízo;</li>
+      <li>avaliar os limites da precificação on-chain de ativos com mercado de referência intermitente.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Capítulo didático; não é recomendação de investimento. Os valores numéricos das seções 3.1 a 3.8 são <span class="badge sim">simulado</span>, usando a mesma pool hipotética do Capítulo 2 (SOL a US$ 150). Os dados de mercado citados na seção 3.8 vêm de reportagens e relatórios públicos de terceiros, datados de 2026, e <strong>devem ser reverificados</strong>. Protocolos de AMMs proprietárias são de código fechado; o modelo da seção 3.7 é uma simplificação conceitual, não a descrição do algoritmo de nenhum protocolo real.</p>
+  </div>
+
+  <h3 class="sec" id="s3-1"><span class="n">3.1</span>O que acontece em um swap</h3>
+  <p>Um <strong>swap</strong> é a operação em que o trader entrega uma quantidade de um ativo à pool e recebe do outro, com as quantidades determinadas pela regra do AMM. Na Solana, a sequência típica é:</p>
+  <ol>
+    <li>o usuário, ou o roteador de um agregador, escolhe o par, a quantidade e a <strong>tolerância máxima de desvio</strong> aceita;</li>
+    <li>uma transação é assinada e enviada à rede, com taxa-base e, quando há disputa por inclusão, taxa de priorização;</li>
+    <li>o programa da pool calcula a quantidade a entregar, verifica a tolerância e atualiza as reservas;</li>
+    <li>se a tolerância for violada, a transação <strong>falha</strong> — e o usuário paga a taxa de rede mesmo assim.</li>
+  </ol>
+  <p>O ponto central, que organiza todo o capítulo: <strong>o preço de execução não é conhecido com certeza quando a ordem é assinada</strong>. Entre assinar e executar, o estado da pool pode mudar por ordens de outros participantes.</p>
+
+  <h4 class="sub"><span class="n">3.1.1</span>Entrada fixa, saída fixa e o dilema da tolerância</h4>
+  <p>Um swap pode ser especificado de duas formas. Em <strong>entrada fixa</strong> (<em class="t">exact-in</em>), a mais comum, o usuário entrega uma quantidade e exige receber <em>pelo menos</em> um mínimo. Em <strong>saída fixa</strong> (<em class="t">exact-out</em>), quer receber uma quantidade exata e aceita pagar <em>no máximo</em> um teto.</p>
+  <p>A tolerância τ liga as duas coisas à cotação exibida na tela: o mínimo aceito é (1 − τ) × cotação. Daí um dilema prático que todo usuário enfrenta sem saber: uma <strong>tolerância pequena</strong> protege contra execução ruim, mas aumenta a taxa de falha — e cada falha custa taxa de rede sem entregar nada. Uma <strong>tolerância grande</strong> garante execução, mas autoriza o mercado (ou um atacante) a entregar um preço bem pior.</p>
+
+  <h4 class="sub"><span class="n">3.1.2</span>Roteamento: por que dividir a ordem funciona</h4>
+  <p>A maior parte dos swaps de varejo não vai direto a uma pool: passa por um agregador que simula rotas diretas, em vários saltos e divididas entre pools. Para pools CPMM com o mesmo preço, a regra ótima é simples: <strong>dividir a ordem em proporção à profundidade de cada pool</strong>.</p>
+  <div class="callout exemplo">
+    <h5>Divisão de ordem <span class="badge sim">simulado</span> — mesmo preço de 150,00 em duas pools, sem taxa</h5>
+    <p class="mono">Pool A: 1.000 SOL / 150.000 USDC. Pool B: 500 SOL / 75.000 USDC. Ordem: 3.000 USDC.<br>
+    Tudo na pool A → 19,6078 SOL · preço médio 153,00 · desvio <b>2,00%</b><br>
+    2.000 na A + 1.000 na B → 19,7368 SOL · preço médio 152,00 · desvio <b>1,33%</b></p>
+    <p style="margin-top:.7rem">O desvio cai para 3.000 ÷ 225.000 = 1,33%, exatamente como se a ordem fosse executada em uma pool única com as reservas somadas. Já <strong>dividir a ordem dentro da mesma pool não ajuda</strong>: com taxa de 0,30%, três ordens sequenciais de 1.000 USDC rendem 19,5502 SOL — idêntico à ordem única, e com o triplo do custo de rede.</p>
+  </div>
+
+  <h3 class="sec" id="s3-2"><span class="n">3.2</span>Três preços, três custos</h3>
+  <p>Quase toda confusão sobre o custo de negociar em DeFi vem de misturar três preços diferentes. Separá-los é o passo analítico mais importante deste capítulo.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 3.1</span><span class="nm">Os três preços de uma operação</span></div>
+    <div class="eq-body" style="font-size:1rem;text-align:left;line-height:2.1">
+      <div><b style="font-family:var(--mono);font-size:.7rem;color:var(--c1)">MARGINAL</b> &nbsp; <v>P</v><sub>0</sub><span class="op">=</span><span class="frac"><span><v>y</v></span><span><v>x</v></span></span> &nbsp;<span style="font-size:.8rem;color:var(--ink-3)">— o preço antes da ordem, válido só para quantidade infinitesimal</span></div>
+      <div><b style="font-family:var(--mono);font-size:.7rem;color:var(--c2)">MÉDIO</b> &nbsp; <v>P̄</v><span class="op">=</span><span class="frac"><span>Δ<v>y</v></span><span>Δ<v>x</v></span></span> &nbsp;<span style="font-size:.8rem;color:var(--ink-3)">— o que você realmente pagou por unidade</span></div>
+      <div><b style="font-family:var(--mono);font-size:.7rem;color:var(--c3)">FINAL</b> &nbsp; <v>P</v><sub>1</sub><span class="op">=</span><span class="frac"><span><v>y</v><span class="op">+</span>Δ<v>y</v></span><span><v>x</v><span class="op">−</span>Δ<v>x</v></span></span> &nbsp;<span style="font-size:.8rem;color:var(--ink-3)">— o preço que o próximo comprador encontra</span></div>
+    </div>
+    <div class="eq-legend">
+      <span><b>Price impact</b> = (P₁ − P₀) ÷ P₀ — quanto a <em>sua</em> ordem deslocou o mercado</span>
+      <span><b>Desvio do preço médio</b> = (P̄ − P₀) ÷ P₀ — quanto você pagou a mais do que o preço de tela</span>
+      <span><b>Slippage</b> — diferença entre o preço <em>cotado</em> e o <em>executado</em>, causada por mudanças de estado entre assinar e executar</span>
+      <span><b>Taxa</b> — parcela φ retida para os LPs; soma-se às anteriores, mas tem causa distinta</span>
+    </div>
+  </div>
+  <div class="callout nota">
+    <h5>Uma distinção que o uso corrente apaga</h5>
+    <p>Na linguagem informal, "slippage" vira um guarda-chuva para tudo. Neste livro, <strong>price impact</strong> é determinístico: dada a pool e o tamanho da ordem, é calculável antes de enviar. <strong>Slippage</strong> é estocástico: depende do que outros participantes fizerem entre a cotação e a execução. Um é um custo que você escolhe; o outro, um risco que você corre. Modelos que os tratam como a mesma coisa não conseguem separar o efeito do tamanho da ordem do efeito da volatilidade.</p>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">O custo cresce mais rápido que a ordem</p>
+      <p class="chart-sub">pool de US$ 300 mil, sem taxa · desvio do preço médio e price impact por tamanho de ordem</p>
+      <div id="f3-1"></div>
+    </div>
+    <figcaption><b>Figura 3.1</b> — Multiplicar a ordem por dez multiplica o desvio do preço médio por dez, mas o price impact por <em>mais</em> de dez. A não linearidade é a razão pela qual ordens grandes devem ser divididas no tempo ou entre pools. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 3.1 — Custo de uma compra de SOL na pool didática <span class="badge sim">simulado</span>; x = 1.000 SOL, y = 150.000 USDC, sem taxa</caption>
+      <thead><tr><th class="n">Ordem (USDC)</th><th class="n">SOL recebido</th><th class="n">Preço médio</th><th class="n">Desvio do médio</th><th class="n">Preço marginal final</th><th class="n">Price impact</th></tr></thead>
+      <tbody>
+        <tr><td class="n">1.500</td><td class="n">9,9010</td><td class="n">151,50</td><td class="n">1,00%</td><td class="n">153,02</td><td class="n">2,01%</td></tr>
+        <tr><td class="n">3.000</td><td class="n">19,6078</td><td class="n">153,00</td><td class="n">2,00%</td><td class="n">156,06</td><td class="n">4,04%</td></tr>
+        <tr><td class="n">15.000</td><td class="n">90,9091</td><td class="n">165,00</td><td class="n neg">10,00%</td><td class="n">181,50</td><td class="n neg">21,00%</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Com taxa de 0,30% sobre a ordem de 3.000 USDC, o usuário recebe 19,5502 SOL a um preço médio de 153,45 — um custo adicional de 0,29% sobre o caso sem taxa, coerente com φ. Fonte: cálculo próprio.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h4 class="sub"><span class="n">3.2.1</span>Um caso de extração: o ataque <em class="t">sandwich</em></h4>
+  <p>A tolerância de execução tem um custo que não aparece na cotação. Um atacante que observa uma ordem pendente com tolerância folgada pode inserir uma compra <em>antes</em> dela, deixar a ordem da vítima executar a um preço pior e vender logo <em>depois</em>, embolsando a diferença. A vítima recebe menos do que a cotação indicava, mas acima do mínimo que autorizou — portanto, a transação não falha.</p>
+  <p>Esse é um caso particular do que a literatura chama de <strong>valor extraível</strong> por quem controla a ordenação das transações <span class="cite">(DAIAN et al., 2020)</span>. A defesa não é uma tolerância arbitrariamente pequena, que apenas troca extração por falhas: é tolerância calibrada ao tamanho da ordem e à volatilidade do par, além do uso de rotas e mecanismos que reduzam a exposição.</p>
+
+  <h3 class="sec" id="s3-3"><span class="n">3.3</span>A taxa como preço do risco do LP</h3>
+  <p>Para o trader, a taxa é custo. Para o LP, é <strong>receita que compensa um risco específico</strong>: negociar contra quem sabe mais. Sempre que o preço de mercado se move, a pool fica momentaneamente desatualizada, e o primeiro a notar — um arbitrador — compra barato da pool ou vende caro para ela. O LP é, estruturalmente, o lado desinformado da negociação.</p>
+  <p>Um resultado conhecido da literatura, a <strong>perda em relação ao rebalanceamento</strong> (<em class="t">loss-versus-rebalancing</em>, LVR), quantifica isso: em um CPMM cujo preço segue um movimento browniano geométrico de volatilidade anual σ, o LP perde para os arbitradores, em valor esperado, uma fração previsível do valor da pool por unidade de tempo <span class="cite">(MILIONIS et al., 2024)</span>.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 3.2</span><span class="nm">Perda para arbitradores e giro mínimo de equilíbrio</span></div>
+    <div class="eq-body">LVR<span class="op">≈</span><span class="frac"><span><v>σ</v><sup>2</sup></span><span>8</span></span><span style="display:inline-block;width:2.4em"></span>giro mínimo<span class="op">=</span><span class="frac"><span><v>σ</v><sup>2</sup></span><span>8<span class="op">·</span><v>φ</v></span></span></div>
+    <div class="eq-legend">
+      <span><b>LVR</b> — perda esperada para arbitradores, como fração do valor da pool, ao ano</span>
+      <span><b>σ</b> — volatilidade anual do par · <b>φ</b> — taxa cobrada pela pool</span>
+      <span><b>giro mínimo</b> — volume ÷ TVL ao ano necessário para que as taxas cubram essa perda, supondo que todo o volume pague φ</span>
+    </div>
+  </div>
+  <p>A leitura é direta e tem consequência prática: <strong>pools de ativos mais voláteis precisam de muito mais giro — ou de taxas maiores — para que fornecer liquidez não seja pior do que simplesmente manter os ativos</strong>. É a mesma métrica de giro da Tabela 2.6, agora com um critério de suficiência.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Quanto uma pool precisa girar para o LP não perder</p>
+      <p class="chart-sub">giro anual mínimo (volume ÷ TVL) com taxa de 0,30%, por volatilidade do par</p>
+      <div id="f3-2"></div>
+    </div>
+    <figcaption><b>Figura 3.2</b> — Como a perda cresce com o <em>quadrado</em> da volatilidade, dobrar a volatilidade quadruplica a exigência de giro. Um par a 100% de volatilidade anual precisa girar quase 42 vezes seu TVL por ano — cerca de 11% do TVL por dia — só para empatar. Fonte: elaboração própria a partir de <span class="cite">MILIONIS et al., 2024</span>. <span class="badge est">estimado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s3-4"><span class="n">3.4</span>Arbitragem: o mecanismo que alinha preços</h3>
+  <p>Se o preço marginal da pool diverge do preço de um mercado de referência além do custo de operar, há lucro em negociar até igualá-los. Esse processo mantém o preço da pool ancorado no mercado externo — e as perdas dos LPs são o contraponto.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 3.3</span><span class="nm">Volume ótimo de arbitragem em um CPMM</span></div>
+    <div class="eq-body"><v>y</v><sup>*</sup><span class="op">=</span><span class="sq"><span><v>k</v><span class="op">·</span><v>P</v><sub>ext</sub></span></span><span style="display:inline-block;width:2em"></span>Δ<v>y</v><sup>*</sup><span class="op">=</span><v>y</v><sup>*</sup><span class="op">−</span><v>y</v></div>
+    <div class="eq-legend">
+      <span><b>y*</b> — reserva de USDC que faz o preço marginal da pool igualar o preço externo</span>
+      <span><b>P<sub>ext</sub></b> — preço no mercado de referência · <b>k</b> — invariante da pool</span>
+      <span><b>Consequência</b> — a operação ótima é <em>limitada</em>: a partir de Δy*, negociar mais <em>reduz</em> o lucro.</span>
+    </div>
+  </div>
+
+  <h4 class="sub"><span class="n">3.4.1</span>A banda de não arbitragem</h4>
+  <p>Com taxa φ, só vale a pena arbitrar quando o desvio supera aproximadamente a própria taxa, mais os custos de rede. Existe, portanto, uma <strong>banda de não arbitragem</strong> em torno do preço externo — de cerca de ±0,30% para uma pool com taxa de 0,30% — dentro da qual o preço da pool pode divergir sem que ninguém opere. Esse é o motivo pelo qual pequenos desvios <em>persistem</em> em vez de desaparecerem, e por que afirmar que "o mercado é eficiente" exige dizer <em>com que tolerância</em>.</p>
+
+  <div class="callout exemplo">
+    <h5>Arbitragem entre duas DEXs <span class="badge sim">simulado</span> — e o que as taxas fazem com ela</h5>
+    <p class="mono">Pool A: 1.000 SOL / 150.000 USDC (preço 150,00). Pool B: 800 SOL / 122.400 USDC (preço 153,00).<br>
+    Sem taxas → entrada ótima ≈ 663 USDC · 4,40 SOL negociados · lucro bruto ≈ <b>US$ 6,60</b><br>
+    Com 0,30% em cada pool → entrada ótima ≈ 464 USDC · 3,07 SOL · lucro bruto ≈ <b>US$ 3,21</b></p>
+    <p style="margin-top:.7rem">As duas taxas consomem <strong>cerca de metade</strong> do lucro bruto e reduzem o volume ótimo em 30%. Antes de qualquer custo de rede, o lucro é de poucos dólares — e, em disputas competitivas por inclusão no bloco, parte relevante dele é repassada a validadores. Por isso a arbitragem é um negócio de volume e velocidade, e não de margem.</p>
+  </div>
+
+  <h4 class="sub"><span class="n">3.4.2</span>Quatro formas da mesma operação</h4>
+  <ul>
+    <li><strong>CEX × DEX</strong> — a pool segue um preço formado em exchange centralizada. Exige saldo nos dois lados, com inventário pré-posicionado.</li>
+    <li><strong>DEX × DEX</strong> — duas pools com o mesmo par. Pode ser executada em uma <strong>única transação atômica</strong>, sem risco de ficar com uma perna só.</li>
+    <li><strong>Triangular</strong> — uma rota A→B→C→A cujo produto das taxas de câmbio excede os custos acumulados de cada perna.</li>
+    <li><strong>Criação e resgate</strong> — para ativos tokenizados, explora a diferença entre o token e o ativo subjacente (seção 3.8).</li>
+  </ul>
+
+  <h3 class="sec" id="s3-5"><span class="n">3.5</span>Eficiência de preços e quem paga por ela</h3>
+  <p>Medir eficiência exige mais do que comparar dois preços em um instante. Três medidas dão uma primeira leitura séria: o <strong>desvio médio absoluto</strong> entre a pool e a referência ao longo de uma janela; a <strong>meia-vida do desvio</strong>, isto é, quanto tempo leva, em média, para que metade de um afastamento seja corrigida; e a <strong>fração do tempo fora da banda</strong> de não arbitragem — porque dentro da banda o desvio não é ineficiência, é custo de transação.</p>
+  <div class="callout nota">
+    <h5>A eficiência tem um financiador</h5>
+    <p>O preço da pool acompanha o mercado porque arbitradores lucram ao corrigi-lo. Esse lucro sai do bolso dos LPs: é exatamente a perda da Fórmula 3.2. Dito de outro modo, <strong>os provedores de liquidez financiam a descoberta de preço</strong>, e as taxas são a compensação que torna esse arranjo sustentável. Quando as taxas não cobrem a perda, a liquidez migra — e a eficiência se deteriora.</p>
+  </div>
+
+  <h3 class="sec" id="s3-6"><span class="n">3.6</span>Além do CPMM: AMMs proprietárias</h3>
+  <p>Uma parcela crescente do fluxo em redes rápidas não é atendida por pools passivas, mas por <strong>formadores de mercado que operam contratos próprios</strong>, atualizando cotações a cada bloco com base em preços externos. A hipótese de funcionamento é que esse operador reduz a seleção adversa porque <em>atualiza a cotação antes do arbitrador</em>, e protege o fluxo de varejo de certas formas de extração.</p>
+  <p>Em troca, o usuário depende de um <strong>operador único</strong>: o risco de contraparte e de código fechado é maior que em uma pool aberta, e a própria qualidade da execução passa a ser uma afirmação difícil de auditar de fora. A medida apropriada aqui é o <strong>spread efetivo</strong> — a diferença entre o preço executado e o ponto médio do mercado no instante da ordem — comparado entre rotas, separando por tamanho de ordem e por volatilidade. O Capítulo 6 retoma esse <em>trade-off</em> ao tratar de risco de contraparte.</p>
+
+  <h3 class="sec" id="s3-7"><span class="n">3.7</span>Estudo de caso: ações tokenizadas em AMMs</h3>
+  <p>Este estudo de caso atravessa os Capítulos 3, 4 e 5, e serve a um propósito: testar os conceitos do livro contra um ativo que <strong>quebra uma hipótese implícita</strong> em quase toda a teoria de AMM — a de que existe um mercado de referência contínuo.</p>
+  <p>Uma <strong>ação tokenizada</strong> é um token que representa exposição a uma ação negociada em bolsa. O token circula 24 horas por dia em uma blockchain; a ação, não. Nos fins de semana e fora do pregão, <strong>não existe preço externo ao qual ancorar</strong>.</p>
+  <p>O mecanismo que normalmente ancora o token ao ativo é a <strong>criação e resgate</strong>: participantes autorizados podem trocar o token pela ação subjacente, e vice-versa. Enquanto esse canal funciona e está aberto, a arbitragem mantém os preços próximos. Quando ele fecha — fim de semana, feriado, suspensão de negociação, evento corporativo —, o preço do token passa a refletir apenas <strong>expectativa</strong>, e o desvio em relação ao último preço de bolsa pode crescer sem limite definido.</p>
+  <div class="callout alerta">
+    <h5>A consequência quantitativa</h5>
+    <p>Toda fórmula de profundidade, slippage e arbitragem deste capítulo continua válida para esses ativos. O que deixa de valer é a <strong>interpretação</strong>: um desvio de 2% em relação ao preço de fechamento não indica ineficiência de mercado quando a bolsa está fechada há 40 horas. Medir eficiência nesses ativos exige <em>separar a janela de pregão da janela sem âncora</em> — e relatar as duas separadamente. Fazer a média das duas produz um número que não descreve nenhuma das situações.</p>
+  </div>
+  <p>Há ainda um ponto que o Capítulo 5 desenvolve: se o oráculo que alimenta um protocolo usa o próprio token como fonte fora do pregão, e o token é precificado por um mercado fino, cria-se um <strong>ciclo de dependência</strong> em que um preço manipulado contamina os demais sistemas.</p>
+
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s3-8"><span class="n">3.8</span>Roteiro para dados reais da Solana</h3>
+  <p>As seções anteriores entregaram as fórmulas e os exemplos controlados. Substituí-los por medição exige um procedimento declarado. Este é o roteiro que propomos, a ser executado e documentado conforme os seis itens do Capítulo 1:</p>
+  <ol>
+    <li>escolher um par líquido (SOL/USDC) e um período fixo, declarado em UTC;</li>
+    <li>coletar os swaps e, quando houver, o preço de referência externo na mesma janela;</li>
+    <li>calcular, <strong>por faixa de tamanho de ordem</strong>, o slippage realizado = (preço executado − preço de referência) ÷ preço de referência;</li>
+    <li>comparar rotas por AMM passivo e por AMM proprietária, <strong>separando</strong> tamanho de ordem e volatilidade — sem essa separação, a comparação mede composição de fluxo, não qualidade de execução;</li>
+    <li>repetir para um token de ação tokenizada, comparando horas de mercado aberto e fechado.</li>
+  </ol>
+  <div class="callout aviso">
+    <h5>Nenhum resultado real é apresentado nesta edição</h5>
+    <p>O roteiro acima é uma <strong>proposta metodológica</strong>, e a sua execução é o próximo passo natural deste trabalho. Declarar isso explicitamente é parte da regra editorial do livro: um roteiro não é um resultado.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>O custo de negociar em um AMM tem quatro componentes com causas distintas: a <strong>taxa</strong>, que remunera o LP; o <strong>price impact</strong>, determinístico e calculável antes de enviar a ordem; o <strong>slippage</strong>, estocástico e dependente do que outros fizerem; e o <strong>custo de rede</strong>, que na Solana costuma ser a menor parcela. Confundi-los impede diagnosticar o que encarece uma operação.</p>
+    <p>Vimos também que o preço da pool só acompanha o mercado porque arbitradores lucram ao corrigi-lo, e que esse lucro é financiado pelos LPs — o que estabelece um piso de giro abaixo do qual fornecer liquidez destrói valor. O <strong>Capítulo 4</strong> leva essa lógica para o crédito: o que acontece quando o ativo não é trocado, mas depositado como garantia de uma dívida.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>Swap</dt><dd>Troca de um ativo por outro em uma pool, com quantidades dadas pela regra do AMM.</dd></div>
+      <div><dt>Preço médio</dt><dd>Razão entre o total entregue e o total recebido; o preço efetivamente pago.</dd></div>
+      <div><dt>Price impact</dt><dd>Deslocamento do preço marginal causado pela própria ordem; determinístico.</dd></div>
+      <div><dt>Slippage</dt><dd>Diferença entre o preço cotado e o executado, por mudança de estado entre assinar e executar.</dd></div>
+      <div><dt>Tolerância (τ)</dt><dd>Desvio máximo que o usuário autoriza; abaixo dele, a transação falha.</dd></div>
+      <div><dt>LVR</dt><dd>Perda esperada do LP para arbitradores, em relação a uma carteira rebalanceada.</dd></div>
+      <div><dt>Banda de não arbitragem</dt><dd>Intervalo de desvio em que arbitrar não cobre os custos, e o desvio persiste.</dd></div>
+      <div><dt>Sandwich</dt><dd>Extração que cerca a ordem da vítima com uma compra antes e uma venda depois.</dd></div>
+      <div><dt>Spread efetivo</dt><dd>Diferença entre o preço executado e o ponto médio do mercado no instante da ordem.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ var x=1000,y=150000,k=x*y,A=[],B=[];
+ for(var dy=250;dy<=20000;dy+=250){
+   var dx=x*dy/(y+dy), avg=dy/dx, p1=(y+dy)/(x-dx);
+   A.push([dy/1000,(avg/150-1)*100]); B.push([dy/1000,(p1/150-1)*100]);
+ }
+ CH.line("f3-1",{height:300,xMin:0,xMax:20,yMin:0,xTicks:4,
+  x:{dec:0,suf:" mil"},y:{dec:0,suf:"%"},
+  xLabel:"tamanho da ordem em USDC (milhares)",yLabel:"custo em % sobre o preço inicial",
+  series:[{name:"Desvio do preço médio (o que você paga a mais)",points:A,color:"var(--c2)",area:true},
+          {name:"Price impact (o que a ordem faz com o preço)",points:B,color:"var(--c5)"}]});
+
+ var vols=[20,30,40,60,80,100];
+ CH.bars("f3-2",{height:290,cats:vols.map(function(v){return v+"%";}),
+  y:{dec:1,suf:"×"},yLabel:"giro anual mínimo (volume ÷ TVL)",xLabel:"volatilidade anual do par",
+  series:[{name:"giro mínimo",color:"var(--c1)",values:vols.map(function(v){var s=v/100;return s*s/(8*0.003);})}]});
+})();
+</script>
+</section>

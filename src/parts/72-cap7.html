@@ -1,0 +1,327 @@
+<section class="chap" id="cap7">
+<div class="opener"><div class="wrap">
+  <div class="num">7</div>
+  <div>
+    <p class="kicker">Capítulo 7 · Prática</p>
+    <h2>Da teoria à carteira: corretoras, conversão e custódia</h2>
+    <p class="lede">Todo o livro até aqui mediu mercados. Este capítulo mede a sua própria entrada neles: quanto custa transformar reais em cripto, onde guardá-la e de onde vem o rendimento que as plataformas oferecem.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>verificar se uma corretora está em situação regular no Brasil depois do prazo de autorização de 2026;</li>
+      <li>comparar corretoras por critérios mensuráveis — taxa, profundidade, custo de saque — e não por propaganda;</li>
+      <li>executar a rota <strong>reais → USDT → cripto</strong> com ordem limitada passiva e calcular quanto ela economiza;</li>
+      <li>decidir entre custódia na corretora, carteira de software e carteira física (<em class="t">cold wallet</em>);</li>
+      <li>identificar a origem do rendimento de um produto <em class="t">Earn</em> — e o risco que vem junto;</li>
+      <li>conhecer as regras de imposto e declaração que valem em 2026.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Este capítulo é didático e <strong>não recomenda corretora, ativo ou produto</strong>. Corretoras são citadas como exemplos do mercado brasileiro; um dos autores usa a Bybit, e por isso ela aparece nos exemplos. As informações regulatórias e de taxas são <span class="badge real">real</span> e têm data: <strong>refletem o mercado em 7 de novembro de 2026</strong>, uma semana depois do prazo de autorização do Banco Central, e podem mudar em semanas. Confira tudo na fonte antes de agir. Os custos do simulador da seção 7.5 são <span class="badge sim">simulado</span>, com parâmetros declarados.</p>
+  </div>
+
+  <p class="lead">Os capítulos anteriores ensinaram a medir o custo de uma negociação (Capítulo 3), o risco de um empréstimo (Capítulo 4) e a dependência de um oráculo (Capítulo 5). Tudo isso continua valendo quando quem negocia é você. A diferença é que, antes de chegar ao protocolo, existe uma camada que o leitor brasileiro atravessa quase sempre: a <strong>corretora centralizada</strong>, onde os reais viram cripto.</p>
+  <p>Essa camada tem custos que não aparecem no extrato — o <em class="t">spread</em> embutido no botão "comprar", o lado do livro em que sua ordem cai — e riscos que não aparecem em nenhum gráfico de preço: a corretora quebrar, ser invadida ou deixar o país. Este capítulo trata os dois com o mesmo método do resto do livro.</p>
+
+  <h3 class="sec" id="s7-1"><span class="n">7.1</span>O que mudou em 2026: a corretora agora precisa de autorização</h3>
+  <p>Até 2025, qualquer empresa podia oferecer compra e venda de cripto a brasileiros sem licença específica. Isso acabou. As Resoluções BCB nº 519, 520 e 521, publicadas em novembro de 2025 e em vigor desde 2 de fevereiro de 2026, criaram a figura da <strong>sociedade prestadora de serviços de ativos virtuais</strong> (SPSAV), com exigências de capital, governança, segurança e prevenção à lavagem de dinheiro. O capital mínimo varia de <strong>R$ 10,8 milhões a R$ 37,2 milhões</strong>, conforme as atividades <span class="cite">(MENDES, 2026)</span>.</p>
+  <p>As empresas que já operavam tinham até <strong>30 de outubro de 2026</strong> para protocolar a primeira fase do pedido de autorização. Quem não pediu precisa encerrar as atividades em até 30 dias <span class="cite">(MARINS, 2026)</span>. E desde <strong>6 de novembro</strong>, pela Resolução BCB nº 589, bancos e instituições de pagamento autorizados não podem mais fazer operações com prestadoras de cripto sem autorização — o que, na prática, tende a cortar o acesso ao sistema bancário, PIX incluído, de quem ficou de fora <span class="cite">(MENDES, 2026)</span>.</p>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 7.1 — Situação de corretoras conhecidas após o prazo de 30/10/2026 <span class="badge real">real</span></caption>
+      <thead><tr><th>Situação</th><th>Empresas</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Pediram autorização</strong></td><td>Binance, Bybit, Coinbase, Foxbit, Mercado Bitcoin, OKX, Ripio, Brasil Bitcoin; e instituições como B3, Bradesco, Itaú e Nubank</td></tr>
+        <tr><td><strong>Saíram ou reduziram operação</strong></td><td>Bitso (varejo transferido ao Mercado Bitcoin), Coinext, Lemon, NovaDAX, Uphold, CoinEx, Oobit, Bity; a Crypto.com encerrou serviços em reais</td></tr>
+        <tr><td><strong>Total de registros</strong></td><td>74 pedidos, registros ou notificações no monitor da Cainvest — contra cerca de 200 empresas antes das regras</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fontes: Marins (2026); Paraíba Business (2026). <b>Pedido protocolado não é autorização concedida</b>: em 7/11/2026 nenhuma das empresas acima havia sido confirmada como autorizada, e a lista oficial do Banco Central era esperada para as semanas seguintes.</p>
+  </div>
+
+  <div class="callout nota">
+    <h5>O primeiro filtro é regulatório, não de preço</h5>
+    <p>Antes de comparar taxas, confira se a plataforma está na lista do Banco Central — em pedido ou já autorizada. Uma corretora fora da lista não é necessariamente fraudulenta, mas vai perder o acesso ao sistema financeiro brasileiro, e o seu saldo em reais fica dependente de um encerramento ordenado que ninguém garante. Para quem mantém saldo em uma plataforma que anunciou saída, o prazo de saque é a única informação que importa.</p>
+  </div>
+
+  <h3 class="sec" id="s7-2"><span class="n">7.2</span>Como comparar corretoras com números</h3>
+  <p>Superada a questão regulatória, a escolha é quantitativa. Cinco medidas resolvem quase tudo:</p>
+  <ul>
+    <li><strong>Taxa maker e taxa taker.</strong> <em>Maker</em> é quem coloca uma ordem que fica esperando no livro; <em>taker</em> é quem executa contra uma ordem que já estava lá. Muitas corretoras cobram menos de quem fornece liquidez (seção 7.5).</li>
+    <li><strong>Profundidade do par em reais.</strong> É a medida D do Capítulo 2 aplicada à corretora: quanto você consegue comprar antes de mover o preço em 1%. Em pares com pouca liquidez, o impacto de preço custa mais que a taxa.</li>
+    <li><strong>Custo de entrada e saída de reais.</strong> PIX costuma ser gratuito na entrada; o saque varia de zero a percentuais relevantes.</li>
+    <li><strong>Rede e taxa de saque da cripto.</strong> Para levar SOL a uma carteira própria, a corretora precisa sacar pela rede Solana — e cobra uma taxa fixa por isso, que pesa em valores pequenos.</li>
+    <li><strong>Prova de reservas.</strong> Publicação periódica, verificável, de que os ativos dos clientes existem. Não prova solvência sozinha, mas sua ausência é um sinal.</li>
+  </ul>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 7.2 — Taxas de negociação à vista no nível de entrada <span class="badge real">real</span></caption>
+      <thead><tr><th>Corretora</th><th>Maker</th><th>Taker</th><th>Depósito via PIX</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Binance</strong></td><td>0,10%</td><td>0,10%</td><td>sim</td><td>Desconto pagando taxa em BNB. Restringiu novas posições de margem e empréstimo a brasileiros em 27/10/2026</td></tr>
+        <tr><td><strong>Bybit</strong></td><td>0,10%</td><td>0,10%</td><td>—</td><td>Pediu autorização ao BC. Meios de depósito em reais variam; confira na plataforma</td></tr>
+        <tr><td><strong>OKX</strong></td><td>0,08%</td><td>0,10%</td><td>—</td><td>Única do grupo com maker abaixo do taker no nível de entrada</td></tr>
+        <tr><td><strong>Mercado Bitcoin</strong></td><td>0,30%</td><td>0,70%</td><td>sim</td><td>Diferença maker–taker de 0,40 p.p.: aqui a ordem passiva faz muita diferença</td></tr>
+        <tr><td><strong>Foxbit</strong></td><td>0,25%</td><td>0,50%</td><td>sim</td><td>Corretora nacional</td></tr>
+        <tr><td><strong>Coinbase</strong></td><td>0%</td><td>até 0,60%</td><td>—</td><td>Estrutura varia por produto (compra simples × negociação avançada)</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fontes: Brapi (2026), para as corretoras com operação em reais, e Crypto.news (2026), para Binance, Bybit, OKX e Coinbase; Economic News Brasil (2026), para a restrição da Binance. "—" indica que a fonte consultada não informou. <b>Taxas mudam e há níveis VIP por volume</b>: trate a tabela como ordem de grandeza e confirme na página de taxas de cada corretora.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s7-3"><span class="n">7.3</span>Cadastro e segurança da conta: o passo a passo</h3>
+  <p>O cadastro é igual em quase todas as plataformas. O que varia é quanto de segurança você liga — e ela vem desligada por padrão.</p>
+  <ol>
+    <li><strong>Crie a conta pelo endereço digitado, nunca por link</strong> de anúncio, e-mail ou mensagem. Sites falsos de corretoras são a fraude mais comum do setor.</li>
+    <li><strong>Faça a verificação de identidade (KYC)</strong>: documento com foto, selfie e, em níveis mais altos, comprovante de endereço. Com a regulação de 2026, identificar o cliente deixou de ser opcional.</li>
+    <li><strong>Ative a autenticação em dois fatores por aplicativo</strong> (Google Authenticator, Authy ou similar) ou chave física. Evite SMS: o golpe de troca de chip transfere seu número para outra pessoa.</li>
+    <li><strong>Configure o código antifraude</strong> (<em class="t">anti-phishing code</em>): uma palavra que a corretora inclui em todos os e-mails legítimos. E-mail sem a palavra é falso.</li>
+    <li><strong>Ative a lista de endereços de saque</strong> (<em class="t">whitelist</em>), com carência para novos endereços. Se alguém tomar a conta, não consegue sacar para fora dela de imediato.</li>
+  </ol>
+
+  <h3 class="sec" id="s7-4"><span class="n">7.4</span>Colocar reais na corretora</h3>
+  <p>Há quatro caminhos, com custos e riscos muito diferentes:</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 7.3 — Meios de depósito em reais <span class="badge est">estimado</span></caption>
+      <thead><tr><th>Meio</th><th>Custo típico</th><th>Prazo</th><th>Principal risco</th></tr></thead>
+      <tbody>
+        <tr><td><strong>PIX</strong></td><td>geralmente zero</td><td>segundos</td><td>Enviar de conta de outra pessoa: o depósito é recusado ou bloqueado</td></tr>
+        <tr><td><strong>TED</strong></td><td>tarifa do seu banco</td><td>mesmo dia útil</td><td>Mais lento; só em dias úteis</td></tr>
+        <tr><td><strong>P2P</strong> (pessoa a pessoa)</td><td>ágio no preço do anúncio</td><td>minutos</td><td>Receber dinheiro de origem ilícita (golpe da triangulação) e ter a conta bancária bloqueada</td></tr>
+        <tr><td><strong>Cartão de crédito</strong></td><td>de 2% a 5% somando taxas e câmbio</td><td>imediato</td><td>O mais caro; pode ser tratado como saque pelo banco</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Faixas de custo estimadas pelos autores a partir das páginas de tarifas das plataformas; variam por corretora e mudam com frequência. Em todos os casos, <b>use conta de mesma titularidade</b> que o cadastro.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s7-5"><span class="n">7.5</span>Reais → USDT → cripto: não perca no spread</h3>
+  <p>Este é o ponto em que o vocabulário do Capítulo 3 vira dinheiro. Toda compra paga três componentes, mesmo quando a tela mostra "taxa zero":</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 7.1</span><span class="nm">Custo de uma conversão, medido contra o preço médio</span></div>
+    <div class="eq-body">custo<span class="op">≈</span><v>taxa</v><span class="op">+</span><span class="frac"><span><v>spread</v></span><span>2</span></span><span class="op">+</span><v>impacto</v></div>
+    <div class="eq-legend">
+      <span><b>taxa</b> — maker ou taker, conforme o tipo de ordem (Tabela 7.2)</span>
+      <span><b>spread ÷ 2</b> — distância entre o preço médio e a melhor oferta do lado contrário. Quem executa a mercado paga; quem espera no livro não paga</span>
+      <span><b>impacto</b> — quanto sua ordem anda o livro, que depende da profundidade D do par (Capítulo 2)</span>
+    </div>
+  </div>
+
+  <p>Três escolhas mudam esse custo.</p>
+  <p><strong>A rota.</strong> Comprar SOL direto com reais usa o par SOL/BRL, em geral raso: spread largo e pouca profundidade. A rota em duas pernas — <strong>reais para USDT, depois USDT para SOL</strong> — passa por dois dos pares mais líquidos disponíveis ao brasileiro: o USDT/BRL, onde se concentra o fluxo local, e o SOL/USDT, que é o livro global da moeda. Mas ela paga taxa duas vezes. A rota via USDT compensa quando o spread que ela evita é maior que a taxa extra que ela cobra — e isso depende da corretora (Figura 7.1). Para moedas sem par em reais, ela é o único caminho.</p>
+  <p><strong>O botão.</strong> As funções "Comprar cripto" e "Converter" das corretoras costumam anunciar taxa zero e embutir a margem no preço cotado. É o canal mais caro, e o único em que o custo não aparece em lugar nenhum.</p>
+  <p><strong>O tipo de ordem.</strong> A ordem a mercado executa imediatamente contra o livro: paga taxa taker, meio spread e impacto. A <strong>ordem limitada passiva</strong> — com a opção <em class="t">post-only</em>, que a cancela se fosse executar como taker — fica no livro esperando alguém vir até ela. Paga taxa maker e não paga o meio spread. É aqui que está a maior economia, em qualquer rota.</p>
+
+  <div class="callout alerta">
+    <h5>O preço da ordem passiva</h5>
+    <p>A economia não é grátis. A ordem passiva <strong>pode não ser executada</strong>: se o preço subir, ela fica para trás e você compra mais caro depois. E ela tende a ser executada justamente quando o mercado vem contra você — é a seleção adversa do Capítulo 5, vista do lado do pequeno investidor. Para quem acumula aos poucos, sem pressa, o custo é aceitável. Para quem precisa comprar agora, não.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-head">
+      <h5>Simulador · quanto custa transformar reais em SOL</h5>
+      <span class="hint">compare rota, botão e tipo de ordem <span class="badge sim">simulado</span></span>
+    </div>
+    <div class="sim-body">
+      <div class="sim-ctl">
+        <label for="cvAmt">Valor a converter <output id="cvAmtOut">R$ 5.000</output></label>
+        <input type="range" id="cvAmt" min="100" max="200000" step="100" value="5000">
+      </div>
+      <div class="sim-ctl">
+        <label for="cvSp">Spread do par direto SOL/BRL <output id="cvSpOut">0,30%</output></label>
+        <input type="range" id="cvSp" min="0.05" max="1.5" step="0.05" value="0.3">
+      </div>
+      <div class="sim-ctl">
+        <label for="cvFee">Tabela de taxas (maker / taker) <output id="cvFeeOut">0,10% / 0,10%</output></label>
+        <select id="cvFee" class="sel">
+          <option value="0.10,0.10">0,10% / 0,10% — Binance, Bybit</option>
+          <option value="0.08,0.10">0,08% / 0,10% — OKX</option>
+          <option value="0.25,0.50">0,25% / 0,50% — Foxbit</option>
+          <option value="0.30,0.70">0,30% / 0,70% — Mercado Bitcoin</option>
+        </select>
+      </div>
+      <div class="readout" id="cvOut"></div>
+      <p class="sim-note">Parâmetros simulados: spread de 0,03% no USDT/BRL e 0,01% no SOL/USDT; profundidade para mover o preço em 1% de R$ 20 milhões no USDT/BRL, US$ 5 milhões no SOL/USDT e R$ 2 milhões no SOL/BRL; margem embutida de 0,8% no botão "Converter". Custos medidos contra o preço médio. Na ordem passiva, supomos execução completa e que a seleção adversa consome o meio spread que ela deixaria de pagar — por isso ela custa só a taxa maker.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Quando a rota via USDT compensa</p>
+      <p class="chart-sub">custo de converter R$ 5.000 em SOL com ordem a mercado, em pontos-base (0,01%), conforme o spread do par direto SOL/BRL</p>
+      <div id="f7-1"></div>
+    </div>
+    <figcaption><b>Figura 7.1</b> — A rota via USDT tem custo quase fixo: duas taxas taker. A rota direta fica mais cara à medida que o spread do SOL/BRL se abre. Com taxa de 0,10%, as linhas se cruzam perto de 0,25% de spread; com taxa taker de 0,70%, só perto de 1,45%. <strong>Em corretora de taxa baixa, a rota via USDT costuma ganhar; em corretora de taxa alta, pagar a taxa duas vezes custa mais do que o spread que ela evita.</strong> Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <div class="callout exemplo">
+    <h5>Na prática, em qualquer corretora com par USDT/BRL</h5>
+    <p class="mono">1. Deposite via PIX.<br>
+    2. Abra o mercado à vista USDT/BRL. Escolha ordem <b>Limitada</b>, marque <b>Post-only</b> e<br>&nbsp;&nbsp;&nbsp;coloque o preço igual à melhor oferta de compra do livro.<br>
+    3. Executada a ordem, abra SOL/USDT e repita: Limitada, Post-only, no melhor preço de compra.<br>
+    4. Se o preço se afastar e a ordem não executar em tempo razoável, reavalie: cancele e<br>&nbsp;&nbsp;&nbsp;recoloque, ou aceite pagar o spread com uma ordem a mercado.</p>
+  </div>
+  <p>Uma observação regulatória: desde fevereiro de 2026, as novas regras do Banco Central passaram a tratar como <strong>operação de câmbio</strong> as transações internacionais com stablecoins, com limite de US$ 100 mil por operação quando a contraparte não é autorizada a operar câmbio <span class="cite">(EU QUERO INVESTIR, 2025)</span>. Comprar USDT em reais dentro de uma corretora brasileira não é transferência internacional — mas enviar USDT para uma plataforma no exterior pode ser.</p>
+
+  <h3 class="sec" id="s7-6"><span class="n">7.6</span>Custódia: corretora, carteira própria ou cold wallet</h3>
+  <p>Cripto na corretora é um saldo na contabilidade da corretora: você tem um crédito contra ela, não a moeda. A expressão do setor é direta — <em>not your keys, not your coins</em>. Três episódios recentes mostram por que isso importa:</p>
+  <ul>
+    <li><strong>Celsius, julho de 2022.</strong> A plataforma pagava rendimento sobre depósitos emprestando-os a terceiros; quando os empréstimos azedaram, congelou saques e entrou em recuperação judicial.</li>
+    <li><strong>FTX, novembro de 2022.</strong> A corretora usava depósitos de clientes em operações de uma empresa ligada; uma corrida de saques revelou o buraco em poucos dias.</li>
+    <li><strong>Bybit, fevereiro de 2025.</strong> Cerca de US$ 1,5 bilhão em ETH foi desviado de uma carteira fria da corretora, no maior roubo de cripto já registrado. O FBI atribuiu o ataque ao grupo norte-coreano conhecido como TraderTraitor/Lazarus <span class="cite">(FEDERAL BUREAU OF INVESTIGATION, 2025)</span>. A corretora cobriu o prejuízo e manteve os saques — o que separa um ataque de uma falência é o capital próprio da empresa.</li>
+  </ul>
+  <p>A alternativa é a <strong>autocustódia</strong>: você guarda a chave privada, e ninguém mais pode mover os fundos — nem a corretora, nem um juiz, nem você mesmo se perder a chave.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 7.4 — Três formas de guardar SOL</caption>
+      <thead><tr><th></th><th>Na corretora</th><th>Carteira de software (<em>hot</em>)</th><th>Carteira física (<em>cold</em>)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Exemplos</strong></td><td>Saldo na Binance, Bybit, Mercado Bitcoin…</td><td>Phantom, Solflare, Backpack</td><td>Ledger, Trezor (suporte a Solana desde dez./2023), Keystone</td></tr>
+        <tr><td><strong>Quem tem a chave</strong></td><td>A corretora</td><td>Você, num aparelho conectado</td><td>Você, num dispositivo que assina offline</td></tr>
+        <tr><td><strong>Risco dominante</strong></td><td>Falência, fraude ou invasão da corretora</td><td>Malware, site falso, assinar transação maliciosa</td><td>Perder a frase de recuperação</td></tr>
+        <tr><td><strong>Acesso a DeFi</strong></td><td>Não</td><td>Direto</td><td>Via carteira de software, assinando no dispositivo</td></tr>
+        <tr><td><strong>Faz sentido para</strong></td><td>Saldo que você vai negociar em breve</td><td>Valores de uso, interação com protocolos</td><td>Reserva de longo prazo</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Suporte da Trezor a Solana: The Block (2023). A carteira física não elimina o risco — ela o desloca da internet para o papel onde você anotou a frase de recuperação.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout nota">
+    <h5>Cinco regras da autocustódia</h5>
+    <p>1. A frase de recuperação (12 ou 24 palavras) <strong>nunca é digitada em computador, fotografada ou salva na nuvem</strong>; vai para papel ou placa de metal, em dois lugares. 2. Nenhum suporte legítimo pede a frase — quem pede é golpista. 3. Compre o dispositivo do fabricante, nunca usado ou de revendedor desconhecido. 4. Na primeira transferência, envie um valor pequeno e confira a chegada antes do resto. 5. Leia o que está assinando: na Solana, uma única assinatura pode autorizar várias instruções.</p>
+  </div>
+  <p>A autocustódia também passou a ter acompanhamento regulatório. Desde 1º de outubro de 2026, pela Resolução BCB nº 588, transferências de US$ 10 mil ou mais entre corretoras e carteiras autocustodiadas são comunicadas especificamente ao Coaf <span class="cite">(MENDES, 2026)</span>, e as corretoras precisam verificar quem é o titular dessas carteiras <span class="cite">(EU QUERO INVESTIR, 2025)</span>. Não é proibição: é rastreabilidade.</p>
+
+  <h3 class="sec" id="s7-7"><span class="n">7.7</span>Earn: de onde vem o rendimento</h3>
+  <p>Quase toda corretora tem uma aba <em>Earn</em>, e quase todo protocolo anuncia um rendimento. A pergunta do livro é sempre a mesma: <strong>quem paga, e por quê?</strong> Rendimento sem pagador identificável é distribuição de capital de outros depositantes ou emissão de token — e nenhum dos dois dura.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 7.5 — Fontes de rendimento para quem tem SOL ou stablecoins</caption>
+      <thead><tr><th>Produto</th><th>Quem paga</th><th>Ordem de grandeza</th><th>Risco principal</th><th>Ver</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Earn da corretora</strong></td><td>A corretora, que empresta ou faz stake com o seu saldo</td><td>varia por produto</td><td>Contraparte: o caso Celsius</td><td>7.6</td></tr>
+        <tr><td><strong>Staking nativo</strong></td><td>O protocolo: emissão de novos SOL + taxas + MEV</td><td>≈ 5% a 7% a.a. <span class="badge real">real</span></td><td>Validador ruim; prazo de 2 a 4 dias para desfazer</td><td>—</td></tr>
+        <tr><td><strong>Staking líquido</strong> (JitoSOL, mSOL, INF)</td><td>O mesmo staking, empacotado num token negociável</td><td>5,7% a 6,3% a.a. <span class="badge real">real</span></td><td>Contrato do protocolo; o token pode negociar abaixo do valor</td><td>Cap. 4</td></tr>
+        <tr><td><strong>Empréstimo</strong> (Kamino e similares)</td><td>Tomadores que pagam juros</td><td>variável com a utilização</td><td>Dívida incobrável em quedas rápidas</td><td>Cap. 4</td></tr>
+        <tr><td><strong>Prover liquidez</strong></td><td>Quem negocia, via taxas</td><td>variável com o volume</td><td>Perda em relação a manter os ativos</td><td>Caps. 2 e 6</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Faixas de staking: Sanctum (2026), com médias de março a maio de 2026 — INF 6,28%, mSOL 6,09%, JitoSOL 5,69%. A fonte é um provedor de staking líquido e pode favorecer o próprio produto.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <p>O staking de SOL tem uma particularidade que muda o cálculo. Boa parte do rendimento vem da <strong>emissão de novos SOL</strong>, a uma inflação que começou em 8% ao ano, cai 15% a cada ano e caminha para 1,5%; em 2026 está perto de 4% <span class="cite">(SANCTUM, 2026)</span>. Quem não faz stake não perde moedas, mas sua fatia do total diminui nesse ritmo. Por isso o rendimento de 6% não é um ganho de 6% sobre quem fica parado: <strong>boa parte dele só compensa a diluição</strong>. O ganho real é a diferença entre o rendimento e a inflação — e, no Capítulo 8, é como tratamos o staking ao compará-lo com outros investimentos.</p>
+  <div class="callout alerta">
+    <h5>Rendimento alto é preço de risco</h5>
+    <p>Quando um produto em stablecoin paga muito acima da Selic, alguém do outro lado está aceitando pagar esse juro — em geral, para se alavancar. Num mercado em queda, esse tomador é o primeiro a ser liquidado, e a liquidação pode falhar (Capítulo 4). O rendimento extra é a remuneração por esse risco, não um presente.</p>
+  </div>
+
+  <h3 class="sec" id="s7-8"><span class="n">7.8</span>Impostos e declaração em 2026</h3>
+  <p>A tributação de cripto quase mudou em 2025. A Medida Provisória nº 1.303 propunha alíquota única e o fim da isenção mensal, mas perdeu a vigência em outubro de 2025 sem ser votada. As regras anteriores continuam valendo <span class="cite">(ESTRATÉGIA CONCURSOS, 2026)</span>:</p>
+  <ul>
+    <li><strong>Corretora no Brasil:</strong> ganho de capital tributado de 15% a 22,5%, apurado por mês. Há isenção quando o total vendido no mês não passa de <strong>R$ 35 mil</strong>.</li>
+    <li><strong>Corretora no exterior</strong> (Lei nº 14.754/2023): 15% sobre o ganho, apurado uma vez por ano, na declaração. Não há isenção.</li>
+    <li><strong>Declaração:</strong> cada tipo de cripto com custo de aquisição igual ou superior a R$ 5 mil em 31 de dezembro precisa ser declarado, mesmo sem venda.</li>
+    <li><strong>Informação mensal:</strong> corretoras no Brasil informam suas operações à Receita. Em corretora estrangeira ou P2P, quem informa é você, quando as operações do mês passam de R$ 30 mil.</li>
+  </ul>
+  <p>A regra de "onde a corretora está" ganhou peso com a regulação de 2026: uma corretora estrangeira que opera no Brasil por meio de uma SPSAV local pode mudar de regime. Na dúvida, este é o ponto para consultar um contador — não um painel de corretora.</p>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>A entrada no mercado cripto tem custos e riscos que o resto do livro ensina a medir. O custo de converter reais é uma aplicação direta da Fórmula 7.1: rota por pares líquidos, ordem limitada passiva e distância do botão "Converter" reduzem o custo a uma fração. A custódia é uma escolha entre riscos diferentes — da corretora, do seu computador ou da sua frase de recuperação — e não existe opção sem risco.</p>
+    <p>Em 2026 surgiu uma camada nova: a regulatória. Escolher corretora começa por conferir a lista do Banco Central, e a autocustódia passou a ser rastreada. O próximo capítulo usa tudo isso para responder à pergunta que o leitor faz desde a capa: <strong>no fim das contas, teria valido a pena?</strong></p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>SPSAV</dt><dd>Sociedade prestadora de serviços de ativos virtuais: a corretora de cripto autorizada pelo Banco Central.</dd></div>
+      <div><dt>KYC</dt><dd><em>Know your customer</em>: verificação de identidade do cliente.</dd></div>
+      <div><dt>Maker / taker</dt><dd>Quem coloca a ordem que espera no livro / quem executa contra ela.</dd></div>
+      <div><dt>Post-only</dt><dd>Opção que cancela a ordem limitada se ela fosse executar como taker.</dd></div>
+      <div><dt>Spread</dt><dd>Diferença entre a melhor oferta de venda e a melhor de compra.</dd></div>
+      <div><dt>Stablecoin</dt><dd>Token que busca manter paridade com uma moeda, como o USDT com o dólar.</dd></div>
+      <div><dt>Autocustódia</dt><dd>Guardar a própria chave privada, sem intermediário.</dd></div>
+      <div><dt>Frase de recuperação</dt><dd>Sequência de 12 ou 24 palavras que reconstrói a chave privada.</dd></div>
+      <div><dt>Cold wallet</dt><dd>Dispositivo que guarda a chave e assina transações sem se conectar à internet.</dd></div>
+      <div><dt>Staking</dt><dd>Delegar moedas a um validador em troca de parte das recompensas da rede.</dd></div>
+      <div><dt>Staking líquido</dt><dd>Staking representado por um token negociável, como JitoSOL ou mSOL.</dd></div>
+      <div><dt>Prova de reservas</dt><dd>Demonstração verificável de que a corretora possui os ativos que deve aos clientes.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ function NARROW(){ var e=document.querySelector("#cap7 .col"); return !!e&&e.clientWidth>0&&e.clientWidth<560; }
+ /* cost model — every parameter is declared in the simulator note */
+ var P={sp:{ub:0.0003,su:0.0001}, D:{ub:20e6,su:5e6*5.42,sb:2e6}, conv:0.008};
+ function leg(amt,spread,D,fee,passive){ // cost in BRL for one leg, relative to mid
+   if(passive) return amt*fee;
+   return amt*(fee+spread/2+0.5*amt/D*0.01); }
+ function costs(amt,mk,tk,sb){
+   return {
+    conv: amt*P.conv,
+    dirMkt: leg(amt,sb,P.D.sb,tk,false),
+    usdMkt: leg(amt,P.sp.ub,P.D.ub,tk,false)+leg(amt,P.sp.su,P.D.su,tk,false),
+    dirPas: leg(amt,sb,P.D.sb,mk,true),
+    usdPas: leg(amt,P.sp.ub,P.D.ub,mk,true)+leg(amt,P.sp.su,P.D.su,mk,true)
+   }; }
+ var LBL={conv:"Botão Converter",dirMkt:"SOL/BRL a mercado",usdMkt:"Via USDT a mercado",dirPas:"SOL/BRL passiva",usdPas:"Via USDT passiva"};
+ var a=document.getElementById("cvAmt"), f=document.getElementById("cvFee"), sp=document.getElementById("cvSp"), out=document.getElementById("cvOut");
+ function brl(v){ return "R$ "+CH.fmtNum(v,v<100?2:0); }
+ function u(){
+  var amt=+a.value, fe=f.value.split(",").map(Number), sb=+sp.value/100, c=costs(amt,fe[0]/100,fe[1]/100,sb);
+  document.getElementById("cvAmtOut").textContent=brl(amt);
+  document.getElementById("cvSpOut").textContent=CH.fmtNum(+sp.value,2)+"%";
+  document.getElementById("cvFeeOut").textContent=CH.fmtNum(fe[0],2)+"% / "+CH.fmtNum(fe[1],2)+"%";
+  var best="usdPas"; Object.keys(c).forEach(function(k){ if(c[k]<c[best]) best=k; });
+  out.innerHTML=Object.keys(LBL).map(function(k){
+    var bps=c[k]/amt*1e4;
+    return '<div class="ro'+(k===best?' hi':'')+'"><span class="k">'+LBL[k]+'</span><span class="v">'+brl(c[k])+' <small>'+CH.fmtNum(bps,0)+' bps</small></span></div>'; }).join("");
+ }
+ [a,f,sp].forEach(function(e){ e.addEventListener("input",u); }); u();
+
+ function curve(mk,tk,key){ var pts=[]; for(var x=0.05;x<=1.6001;x+=0.05){ pts.push([x,costs(5000,mk,tk,x/100)[key]/0.5]); } return pts; }
+ CH.line("f7-1",{W:NARROW()?440:720,height:NARROW()?285:300,xMin:0,xMax:1.6,yMin:0,yMax:160,xTicks:8,mr:24,ml:72,
+  x:{dec:1,suf:"%"},y:{dec:0,suf:" bps"},
+  xLabel:"spread do par SOL/BRL",yLabel:"custo (pontos-base)",
+  series:[
+   {name:"direta · taxa 0,10%",color:"var(--c1)",points:curve(0.001,0.001,"dirMkt")},
+   {name:"via USDT · taxa 0,10%",color:"var(--c1)",dash:"5 4",points:curve(0.001,0.001,"usdMkt")},
+   {name:"direta · taxa 0,70%",color:"var(--c2)",points:curve(0.003,0.007,"dirMkt")},
+   {name:"via USDT · taxa 0,70%",color:"var(--c2)",dash:"5 4",points:curve(0.003,0.007,"usdMkt")}
+  ]});
+})();
+</script>
+</section>

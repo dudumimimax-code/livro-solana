@@ -1,0 +1,31 @@
+<script>
+(function(){
+  /* theme toggle: respects the viewer's system setting until they choose */
+  var root=document.documentElement, tb=document.getElementById("themeBtn");
+  function current(){ var a=root.getAttribute("data-theme"); if(a) return a;
+    return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"; }
+  try{ var saved=localStorage.getItem("defi-livro-tema"); if(saved) root.setAttribute("data-theme",saved); }catch(e){}
+  tb.addEventListener("click",function(){
+    var next=current()==="dark"?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{ localStorage.setItem("defi-livro-tema",next); }catch(e){}
+  });
+
+  /* table of contents drawer */
+  var toc=document.getElementById("toc"), btn=document.getElementById("tocBtn");
+  function open(){ toc.hidden=false; } function close(){ toc.hidden=true; }
+  btn.addEventListener("click",open);
+  toc.addEventListener("click",function(e){ if(e.target===toc||e.target.closest("a")) close(); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!toc.hidden) close(); });
+
+  /* reading progress */
+  var bar=document.getElementById("progress"), ticking=false;
+  function upd(){
+    var h=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(h>0?Math.min(100,Math.max(0,scrollY/h*100)):0)+"%";
+    ticking=false;
+  }
+  addEventListener("scroll",function(){ if(!ticking){ ticking=true; requestAnimationFrame(upd); } },{passive:true});
+  upd();
+})();
+</script>

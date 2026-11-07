@@ -1,0 +1,297 @@
+<section class="chap" id="cap4">
+<div class="opener"><div class="wrap">
+  <div class="num">4</div>
+  <div>
+    <p class="kicker">Capítulo 4 · Análise quantitativa</p>
+    <h2>Crédito descentralizado e geração de rendimento</h2>
+    <p class="lede">Emprestar sem analisar o tomador só funciona se a garantia valer mais que a dívida — e se for possível vendê-la a tempo. Este capítulo mede as duas condições.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>explicar como um mercado de crédito on-chain define taxas sem analisar o tomador;</li>
+      <li>calcular o <strong>Health Factor</strong>, o LTV e o preço de liquidação de uma posição;</li>
+      <li>descrever uma liquidação passo a passo e identificar quando ela gera dívida incobrável;</li>
+      <li>estimar a probabilidade de uma posição ser liquidada em um dado horizonte;</li>
+      <li>distinguir rendimento orgânico de rendimento de incentivos, e reconhecer alavancagem recursiva;</li>
+      <li>avaliar por que a liquidez de venda do colateral determina se uma queda vira crise.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Capítulo didático; não é recomendação de investimento. <strong>Operações alavancadas em protocolos de crédito podem levar à perda total do colateral</strong>, e a liquidação é automática e não negociável. Todos os valores são <span class="badge sim">simulado</span>, com parâmetros declarados em cada exemplo. Os dados de mercado sobre ativos tokenizados vêm de fontes públicas de 2026 e devem ser reverificados.</p>
+  </div>
+
+  <p class="lead">Um banco decide se você merece crédito olhando para quem você é: renda, histórico, garantias, relacionamento. Um protocolo DeFi não sabe quem você é e não tem como executar uma dívida em juízo. Ele resolve o problema de um jeito brutalmente simples: <strong>exige mais garantia do que empresta, e vende a garantia automaticamente quando ela encolhe demais</strong>.</p>
+  <p>Toda a engenharia do crédito descentralizado decorre dessa escolha. E toda a sua fragilidade também.</p>
+
+  <h3 class="sec" id="s4-1"><span class="n">4.1</span>Emprestar e tomar emprestado</h3>
+  <p>Em um mercado de crédito on-chain, quem deposita um ativo não empresta a uma pessoa específica: deposita em um <strong>pool comum</strong>, do qual qualquer tomador habilitado pode sacar mediante garantia. O depositante recebe em troca um recibo cujo valor cresce com o tempo — o rendimento não chega como um pagamento à parte, mas fica <strong>embutido no preço do recibo</strong>. Para medir retorno, portanto, o que se acompanha é a variação desse índice, não um fluxo de juros.</p>
+  <p>A variável que governa o mercado é a <strong>utilização</strong>: a fração do que foi depositado que está emprestada. Ela determina a taxa de juros por meio de uma curva definida em código, e não por negociação. Tipicamente, a curva é suave até um ponto de inflexão — a utilização-alvo — e sobe abruptamente depois dele.</p>
+  <div class="callout nota">
+    <h5>Por que a curva tem um "joelho"</h5>
+    <p>A inclinação abrupta após a utilização-alvo não é um detalhe de calibração: é o mecanismo que protege a <strong>liquidez de saque</strong>. Se a utilização chegasse a 100%, os depositantes não conseguiriam retirar seus fundos. Encarecer violentamente o crédito perto desse ponto incentiva tomadores a pagar e novos depositantes a entrar. O "joelho" da curva é, portanto, um preço de escassez de liquidez — e um bom lugar para procurar sinais de estresse em um protocolo.</p>
+  </div>
+  <p>Um caso particular merece menção: os <strong>empréstimos atômicos</strong> (<em class="t">flash loans</em>), em que se toma qualquer quantia sem garantia, desde que a dívida seja paga <em>dentro da mesma transação</em>. Não é um truque: decorre diretamente da atomicidade descrita no Capítulo 2. Se o pagamento não ocorre, a transação inteira é revertida, e o empréstimo nunca existiu.</p>
+
+  <h3 class="sec" id="s4-2"><span class="n">4.2</span>Colateral, sobrecolateralização e saúde da posição</h3>
+  <p>Para tomar emprestado, o usuário deposita um ativo como <strong>colateral</strong>. Cada ativo aceito tem dois parâmetros definidos por governança: o <strong>LTV máximo</strong>, que limita quanto se pode tomar na abertura, e o <strong>limiar de liquidação</strong> (LT), um pouco mais alto, a partir do qual a posição se torna liquidável. A diferença entre os dois é a folga que o tomador tem antes de ser liquidado.</p>
+  <p>A saúde de uma posição se resume a um número.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 4.1</span><span class="nm">Health Factor, LTV e preço de liquidação</span></div>
+    <div class="eq-body">HF<span class="op">=</span><span class="frac"><span><v>LT</v><span class="op">·</span><v>C</v></span><span><v>D</v></span></span><span style="display:inline-block;width:2em"></span>LTV<span class="op">=</span><span class="frac"><span><v>D</v></span><span><v>C</v></span></span><span style="display:inline-block;width:2em"></span><v>P</v><sub>liq</sub><span class="op">=</span><span class="frac"><span><v>D</v></span><span><v>LT</v><span class="op">·</span><v>n</v></span></span></div>
+    <div class="eq-legend">
+      <span><b>C</b> — valor do colateral em dólares · <b>D</b> — dívida em dólares · <b>n</b> — quantidade de unidades do colateral</span>
+      <span><b>LT</b> — limiar de liquidação do ativo (0,80 para 80%)</span>
+      <span><b>A regra</b> — a posição é liquidável quando <b>HF &lt; 1</b>. Com vários colaterais, LT é a média ponderada pelos valores.</span>
+      <span><b>Atenção</b> — os juros da dívida reduzem o HF com o tempo, mesmo sem nenhuma mudança de preço.</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 4.1 — Saúde de uma posição: 100 SOL a US$ 150 como colateral <span class="badge sim">simulado</span>; LT = 80%, LTV máximo = 75%</caption>
+      <thead><tr><th class="n">Dívida (USDC)</th><th class="n">LTV</th><th class="n">Health Factor</th><th class="n">Preço de liquidação</th><th class="n">Queda até liquidar</th></tr></thead>
+      <tbody>
+        <tr><td class="n">6.000</td><td class="n">40,0%</td><td class="n pos">2,00</td><td class="n">US$ 75,00</td><td class="n">−50,0%</td></tr>
+        <tr><td class="n">8.000</td><td class="n">53,3%</td><td class="n pos">1,50</td><td class="n">US$ 100,00</td><td class="n">−33,3%</td></tr>
+        <tr><td class="n">10.000</td><td class="n">66,7%</td><td class="n">1,20</td><td class="n">US$ 125,00</td><td class="n">−16,7%</td></tr>
+        <tr><td class="n">11.250 <em>(máximo)</em></td><td class="n">75,0%</td><td class="n neg">1,07</td><td class="n">US$ 140,63</td><td class="n neg">−6,25%</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">O tomador que usa o LTV máximo fica a <b>6,25% de queda</b> da liquidação — para um ativo cuja volatilidade anual costuma passar de 60%, isso é uma tarde de mercado. <b>O LTV máximo existe para limitar a abertura da posição, não para ser usado.</b> Guias de uso sugerem manter o HF acima de 1,5 e, para posições que não serão monitoradas diariamente, acima de 2,0. Fonte: cálculo próprio.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-head">
+      <h5>Simulador · saúde de uma posição de crédito</h5>
+      <span class="hint">veja o preço de liquidação se mover <span class="badge sim">simulado</span></span>
+    </div>
+    <div class="sim-body">
+      <div class="sim-ctl">
+        <label for="hfColl">Colateral depositado <output id="hfCollOut">100 SOL</output></label>
+        <input type="range" id="hfColl" min="10" max="500" step="5" value="100">
+      </div>
+      <div class="sim-ctl">
+        <label for="hfDebt">Dívida tomada <output id="hfDebtOut">8.000 USDC</output></label>
+        <input type="range" id="hfDebt" min="500" max="45000" step="250" value="8000">
+      </div>
+      <div class="sim-ctl">
+        <label for="hfPrice">Preço do SOL <output id="hfPriceOut">US$ 150</output></label>
+        <input type="range" id="hfPrice" min="40" max="300" step="1" value="150">
+      </div>
+      <div class="readout">
+        <div class="ro"><span class="k">LTV atual</span><span class="v" id="roLtv">53,3%</span></div>
+        <div class="ro hi"><span class="k">Health Factor</span><span class="v" id="roHf">1,50</span></div>
+        <div class="ro"><span class="k">Preço de liquidação</span><span class="v" id="roPliq">US$ 100,00</span></div>
+        <div class="ro"><span class="k">Queda até liquidar</span><span class="v" id="roDrop">−33,3%</span></div>
+        <div class="ro"><span class="k">Situação</span><span class="v" id="roState" style="font-size:.82rem">Saudável</span></div>
+      </div>
+      <p style="font-family:var(--mono);font-size:.7rem;color:var(--ink-3);margin:.9rem 0 0;line-height:1.6">LT = 80%, LTV máximo = 75%. A posição é liquidável quando HF cai abaixo de 1,00. Note que a faixa entre o LTV máximo e o limiar de liquidação é estreita — e que os juros corroem o HF mesmo com o preço parado.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s4-3"><span class="n">4.3</span>Liquidação: como funciona e quando falha</h3>
+  <p>Quando o HF cai abaixo de 1, qualquer pessoa pode liquidar a posição. O liquidante paga parte da dívida em nome do tomador — limitada pelo <strong>fator de fechamento</strong>, tipicamente 50% por transação — e recebe em troca colateral de valor equivalente <strong>mais um bônus</strong>, em geral de poucos pontos percentuais. Em seguida, costuma vender esse colateral no mercado (Capítulo 3) para realizar o lucro.</p>
+  <p>O custo para o tomador é o bônus pago. Para o sistema, a liquidação <strong>funciona enquanto o bônus cobre os custos do liquidante</strong> — e falha exatamente quando não cobre.</p>
+
+  <div class="callout exemplo">
+    <h5>Uma liquidação passo a passo <span class="badge sim">simulado</span></h5>
+    <p class="mono">Posição: 100 SOL, dívida de US$ 8.000, LT = 80%. A US$ 100, HF = 1,00.<br>
+    O preço cai para <b>US$ 95</b>; HF = 0,95. Um liquidante age, com fator de fechamento de 50% e bônus de 5%:<br><br>
+    Dívida repaga pelo liquidante &nbsp;→&nbsp; US$ 4.000<br>
+    Colateral recebido &nbsp;→&nbsp; US$ 4.200 (4.000 × 1,05) = 44,21 SOL a US$ 95<br>
+    Colateral restante &nbsp;→&nbsp; 55,79 SOL = US$ 5.300 &nbsp;·&nbsp; Dívida restante → US$ 4.000<br>
+    Novo Health Factor &nbsp;→&nbsp; 0,80 × 5.300 ÷ 4.000 = <b>1,06</b><br>
+    Custo para o tomador &nbsp;→&nbsp; <b>US$ 200</b>, o bônus pago ao liquidante</p>
+  </div>
+
+  <h4 class="sub"><span class="n">4.3.1</span>Quando a liquidação não resolve: dívida incobrável</h4>
+  <p>O mecanismo acima pressupõe uma queda gradual, em que há tempo de agir. Um <strong>salto</strong> de preço quebra essa premissa.</p>
+  <div class="callout alerta">
+    <h5>Cenário de lacuna <span class="badge sim">simulado</span> — o preço cai direto a US$ 80</h5>
+    <p>Com 100 SOL a US$ 80, o colateral vale US$ 8.000 e a dívida também. Como o colateral vale menos que a dívida acrescida do bônus (8.000 &lt; 8.400), <strong>nenhuma sequência de liquidações restabelece a saúde da posição</strong>. Após a primeira rodada o HF cai para 0,76, e sobra um prejuízo de aproximadamente <strong>US$ 381</strong> — a <em class="t">dívida incobrável</em>, absorvida pelos depositantes ou pelo protocolo.</p>
+    <p>A conclusão é estrutural, e vale para qualquer protocolo de crédito automatizado: <strong>o limiar de liquidação protege contra quedas, não contra saltos.</strong> Ele pressupõe que exista um preço intermediário no qual alguém possa agir. Oráculo atrasado, congestionamento de rede e lacuna de abertura em ativos com pregão produzem exatamente o salto que o desenho não cobre.</p>
+  </div>
+  <p>Os pontos de falha são sempre os mesmos quatro: <strong>oráculo</strong> desatualizado ou manipulável (Capítulo 5); <strong>congestionamento</strong> que atrasa os liquidantes no momento em que mais se precisa deles; <strong>liquidez insuficiente</strong> para vender o colateral, o que faz o liquidante perder dinheiro e simplesmente não agir; e <strong>correlação</strong> entre colaterais em um episódio de estresse.</p>
+
+  <h3 class="sec" id="s4-4"><span class="n">4.4</span>De onde vem o rendimento</h3>
+  <p>A pergunta que todo analista deve fazer diante de um rendimento anunciado é: <strong>quem paga por ele?</strong> Há apenas quatro respostas honestas.</p>
+  <ul>
+    <li><strong>Juros de tomadores</strong> — alguém está pagando para alavancar uma posição. Sustentável enquanto houver demanda por crédito.</li>
+    <li><strong>Taxas de negociação</strong> — pagas por quem usa a liquidez, como visto no Capítulo 3. Sustentável enquanto houver volume.</li>
+    <li><strong>Recompensas de validação</strong> — emissão da própria rede paga a quem ajuda a protegê-la. É diluição dos demais detentores, e sustentável por desenho do protocolo.</li>
+    <li><strong>Incentivos em token</strong> — o protocolo distribui seu próprio token para atrair capital. <strong>Não é receita</strong>: é despesa de aquisição de usuários, paga em um ativo cujo preço o próprio programa pressiona.</li>
+  </ul>
+  <p>Os três primeiros são <strong>rendimento orgânico</strong>; o quarto é <strong>rendimento de incentivos</strong>. Separá-los é a primeira coisa a fazer ao avaliar qualquer oportunidade — e é também a mais frequentemente omitida nos painéis que exibem apenas o número agregado.</p>
+  <div class="callout alerta">
+    <h5>Alavancagem recursiva: onde o rendimento vira risco</h5>
+    <p>Uma estratégia comum consiste em depositar um ativo que já rende, tomar emprestado contra ele, comprar mais do mesmo ativo e repetir. Cada volta multiplica a exposição ao rendimento — e também ao risco. O resultado é uma posição em que uma queda modesta no preço, ou uma alta na taxa de juros tomada, aciona liquidação. Quando muitos participantes montam a mesma estrutura, suas liquidações ocorrem <em>ao mesmo tempo</em>, e é aí que a seção seguinte se torna relevante.</p>
+  </div>
+
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s4-5"><span class="n">4.5</span>Probabilidade de liquidação</h3>
+  <p>Saber que uma posição é liquidada a US$ 100 é menos útil do que saber <em>com que probabilidade</em> o preço chega lá. Supondo que o preço do colateral siga um movimento browniano geométrico sem tendência, a probabilidade de <strong>tocar</strong> o preço de liquidação em algum momento até o horizonte T tem forma fechada.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 4.2</span><span class="nm">Probabilidade de atingir o preço de liquidação até T</span></div>
+    <div class="eq-body"><v>P</v><span class="op">≈</span>2<span class="op">·</span><v>Φ</v><span style="font-size:1.3em">(</span><span class="frac"><span>ln(<v>P</v><sub>liq</sub> ÷ <v>P</v><sub>0</sub>)</span><span><v>σ</v><span class="op">·</span><span class="sq"><span><v>T</v></span></span></span></span><span style="font-size:1.3em">)</span></div>
+    <div class="eq-legend">
+      <span><b>Φ</b> — função de distribuição acumulada da normal padrão</span>
+      <span><b>σ</b> — volatilidade anual do colateral · <b>T</b> — horizonte em anos</span>
+      <span><b>Hipóteses</b> — monitoramento contínuo, sem tendência e sem saltos. Por ignorar saltos e atraso de oráculo, o resultado é um <em>limite inferior</em> do risco real.</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Probabilidade de liquidação por nível de alavancagem</p>
+      <p class="chart-sub">colateral com volatilidade anual de 60% · horizontes de 30 e 90 dias</p>
+      <div id="f4-1"></div>
+    </div>
+    <figcaption><b>Figura 4.1</b> — Uma posição com LTV de 53% parece segura em 30 dias (1,8%), mas tem <strong>uma chance em seis</strong> de ser liquidada em 90 dias. O risco cresce com o horizonte e com o quadrado da volatilidade, e as duas coisas quase nunca aparecem no painel do protocolo. Fonte: elaboração própria pela Fórmula 4.2. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 4.2 — Probabilidade de liquidação por LTV, volatilidade e horizonte <span class="badge sim">simulado</span></caption>
+      <thead><tr><th>Dívida (LTV)</th><th class="n">P<sub>liq</sub> ÷ P₀</th><th class="n">σ=60%, 30 d</th><th class="n">σ=60%, 90 d</th><th class="n">σ=100%, 30 d</th><th class="n">σ=100%, 90 d</th></tr></thead>
+      <tbody>
+        <tr><td>6.000 (40%)</td><td class="n">0,500</td><td class="n pos">0,01%</td><td class="n pos">2,0%</td><td class="n">1,6%</td><td class="n">16,3%</td></tr>
+        <tr><td>8.000 (53%)</td><td class="n">0,667</td><td class="n">1,8%</td><td class="n">17,4%</td><td class="n">15,7%</td><td class="n neg">41,4%</td></tr>
+        <tr><td>10.000 (67%)</td><td class="n">0,833</td><td class="n">28,9%</td><td class="n neg">54,1%</td><td class="n neg">52,5%</td><td class="n neg">71,4%</td></tr>
+        <tr><td>11.250 (75%)</td><td class="n">0,938</td><td class="n neg">70,8%</td><td class="n neg">82,9%</td><td class="n neg">82,2%</td><td class="n neg">89,7%</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fonte: cálculo próprio. Leitura: a coluna de LTV 75% mostra por que o LTV máximo não é um alvo — em qualquer cenário, a liquidação é o desfecho mais provável.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s4-6"><span class="n">4.6</span>Cascatas: quando a liquidação vira o problema</h3>
+  <p>Cada liquidação individual é benigna: alguém paga a dívida, o sistema se equilibra. O risco aparece quando muitas acontecem juntas, porque cada liquidante <strong>vende o colateral no mercado</strong>, empurrando o preço para baixo — o que aciona a liquidação seguinte.</p>
+  <p>Simulamos um mercado de crédito sintético para medir isso: 2.000 posições, US$ 200 milhões de colateral em SOL, LTV inicial entre 30% e 70%, limiar de 80%, bônus de 5%, volatilidade de 80% ao ano, horizonte de 30 dias. Cada liquidação vende o colateral em uma pool agregada de profundidade <v>D</v>, e o impacto no preço decai 70% ao dia, representando a reposição de liquidez por arbitradores.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">O que decide se uma queda vira crise não é a queda</p>
+      <p class="chart-sub">dívida incobrável média em 100 trajetórias, por profundidade de venda disponível</p>
+      <div id="f4-2"></div>
+    </div>
+    <figcaption><b>Figura 4.2</b> — Com profundidade de venda equivalente a 25% do colateral do mercado (US$ 50 mi), a espiral gera dívida incobrável mesmo <em>sem</em> nenhum choque externo. Com profundidade cinco vezes o colateral, nem um choque de −25% produz perda relevante. Fonte: elaboração própria. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 4.3 — Simulação de cascata em um mercado de crédito sintético <span class="badge sim">simulado</span>; média de 100 trajetórias</caption>
+      <thead><tr><th class="n">Profundidade D</th><th>Choque</th><th class="n">Volume liquidado</th><th class="n">Posições liquidadas</th><th class="n">Dívida incobrável</th><th class="n">Pior impacto no preço</th></tr></thead>
+      <tbody>
+        <tr><td class="n">US$ 50 mi</td><td>nenhum</td><td class="n">US$ 37,2 mi</td><td class="n">53,0%</td><td class="n neg">US$ 17,6 mi</td><td class="n neg">−47,5%</td></tr>
+        <tr><td class="n">US$ 50 mi</td><td>−25%</td><td class="n">US$ 67,7 mi</td><td class="n neg">99,0%</td><td class="n neg">US$ 34,5 mi</td><td class="n neg">−87,6%</td></tr>
+        <tr><td class="n">US$ 200 mi</td><td>nenhum</td><td class="n">US$ 39,8 mi</td><td class="n">41,4%</td><td class="n pos">US$ 0,35 mi</td><td class="n">−25,7%</td></tr>
+        <tr><td class="n">US$ 200 mi</td><td>−25%</td><td class="n">US$ 94,5 mi</td><td class="n neg">97,3%</td><td class="n">US$ 6,5 mi</td><td class="n neg">−58,8%</td></tr>
+        <tr><td class="n">US$ 1.000 mi</td><td>nenhum</td><td class="n">US$ 11,0 mi</td><td class="n pos">13,2%</td><td class="n pos">≈ 0</td><td class="n pos">−1,0%</td></tr>
+        <tr><td class="n">US$ 1.000 mi</td><td>−25%</td><td class="n">US$ 45,9 mi</td><td class="n">49,0%</td><td class="n pos">US$ 0,42 mi</td><td class="n pos">−6,3%</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Modelo estilizado: um único ativo, todos os liquidantes vendendo na mesma pool, sem entrada de capital novo. Fonte: cálculo próprio. <b>A variável decisiva é a razão entre a profundidade de venda e o colateral do mercado</b> — e é essa razão, não o LTV, que deveria calibrar os tetos de depósito de um protocolo.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout nota">
+    <h5>A ponte entre os capítulos</h5>
+    <p>Esta é a conexão mais importante do livro. A profundidade da Tabela 4.3 é <em>exatamente</em> a profundidade D±(d) definida na Fórmula 2.4 do Capítulo 2. Um parâmetro de risco de crédito se resolve com uma medida de liquidez de mercado. <strong>Avaliar um protocolo de crédito sem medir a liquidez do colateral é avaliar metade do sistema</strong> — e é a metade que não quebra.</p>
+  </div>
+
+  <h3 class="sec" id="s4-7"><span class="n">4.7</span>Estudo de caso: ações tokenizadas como colateral</h3>
+  <p>Retomamos o fio condutor do Capítulo 3, agora no crédito. Aceitar uma ação tokenizada como garantia parece atraente: é um ativo com histórico longo, volatilidade geralmente menor que a de criptoativos e preço de referência público. Três diferenças, porém, mudam completamente o cálculo de risco.</p>
+  <p>A primeira é a <strong>lacuna de horário</strong>. A liquidação exige vender o colateral; se a bolsa está fechada, o liquidante não tem como se desfazer da posição a um preço confiável. Ele então exige um desconto maior — ou não age. É o cenário de salto da seção 4.3.1, só que previsível: acontece toda sexta à noite.</p>
+  <p>A segunda é o <strong>risco de emissor</strong>. Entre o token e a ação há uma entidade que custodia o ativo e honra o resgate. Esse é um risco de contraparte que não existe em um colateral nativo, e que não aparece em nenhuma métrica on-chain.</p>
+  <p>A terceira é a <strong>liquidez de venda</strong>, e aqui a Tabela 4.3 dá a régua. Um token com US$ 225 milhões sob gestão distribuídos por dezenas de ativos tem, por ativo, uma profundidade modesta. Pela simulação, o teto de depósito aceitável como colateral deveria ser calibrado pela profundidade da pool do token — não pelo volume negociado da ação na bolsa, que é outro mercado.</p>
+  <div class="callout alerta">
+    <h5>A regra do tamanho máximo</h5>
+    <p>Decorre diretamente da seção 4.6: <strong>o teto de depósito de um colateral deve ser função da profundidade disponível para vendê-lo sob estresse</strong>, não do seu valor de mercado nem do seu TVL. Um ativo com US$ 1 bilhão de capitalização e US$ 2 milhões de profundidade é, para fins de liquidação, um ativo de US$ 2 milhões.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>O crédito descentralizado substitui a análise do tomador por três mecanismos: sobrecolateralização, um indicador de saúde calculável a qualquer momento e liquidação automática. O arranjo funciona bem para quedas graduais em ativos líquidos, e falha de forma previsível em três situações — saltos de preço, oráculo defasado e liquidez insuficiente para vender a garantia.</p>
+    <p>A simulação de cascata mostrou que a variável decisiva não é o LTV médio das posições, e sim a razão entre a profundidade de venda e o colateral total. O <strong>Capítulo 5</strong> trata da dependência que atravessou todo este capítulo sem ser examinada: de onde vem o preço que aciona a liquidação.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>Colateral</dt><dd>Ativo depositado como garantia de um empréstimo.</dd></div>
+      <div><dt>LTV</dt><dd>Razão entre dívida e valor do colateral.</dd></div>
+      <div><dt>Limiar de liquidação (LT)</dt><dd>LTV a partir do qual a posição pode ser liquidada.</dd></div>
+      <div><dt>Health Factor</dt><dd>Indicador de saúde; abaixo de 1,00 a posição é liquidável.</dd></div>
+      <div><dt>Fator de fechamento</dt><dd>Fração máxima da dívida que um liquidante pode pagar por transação.</dd></div>
+      <div><dt>Bônus de liquidação</dt><dd>Desconto recebido pelo liquidante; é o custo do tomador e o incentivo do sistema.</dd></div>
+      <div><dt>Dívida incobrável</dt><dd>Prejuízo que resta quando o colateral não cobre a dívida mais o bônus.</dd></div>
+      <div><dt>Utilização</dt><dd>Fração do depositado que está emprestada; determina a taxa de juros.</dd></div>
+      <div><dt>Flash loan</dt><dd>Empréstimo sem garantia que precisa ser pago na mesma transação.</dd></div>
+      <div><dt>Rendimento orgânico</dt><dd>Rendimento pago por receita real do sistema, em oposição a incentivos em token.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ function ncdf(x){var t=1/(1+0.2316419*Math.abs(x));
+  var d=0.3989423*Math.exp(-x*x/2);
+  var p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  return x>0?1-p:p;}
+ function plq(r,s,T){return Math.min(1,2*ncdf(Math.log(r)/(s*Math.sqrt(T))));}
+ var ratios=[0.5,0.6667,0.8333,0.9375], labs=["40%","53%","67%","75%"];
+ CH.bars("f4-1",{height:300,cats:labs,mb:56,
+  y:{dec:0,suf:"%"},yLabel:"probabilidade de liquidação",xLabel:"LTV inicial da posição",
+  series:[
+   {name:"30 dias",color:"var(--c1)",values:ratios.map(function(r){return plq(r,0.6,30/365)*100;})},
+   {name:"90 dias",color:"var(--c5)",values:ratios.map(function(r){return plq(r,0.6,90/365)*100;})}
+  ]});
+
+ CH.bars("f4-2",{height:300,cats:["US$ 50 mi|(25% do colateral)","US$ 200 mi|(1× o colateral)","US$ 1.000 mi|(5× o colateral)"],mb:60,
+  y:{dec:1,suf:" mi"},yLabel:"dívida incobrável média (US$ milhões)",xLabel:"profundidade de venda disponível",
+  series:[
+   {name:"sem choque externo",color:"var(--c2)",values:[17.6,0.35,0.0]},
+   {name:"com choque de −25%",color:"var(--c5)",values:[34.5,6.5,0.42]}
+  ]});
+
+ var c=document.getElementById("hfColl"),d=document.getElementById("hfDebt"),p=document.getElementById("hfPrice");
+ function u(){
+  var n=+c.value, D=+d.value, P=+p.value, LT=0.8, C=n*P;
+  var ltv=D/C, hf=LT*C/D, pl=D/(LT*n), drop=pl/P-1;
+  document.getElementById("hfCollOut").textContent=n+" SOL";
+  document.getElementById("hfDebtOut").textContent=CH.fmtNum(D,0)+" USDC";
+  document.getElementById("hfPriceOut").textContent="US$ "+P;
+  document.getElementById("roLtv").textContent=CH.fmtNum(ltv*100,1)+"%";
+  document.getElementById("roHf").textContent=CH.fmtNum(hf,2);
+  document.getElementById("roPliq").textContent="US$ "+CH.fmtNum(pl,2);
+  document.getElementById("roDrop").textContent=(drop>=0?"já liquidável":CH.fmtNum(drop*100,1)+"%");
+  var st=document.getElementById("roState"), txt, col;
+  if(hf<1){txt="LIQUIDÁVEL AGORA";col="var(--crit)";}
+  else if(ltv>0.75){txt="Acima do LTV máximo";col="var(--crit)";}
+  else if(hf<1.3){txt="Risco alto";col="var(--warn)";}
+  else if(hf<2){txt="Saudável";col="var(--ok)";}
+  else {txt="Conservadora";col="var(--ok)";}
+  st.textContent=txt; st.style.color=col;
+ }
+ [c,d,p].forEach(function(e){e.addEventListener("input",u);}); u();
+})();
+</script>
+</section>

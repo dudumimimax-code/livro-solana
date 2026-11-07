@@ -1,0 +1,311 @@
+<section class="chap" id="cap0">
+<div class="opener"><div class="wrap">
+  <div class="num">0</div>
+  <div>
+    <p class="kicker">Capítulo 0 · A camada de baixo</p>
+    <h2>A máquina de registros: blockchain além da criptomoeda</h2>
+    <p class="lede">Antes de medir um mercado descentralizado, é preciso entender o que a tecnologia por baixo dele realmente faz — e, principalmente, o que ela não faz. Este capítulo separa o mecanismo da narrativa.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>explicar o que uma blockchain resolve, em uma frase que não use a palavra "blockchain";</li>
+      <li>aplicar um critério objetivo para decidir se um problema <em>precisa</em> de blockchain;</li>
+      <li>descrever os usos de blockchain fora de criptomoeda, com números e suas fontes;</li>
+      <li>explicar como a Solana é vendida como infraestrutura a empresas e bancos, e quais recursos sustentam esse argumento;</li>
+      <li>distinguir anúncio, piloto e produção ao ler notícias sobre adoção institucional;</li>
+      <li>avaliar criticamente números de desempenho de rede, separando capacidade de projeto de medição real.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Os dados de mercado deste capítulo são <span class="badge real">real</span>, com fonte e data explícitas, e vêm majoritariamente de 2025 e 2026 — um setor em que seis meses mudam o quadro. <strong>Reverifique antes de qualquer uso.</strong> Três fontes exigem ressalva declarada: publicações da Solana Foundation e do Solana Research Institute são do próprio ecossistema e aparecem aqui como <em>argumento</em>, não como evidência independente; agregadores de dados divergem entre si (seção 0.4); e números de desempenho de rede frequentemente misturam capacidade de projeto com medição (seção 0.7).</p>
+  </div>
+
+  <p class="lead">A palavra "blockchain" carrega, hoje, tanto ruído que é mais útil começar sem ela. O problema original é antigo e tem uma formulação simples: <strong>como várias partes que não confiam umas nas outras podem compartilhar um mesmo registro, sem que nenhuma delas o controle?</strong></p>
+  <p>Note que o problema não é guardar dados — bancos de dados fazem isso há cinquenta anos, melhor e mais barato. O problema é guardar dados <em>entre partes com interesses conflitantes</em>, de modo que nenhuma possa alterar o passado sem que as outras percebam, e sem contratar um árbitro em quem todas confiem.</p>
+
+  <h3 class="sec" id="s0-1"><span class="n">0.1</span>Uma tecnologia com três ancestrais</h3>
+  <p>A blockchain não nasceu com o Bitcoin. Ela é a combinação de três ideias que já existiam separadamente.</p>
+  <p>A primeira é o <strong>encadeamento por hash</strong>. Em 1991, Haber e Stornetta descreveram como carimbar a data de um documento digital de forma que ninguém — nem mesmo o serviço de carimbo — pudesse alterá-la depois: cada registro inclui o resumo criptográfico do anterior, formando uma corrente em que mexer em um elo quebra todos os seguintes <span class="cite">(HABER; STORNETTA, 1991)</span>.</p>
+  <p>A segunda é o <strong>contrato inteligente</strong>. Em 1997, Nick Szabo propôs formalizar acordos como código executável, de modo que o cumprimento não dependesse da boa vontade das partes nem de um tribunal <span class="cite">(SZABO, 1997)</span>.</p>
+  <p>A terceira, e a que faltava, é o <strong>consenso sem identidade</strong>. Em 2008, o documento assinado por Satoshi Nakamoto mostrou como milhares de participantes anônimos podem concordar sobre a ordem dos registros, usando custo computacional como forma de votar <span class="cite">(NAKAMOTO, 2008)</span>. Em 2013, a proposta do Ethereum generalizou o mecanismo: se é possível concordar sobre transferências, é possível concordar sobre o resultado de qualquer programa <span class="cite">(BUTERIN, 2013)</span>.</p>
+
+  <div class="callout nota">
+    <h5>O que a Solana acrescentou</h5>
+    <p>A proposta da Solana ataca um gargalo específico: em redes anteriores, os participantes precisam <em>conversar</em> para concordar sobre o tempo, e essa conversa é lenta. O <strong>Proof of History</strong> cria um relógio verificável — uma sequência de operações criptográficas que só pode ser produzida em ordem — de modo que a ordem dos eventos possa ser comprovada sem negociação prévia <span class="cite">(YAKOVENKO, [2018])</span>. Combinado com execução paralela de transações que não tocam as mesmas contas, isso é o que sustenta blocos de aproximadamente 400 ms.</p>
+  </div>
+
+  <h3 class="sec" id="s0-2"><span class="n">0.2</span>O teste honesto: você precisa de uma blockchain?</h3>
+  <p>Esta é a seção mais importante do capítulo para um analista de dados, e a que mais contraria o marketing do setor. Uma blockchain paga um preço alto por suas garantias: cada nó armazena e reexecuta tudo, a capacidade é limitada e mudar o sistema exige coordenação social. Esse preço só se justifica quando as garantias são necessárias.</p>
+  <p>O critério técnico é direto, e nem é controverso entre engenheiros de infraestrutura: blockchain faz sentido quando existem <strong>múltiplas partes que não confiam plenamente entre si</strong> e a descentralização é requisito. Quando a autoridade sobre os dados é centralizada em uma única entidade, um <em>ledger</em> centralizado entrega imutabilidade e integridade verificável por hash e árvores de Merkle, sem o custo de uma rede distribuída <span class="cite">(PÚLIS, 2023)</span>.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 0.1 — Quatro perguntas antes de escolher a tecnologia</caption>
+      <thead><tr><th>Pergunta</th><th>Se a resposta for "não"</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1.</strong> Existem múltiplas partes escrevendo no mesmo registro?</td><td>Use um banco de dados. Uma parte só não precisa de consenso distribuído.</td></tr>
+        <tr><td><strong>2.</strong> Essas partes têm interesses conflitantes, a ponto de não aceitarem que uma delas controle o sistema?</td><td>Use um banco de dados compartilhado com controle de acesso. O problema é organizacional, não técnico.</td></tr>
+        <tr><td><strong>3.</strong> A ausência de um intermediário de confiança é um requisito, e não apenas uma preferência?</td><td>Use um <em>ledger</em> centralizado com registros assinados e auditáveis. Entrega imutabilidade sem o custo da rede.</td></tr>
+        <tr><td><strong>4.</strong> O valor de liquidar de forma programável, sem reconciliação posterior, compensa a capacidade limitada e o custo de governança?</td><td>Use integração via API. É mais rápida, mais barata e mais fácil de mudar.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Elaboração própria a partir do critério técnico em <b>PÚLIS, 2023</b>. Quatro "sim" indicam um caso legítimo; um único "não" costuma indicar que a tecnologia foi escolhida antes do problema.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h4 class="sub"><span class="n">0.2.1</span>O que acontece quando o teste é ignorado</h4>
+  <p>O exemplo mais bem documentado é o <strong>TradeLens</strong>, plataforma de comércio global criada pela Maersk e pela IBM. Em novembro de 2022, as duas empresas anunciaram o encerramento. A razão declarada pela própria Maersk é precisa e vale ser lida com atenção: <em>"a necessidade de colaboração plena de toda a indústria global não foi alcançada"</em>, e a plataforma <em>"não atingiu o nível de viabilidade comercial necessário para continuar"</em> <span class="cite">(A.P. MOLLER-MAERSK, 2022)</span>. A plataforma saiu do ar no primeiro trimestre de 2023.</p>
+  <p>O diagnóstico é a pergunta 2 da Tabela 0.1: o projeto exigia que concorrentes diretos — transportadoras rivais — alimentassem um sistema operado por uma delas. O obstáculo não era criptográfico; era de governança, e nenhuma tecnologia o resolve.</p>
+  <p>Um segundo sinal vem do setor público europeu. A <strong>European Blockchain Services Infrastructure</strong>, hoje operada pelo consórcio Europeum-EDIC com dez Estados-membros e vinte nós em produção, <strong>deixou de se chamar "blockchain"</strong> e opera como <em>European Trust Infrastructure</em>. Seu módulo de ativos digitais ainda figura como "em breve" <span class="cite">(EUROPEUM-EDIC, 2026)</span>. A infraestrutura existe e funciona; o que mudou foi a decisão de vendê-la pela garantia que entrega, e não pela tecnologia que usa.</p>
+  <div class="callout nota">
+    <h5>Nota sobre um caso frequentemente citado errado</h5>
+    <p>É comum ver o <strong>IBM Food Trust</strong> citado como projeto encerrado. Não localizamos nenhum anúncio de descontinuação; o que existe é ausência de dados públicos de adoção desde cerca de 2019. Essas duas coisas são diferentes, e tratá-las como iguais é exatamente o tipo de erro que este livro pede que o leitor evite. O caso de fracasso com fonte primária é o TradeLens.</p>
+  </div>
+
+  <h3 class="sec" id="s0-3"><span class="n">0.3</span>Onde a tecnologia vai além da criptomoeda</h3>
+  <p>Passado o teste, restam usos reais. Eles se concentram em três famílias, e vale notar que as duas primeiras são <em>financeiras</em> — o que já é um dado sobre onde a tecnologia encontrou ajuste.</p>
+
+  <h4 class="sub"><span class="n">0.3.1</span>Stablecoins como trilho de pagamento</h4>
+  <p>É aqui que o uso corporativo mais avançou, e a razão é prosaica: transferir valor entre países continua lento e caro, e uma stablecoin liquida em segundos, a qualquer hora. Em 2025, o volume anual de transações em stablecoins foi de US$ 46 trilhões brutos, ou <strong>US$ 9 trilhões ajustados</strong> depois de remover transferências automatizadas e duplicadas <span class="cite">(A16Z CRYPTO, 2025)</span>.</p>
+  <p>A diferença entre esses dois números é uma lição metodológica, não um detalhe: <strong>o número bruto superestima a atividade econômica em cinco vezes</strong>. Qualquer análise séria de volume on-chain precisa declarar qual dos dois está usando — exatamente o problema de dupla contagem que o Capítulo 1 descreve para rotas de swap.</p>
+  <p>Casos concretos, todos com fonte primária:</p>
+  <ul>
+    <li>A <strong>Visa</strong> lançou liquidação em stablecoin nos Estados Unidos, com Cross River Bank e Lead Bank liquidando <strong>em USDC na Solana</strong>, atingindo mais de US$ 3,5 bilhões em volume anualizado em 30 de novembro de 2025 <span class="cite">(VISA, 2025)</span>.</li>
+    <li>A <strong>Western Union</strong> lançou a USDPT na Solana em maio de 2026, emitida pelo Anchorage Digital Bank <span class="cite">(WESTERN UNION, 2026)</span>.</li>
+    <li>A <strong>Fiserv</strong> — que atende cerca de 10 mil instituições financeiras e processa da ordem de 90 bilhões de transações por ano — anunciou a FIUSD na Solana, com infraestrutura da Paxos e da Circle <span class="cite">(COINDESK, 2025b)</span>.</li>
+    <li>A <strong>Société Générale-FORGE</strong> lançou a stablecoin USDCV em Ethereum e Solana, com custódia no BNY Mellon <span class="cite">(COINTELEGRAPH, 2025)</span>.</li>
+  </ul>
+  <div class="callout alerta">
+    <h5>Dois casos que circulam errados — e por que isso importa</h5>
+    <p>Os pagamentos em USDC da <strong>Shopify</strong> rodam na rede <strong>Base</strong>, não na Solana <span class="cite">(SHOPIFY, 2025)</span>. O token de depósito <strong>JPMD do JPMorgan</strong> também roda na <strong>Base</strong> <span class="cite">(J.P. MORGAN, 2025)</span>. Ambos aparecem com frequência em listas de "empresas usando Solana".</p>
+    <p>Verificamos os dois porque pretendíamos citá-los, e eles não resistiram à checagem. Registramos o erro aqui em vez de simplesmente omiti-lo: em um setor onde o material promocional supera em muito o material auditado, <strong>a verificação da rede específica é parte do trabalho</strong>, não um detalhe.</p>
+  </div>
+
+  <h4 class="sub"><span class="n">0.3.2</span>Tokenização de ativos do mundo real</h4>
+  <p>Tokenizar um ativo é emitir um registro on-chain que representa a titularidade de algo que existe fora da blockchain: uma cota de fundo, um título público, uma ação. O ganho buscado é liquidação programável e disponibilidade contínua; o custo é que alguém, fora da rede, precisa garantir que o ativo subjacente existe — e é aí que o modelo de confiança volta a importar.</p>
+  <p>Produtos em operação na Solana, segundo levantamento da própria Solana Foundation <span class="cite">(SOLANA FOUNDATION, 2026c)</span> — fonte do ecossistema, a ser lida como tal: o fundo <strong>BUIDL</strong>, da BlackRock, com mais de US$ 600 milhões na rede; o <strong>BENJI</strong>, da Franklin Templeton, expandido para a Solana em fevereiro de 2025 <span class="cite">(COINDESK, 2025a)</span>; e fundos de VanEck, Apollo, Hamilton Lane, State Street com a Galaxy, e do BNY com a Baillie Gifford. No total, a Foundation reporta US$ 3,7 bilhões em RWA não-stablecoin na rede, com 313 mil detentores, no fim de julho de 2026.</p>
+  <p>As <strong>ações tokenizadas</strong> merecem destaque porque são o estudo de caso que atravessa os Capítulos 3 a 5 deste livro. Os tokens <strong>xStocks</strong>, emitidos pela Backed Finance, acumularam US$ 25 bilhões em volume transacionado desde o lançamento, com cerca de US$ 225 milhões sob gestão e mais de 80 mil detentores on-chain em fevereiro de 2026 <span class="cite">(THE BLOCK, 2026)</span>.</p>
+  <div class="callout nota">
+    <h5>Leia esses dois números juntos</h5>
+    <p>US$ 25 bilhões de volume contra US$ 225 milhões sob gestão significa um giro superior a <strong>cem vezes</strong> o patrimônio. Para um ativo cuja tese é "investir em ações sem fuso horário", isso não descreve investidores de longo prazo: descreve negociação de alta rotatividade. É a métrica de giro do Capítulo 2 aplicada fora de uma pool — e um bom exemplo de como duas métricas corretas, lidas juntas, contam uma história que nenhuma delas conta sozinha.</p>
+  </div>
+
+  <h4 class="sub"><span class="n">0.3.3</span>Usos não financeiros: a evidência é mais fraca</h4>
+  <p>Rastreabilidade de cadeia de suprimentos, identidade digital e registros públicos são os usos mais citados — e os que têm menos números auditáveis. O <strong>Carrefour Brasil</strong> divulgou mapear com blockchain 100% do uso de defensivos agrícolas em produtos de marca própria, com QR code que identifica a família produtora <span class="cite">(SERASA EXPERIAN, 2023)</span>. Vale ler a afirmação com precisão: o "100%" refere-se ao <em>mapeamento de defensivos em marca própria</em>, não à rastreabilidade integral de todos os produtos. A matéria não informa a plataforma usada, o número de SKUs nem o de fornecedores.</p>
+  <p>Não é uma crítica ao projeto, que pode ser perfeitamente sólido. É uma observação sobre o que está disponível para análise: <strong>sem plataforma, escopo e contagem declarados, não há como medir nada</strong>. Essa lacuna entre narrativa e número auditável é a regra, e não a exceção, nos casos não financeiros.</p>
+
+  <h3 class="sec" id="s0-4"><span class="n">0.4</span>Um resultado metodológico: os agregadores não concordam</h3>
+  <p>Ao levantar o tamanho do mercado de ativos tokenizados para este capítulo, encontramos um problema que vale mais do que o número que procurávamos. Na mesma janela de 2026, fontes diferentes reportam valores que divergem em mais de três vezes.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Qual é o tamanho do mercado de ativos tokenizados?</p>
+      <p class="chart-sub">valores reportados por fontes diferentes para 2026 · a resposta depende de quem você pergunta</p>
+      <div id="f0-1"></div>
+    </div>
+    <figcaption><b>Figura 0.1</b> — A divergência vem de decisões metodológicas não padronizadas: incluir ou não stablecoins, ativos em redes privadas e estruturas <em>wrapper</em>. O relatório Nexa, por exemplo, registra que das 593 estruturas tokenizadas mapeadas, <strong>460 são wrappers</strong> — contá-las ou não muda o total. Fonte: compilação própria a partir das fontes citadas no texto. <span class="badge real">real</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>Para um livro sobre análise quantitativa, isso não é um contratempo: é o resultado. <strong>Um número de mercado em DeFi sem o nome do agregador e a data da consulta não significa nada.</strong> A prática correta é citar a fonte, a data e, quando possível, a decisão metodológica que mais afeta o resultado — como fizemos com o volume bruto e ajustado de stablecoins na seção anterior.</p>
+
+  <h3 class="sec" id="s0-5"><span class="n">0.5</span>Como a Solana vende infraestrutura a empresas e bancos</h3>
+  <p>A Solana não se posiciona apenas como rede para aplicações cripto. Há uma oferta institucional explícita, com produtos, argumentos comerciais e uma organização de representação política — o <strong>Solana Policy Institute</strong>, criado em março de 2025 e presidido por Kristin Smith desde maio do mesmo ano, cujo financiamento não é divulgado <span class="cite">(THE BLOCK, 2025)</span>.</p>
+
+  <h4 class="sub"><span class="n">0.5.1</span>Token Extensions: conformidade dentro do token</h4>
+  <p>O produto central dessa oferta são as <strong>Token Extensions</strong>, anunciadas em janeiro de 2024 e descritas pela própria Solana Foundation como construídas <em>"em colaboração com grandes instituições reguladas"</em> <span class="cite">(SOLANA FOUNDATION, 2024)</span>. A ideia comercial é direta: embutir no padrão do token os controles que um banco precisa ter, em vez de exigir que cada emissor os reimplemente.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 0.2 — Token Extensions e a exigência institucional que cada uma atende</caption>
+      <thead><tr><th>Extensão</th><th>O que faz</th><th>Exigência que atende</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Transferências confidenciais</strong></td><td>Oculta valores e saldos usando criptografia, mantendo uma chave de auditor com acesso de leitura.</td><td>Sigilo comercial sem abrir mão de auditabilidade.</td></tr>
+        <tr><td><strong>Transfer hooks</strong></td><td>Permite que o emissor controle com quais carteiras o token pode interagir.</td><td>KYC e listas de participantes autorizados.</td></tr>
+        <tr><td><strong>Delegação permanente</strong></td><td>Autoridade irrevogável do emissor sobre os tokens emitidos.</td><td>Ordens judiciais de congelamento e apreensão.</td></tr>
+        <tr><td><strong>Estado padrão da conta</strong></td><td>Contas nascem congeladas até serem habilitadas.</td><td>Habilitação só após verificação cadastral.</td></tr>
+        <tr><td><strong>Taxa de transferência</strong></td><td>Taxa cobrada no nível do protocolo do token.</td><td>Modelos de receita do emissor.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fonte: <b>SOLANA FOUNDATION, 2024</b>. Adotantes nomeados pela própria Foundation: <b>Paxos</b> (USDP) e <b>GMO Trust</b> (stablecoins reguladas de iene e dólar). Sobre as transferências confidenciais, a documentação oficial descreve o mecanismo criptográfico mas <b>não declara o status de disponibilidade em mainnet</b> — registramos a lacuna em vez de supor.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout alerta">
+    <h5>O paradoxo que a tabela revela</h5>
+    <p>Leia a coluna do meio inteira. Controle de quem pode receber, autoridade irrevogável do emissor, contas congeladas por padrão, valores ocultos do público. <strong>Essas extensões reconstroem, dentro do token, exatamente as propriedades que a seção 0.1 apresentou como o problema que a blockchain veio resolver.</strong></p>
+    <p>Não é hipocrisia, e sim uma escolha de engenharia defensável: o que se preserva é a <em>liquidação compartilhada</em> — um só registro, uma só rede, sem reconciliação entre sistemas — enquanto o controle sobre o ativo permanece com um emissor regulado. Mas o analista precisa nomear a troca com precisão. Um ativo com delegação permanente <strong>não</strong> é autocustodiado no sentido do Capítulo 1, por mais que a chave esteja com o usuário. A pergunta correta nunca é "isto é descentralizado?", e sim "<em>o que</em> é descentralizado aqui, e o que não é?".</p>
+  </div>
+
+  <h4 class="sub"><span class="n">0.5.2</span>Ambientes permissionados</h4>
+  <p>A Solana oferece também os <strong>Solana Permissioned Environments</strong>: instâncias privadas da máquina virtual da Solana, em que a empresa é a autoridade máxima do ambiente e pode restringir quais nós participam <span class="cite">(SORG, 2023)</span>. Dois pontos merecem registro. O primeiro é que a própria documentação afirma que esses ambientes <strong>não são conectados à rede principal</strong>, e que construir uma ponte "adiciona considerações e riscos de segurança". O segundo é que a página, publicada em setembro de 2023, <strong>não nomeia um único cliente, piloto ou implantação</strong>. Mencionamos o produto porque ele faz parte da oferta comercial; não temos como avaliar sua adoção.</p>
+
+  <h4 class="sub"><span class="n">0.5.3</span>Quem de fato usa, e em que estágio</h4>
+  <p>A distinção entre <strong>anúncio</strong>, <strong>piloto</strong> e <strong>produção</strong> é onde a maior parte da cobertura do setor falha. A Tabela 0.3 aplica essa separação.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 0.3 — Instituições financeiras e a Solana: o que está confirmado <span class="badge real">real</span></caption>
+      <thead><tr><th>Instituição</th><th>O que é, concretamente</th><th>Estágio</th><th>Data</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Citi</strong></td><td>Tokenizou uma letra de câmbio e executou emissão, transferência de titularidade e liquidação final na Solana, via plataforma proprietária, sem reconciliação fora da rede.</td><td>Produção<br><span style="color:var(--ink-3)">valor não divulgado</span></td><td>fev. 2026</td></tr>
+        <tr><td><strong>BlackRock</strong></td><td>Fundo BUIDL, com mais de US$ 600 milhões na rede.</td><td>Produção</td><td>mar. 2025</td></tr>
+        <tr><td><strong>Franklin Templeton</strong></td><td>Fundo BENJI (US$ 594 mi) expandido para a Solana.</td><td>Produção</td><td>fev. 2025</td></tr>
+        <tr><td><strong>PayPal / Paxos</strong></td><td>PYUSD; 25,8% do total resgatável emitido na Solana.</td><td>Produção</td><td>mai. 2024</td></tr>
+        <tr><td><strong>Visa</strong></td><td>Liquidação em USDC na Solana com dois bancos parceiros.</td><td>Produção nos EUA<br><span style="color:var(--ink-3)">a Solana classifica como piloto</span></td><td>dez. 2025</td></tr>
+        <tr><td><strong>Western Union</strong></td><td>Stablecoin USDPT, emitida pelo Anchorage Digital Bank.</td><td>Lançado</td><td>mai. 2026</td></tr>
+        <tr><td><strong>Société Générale-FORGE</strong></td><td>Stablecoin USDCV em Ethereum e Solana.</td><td>Lançado</td><td>jun. 2025</td></tr>
+        <tr><td><strong>Fiserv</strong></td><td>Stablecoin FIUSD com Paxos e Circle.</td><td>Anúncio → lançado</td><td>jun. 2025</td></tr>
+        <tr><td><strong>R3 / Corda</strong></td><td>Parceria para levar ativos regulados do Corda à rede pública.</td><td class="neg">Anúncio<br><span style="color:var(--ink-3)">migração em produção não confirmada</span></td><td>mai. 2025</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Fontes primárias e jornalísticas citadas nas referências do capítulo. <b>Não confirmados</b> e deliberadamente excluídos: Shopify e JPMorgan (ambos na rede Base), Bank of America (sem evidência de uso ou teste na Solana) e os casos corporativos de ambientes permissionados, mencionados apenas por fonte do próprio ecossistema.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <h4 class="sub"><span class="n">0.5.4</span>O contra-argumento que o setor prefere não citar</h4>
+  <p>Seria desonesto apresentar a adoção institucional sem o movimento que vai na direção oposta. Em junho de 2026, <strong>JPMorgan, Citi e Bank of America</strong> — os três maiores bancos americanos — planejavam uma rede compartilhada de <strong>depósitos tokenizados</strong>, operada pela The Clearing House, com lançamento previsto até o primeiro semestre de 2027. A motivação declarada é manter depósitos dentro do sistema bancário regulado, <em>como defesa contra as stablecoins</em> <span class="cite">(GODBOLE, 2026)</span>.</p>
+  <p>Ou seja: no segmento de maior porte, a escolha por uma blockchain pública sem permissão está longe de decidida. Os mesmos bancos que tokenizam ativos em redes públicas constroem, em paralelo, uma rede permissionada de propriedade própria.</p>
+  <p>Há ainda a avaliação do <strong>Sygnum Bank</strong>, banco suíço de ativos digitais, para quem <em>"ainda não vemos sinais convincentes de que a Solana seria a escolha preferida"</em> das instituições financeiras tradicionais. O argumento é econômico: a receita da rede seria menos estável por estar concentrada em ativos especulativos, e a receita do Ethereum ainda a superaria em duas a duas vezes e meia. O caminho apontado para fechar essa distância é exatamente crescer em receita estável vinda de tokenização e stablecoins <span class="cite">(COINTELEGRAPH, 2025b)</span>.</p>
+
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s0-6"><span class="n">0.6</span>Medindo a rede: o que é real e o que é marketing</h3>
+  <p>Números de desempenho de blockchain são um campo minado, e aprender a atravessá-lo é um exercício quantitativo em si. A regra é simples: <strong>prefira sempre um número que você consiga recalcular</strong>.</p>
+  <p>A Solana processou <strong>8,92 bilhões de transações não-voto</strong> bem-sucedidas no terceiro trimestre de 2026, segundo dados da Allium. Dividindo por 92 dias de 86.400 segundos, chegamos a aproximadamente <strong>1.122 transações por segundo</strong> em média. Esse número é auditável: qualquer pessoa pode refazer a divisão e questionar a fonte do numerador.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Cálculo 0.1</span><span class="nm">TPS médio real a partir de um total trimestral</span></div>
+    <div class="eq-body">TPS<span class="op">=</span><span class="frac"><span>8,92<span class="op">×</span>10<sup>9</sup> transações</span><span>92 dias<span class="op">×</span>86.400 s</span></span><span class="op">≈</span><strong style="color:var(--accent-2)">1.122</strong></div>
+    <div class="eq-legend">
+      <span><b>Transações não-voto</b> — excluem as transações internas de consenso entre validadores, que não representam atividade econômica</span>
+      <span><b>Por que a média importa</b> — é a métrica que um sistema de produção precisa sustentar; o pico diz o que a rede aguenta, não o que ela faz</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Capacidade da Solana: o que é medido e o que é afirmado</p>
+      <p class="chart-sub">escala logarítmica · transações por segundo</p>
+      <div id="f0-2"></div>
+    </div>
+    <figcaption><b>Figura 0.2</b> — Entre a média auditável e o número de marketing mais repetido há um fator de quase 60. Nenhum dos dois é "falso" — eles medem coisas diferentes, e é por isso que a unidade e a origem precisam vir junto. O recorde diário e o teto teórico vêm, respectivamente, de fonte do ecossistema e de uma afirmação sem origem primária localizável. Fonte: cálculo próprio sobre dados Allium <span class="cite">(CRYPTO.NEWS, 2026)</span>; demais valores conforme citado no texto. <span class="badge real">real</span> / <span class="badge est">estimado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <div class="callout aviso">
+    <h5>Três números que este livro recusa</h5>
+    <p><strong>65.000 TPS</strong> — capacidade de projeto, repetida em dezenas de fontes sem origem primária verificável. É número de marketing.<br>
+    <strong>1 milhão de TPS do Firedancer</strong> — obtido em ambiente de teste, nunca em rede principal.<br>
+    <strong>Finalidade de 150 ms após o Alpenglow</strong> — a própria página oficial declara que é <em>"uma expectativa, não uma constante"</em>, e não apresenta medição em produção <span class="cite">(SOLANA FOUNDATION, 2026d)</span>.</p>
+  </div>
+
+  <h3 class="sec" id="s0-7"><span class="n">0.7</span>Confiabilidade: o histórico e o risco que restou</h3>
+  <p>Vender infraestrutura a um banco exige responder a uma pergunta que nenhum material promocional gosta de abordar: <em>e quando cai?</em> A Solana teve um histórico significativo de interrupções entre 2020 e 2024.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Interrupções totais da rede Solana, 2020–2024</p>
+      <p class="chart-sub">duração em horas · nenhuma parada total documentada após fevereiro de 2024</p>
+      <div id="f0-3"></div>
+    </div>
+    <figcaption><b>Figura 0.3</b> — As causas variam — enxurrada de transações de bots, bug de propagação de blocos, falha de escolha de <em>fork</em>, loop no cache de compilação —, mas o padrão é comum a sistemas jovens de alta capacidade: os limites aparecem sob carga real, não em teste. Fonte: elaboração própria a partir de <span class="cite">HELIUS, 2026b</span>. <span class="badge real">real</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>Desde fevereiro de 2024 não há parada total documentada, e materiais do ecossistema divulgam "100% de uptime" desde então. A afirmação é tecnicamente correta quanto a paradas completas — e incompleta como avaliação de risco, porque omite o episódio mais instrutivo de todos.</p>
+
+  <div class="callout alerta">
+    <h5>12 de agosto de 2026: a margem de 4,5 pontos</h5>
+    <p>Uma falha de roteamento (BGP) em um provedor de hospedagem propagou uma rota malformada e isolou doze de seus <em>datacenters</em> na Europa e na Ásia. <strong>102 dos 699 validadores</strong> saíram do ar, levando <strong>28,83% do SOL em stake</strong> à condição de inativo. A rede para de finalizar blocos quando esse valor atinge <strong>33,34%</strong>.</p>
+    <p>A margem foi de <strong>4,51 pontos percentuais</strong>. A rede não parou, a degradação durou cerca de meia hora, e a página de status oficial não registrou incidente <span class="cite">(LEE, 2026)</span>.</p>
+    <p>A lição é a que mais importa para quem avalia a rede como infraestrutura: <strong>o risco residual da Solana deixou de ser majoritariamente bug de software e passou a ser concentração</strong> — de validadores em poucos provedores de hospedagem e de stake em poucas implementações de cliente. Em outubro de 2025, uma única família de cliente concentrava mais de 70% do stake; o Ethereum trata manter qualquer cliente abaixo de 33% como requisito duro de segurança <span class="cite">(MATOS, 2025)</span>.</p>
+  </div>
+  <p>É justamente esse tipo de risco que o <strong>Firedancer</strong>, implementação independente de validador desenvolvida pela Jump Crypto, pretende reduzir: um segundo cliente diminui o impacto de um bug em qualquer um deles. Ele entrou em rede principal em dezembro de 2025, inicialmente com menos de 1% do stake <span class="cite">(MATOS, 2025)</span>. E o <strong>Alpenglow</strong>, aprovado em governança com 98,27% dos votos a favor e 52% do stake participando, foi ativado na época 1064, em 21 de outubro de 2026, substituindo o mecanismo de votação do consenso <span class="cite">(SOLANA FOUNDATION, 2026d)</span>.</p>
+
+  <h3 class="sec" id="s0-8"><span class="n">0.8</span>O Brasil: regulação, Drex e tokenização</h3>
+  <p>O leitor brasileiro opera sob um arcabouço que mudou substancialmente entre 2022 e 2026, e que vale conhecer antes de desenhar qualquer projeto.</p>
+  <p>A <strong>Lei 14.478/2022</strong> estabeleceu as diretrizes para prestadoras de serviços de ativos virtuais <span class="cite">(BRASIL, 2022)</span>. Sua regulamentação veio com as <strong>Resoluções BCB nº 519, 520 e 521</strong>, de 10 de novembro de 2025, em vigor desde <strong>2 de fevereiro de 2026</strong>. Elas criam a figura da Sociedade Prestadora de Serviços de Ativos Virtuais, organizam o setor em três modalidades — intermediação, custódia e corretora — e aplicam ao segmento exigências de segregação patrimonial, prevenção à lavagem de dinheiro, governança e cibersegurança equivalentes às de instituição de pagamento <span class="cite">(BANCO CENTRAL DO BRASIL, 2025; CSMV ADVOGADOS, 2025)</span>.</p>
+  <p>No mercado de capitais, a CVM manteve como marco o <strong>Parecer de Orientação nº 40/2022</strong>, que trata de quando um criptoativo é valor mobiliário <span class="cite">(CVM, 2022)</span>. Em outubro de 2026, a <strong>Resolução CVM nº 249/2026</strong> criou um <strong>Programa Piloto DLT</strong> para testar o ciclo completo da tokenização — emissão, oferta, negociação, custódia e liquidação. O desenho é deliberadamente conservador: <strong>veda a participação de investidores reais e o uso de valores mobiliários reais</strong>, operando com tokens fictícios e sem conferir autorização para atividade regulada <span class="cite">(INACIO, 2026)</span>.</p>
+  <p>Quanto ao <strong>Drex</strong>, o projeto de moeda digital do Banco Central, o registro honesto é de dificuldade técnica. Em fevereiro de 2025, o BCB decidiu não incluir novos casos de uso na segunda fase do piloto, declarando que, "apesar de avanços importantes, as soluções testadas apresentam limitações" <span class="cite">(FINSIDERS BRASIL, 2025)</span>. O obstáculo central é a <strong>privacidade dos dados</strong> em uma rede compartilhada — o problema de conciliar sigilo bancário com verificabilidade distribuída, que é a mesma tensão que as transferências confidenciais da seção 0.5.1 tentam resolver em outro contexto.</p>
+  <div class="callout nota">
+    <h5>Verificação pendente</h5>
+    <p>Há indicações de mudança arquitetural no Drex ao longo de 2026, inclusive a possibilidade de a solução final não usar blockchain. Não conseguimos confirmar isso em comunicado oficial do Banco Central até a data de fechamento desta edição, e por isso não afirmamos. <strong>Consulte o site do BCB antes de citar o estado atual do projeto.</strong></p>
+  </div>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>Blockchain resolve um problema específico — registro compartilhado entre partes que não confiam umas nas outras — e cobra caro por isso. O teste da Tabela 0.1 separa os casos em que o preço se justifica daqueles em que um banco de dados resolveria melhor, e o encerramento do TradeLens mostra que o obstáculo costuma ser de governança, não de tecnologia.</p>
+    <p>Fora da criptomoeda, os usos com evidência mais sólida são financeiros: stablecoins como trilho de pagamento e tokenização de ativos. A Solana construiu uma oferta institucional em torno disso, cujo produto central — as Token Extensions — reintroduz controles centralizados dentro do token, preservando a liquidação compartilhada e abrindo mão de parte da autocustódia. Casos em produção existem e são verificáveis; outros tantos, amplamente divulgados, não resistem à checagem.</p>
+    <p>Fica também o hábito que o restante do livro vai exigir: <strong>recalcule o número, nomeie o agregador, declare a data e distinga anúncio de produção</strong>. O <strong>Capítulo 1</strong> leva essa postura para a comparação entre o sistema financeiro tradicional e o descentralizado.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>Hash</dt><dd>Resumo criptográfico de um dado; mudar o dado muda o resumo, o que permite detectar alterações.</dd></div>
+      <div><dt>Consenso</dt><dd>Mecanismo pelo qual participantes concordam sobre a ordem e a validade dos registros.</dd></div>
+      <div><dt>Proof of History</dt><dd>Relógio criptográfico verificável da Solana, que comprova a ordem dos eventos sem negociação prévia.</dd></div>
+      <div><dt>Stablecoin</dt><dd>Token cujo valor é mantido próximo ao de uma moeda de referência, em geral por lastro.</dd></div>
+      <div><dt>Tokenização (RWA)</dt><dd>Emissão de um registro on-chain que representa a titularidade de um ativo do mundo real.</dd></div>
+      <div><dt>Wrapper</dt><dd>Estrutura que embrulha um ativo existente em um token; infla contagens de "ativos tokenizados".</dd></div>
+      <div><dt>Transação não-voto</dt><dd>Transação de atividade econômica, excluídas as de consenso entre validadores.</dd></div>
+      <div><dt>Stake delinquente</dt><dd>Parcela do stake cujos validadores pararam de votar; acima de 33,34%, a rede não finaliza blocos.</dd></div>
+      <div><dt>SPSAV</dt><dd>Sociedade Prestadora de Serviços de Ativos Virtuais, figura criada pela regulação do BCB em 2025.</dd></div>
+      <div><dt>Depósito tokenizado</dt><dd>Representação on-chain de um depósito bancário, emitida por um banco regulado.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ CH.hbars("f0-1",{y:{pre:"US$ ",suf:" bi",dec:1},ml:230,rowH:32,max:70,
+  xLabel:"valor reportado do mercado de ativos tokenizados, em bilhões de dólares",
+  rows:[
+   {k:"KuCoin (set. 2026)",v:65,lbl:"US$ 65 bi",color:"var(--c5)",note:"metodologia não detalhada"},
+   {k:"Thirdweb (2026)",v:60,lbl:"US$ 60 bi",color:"var(--c5)"},
+   {k:"RWA.xyz, via Cryptobriefing",v:46.3,lbl:"US$ 46,3 bi",color:"var(--c2)"},
+   {k:"RWA.xyz, via Nexa (set. 2026)",v:39.2,lbl:"US$ 39,2 bi",color:"var(--c2)",note:"exclui stablecoins"},
+   {k:"RWA.xyz (2026)",v:31.0,lbl:"US$ 31,0 bi",color:"var(--c1)"},
+   {k:"CoinGecko (mar. 2026)",v:19.32,lbl:"US$ 19,3 bi",color:"var(--c1)",note:"recorte mais restrito"}
+  ]});
+
+ CH.hbars("f0-2",{y:{dec:0},ml:230,rowH:32,log:true,logMin:100,max:100000,
+  xLabel:"transações por segundo — escala logarítmica",
+  rows:[
+   {k:"Média real, 3T/2026",v:1122,lbl:"1.122 TPS",color:"var(--c3)",note:"derivado de 8,92 bi de transações não-voto"},
+   {k:"Recorde diário (ago. 2026)",v:1966,lbl:"1.966 TPS",color:"var(--c1)",note:"169,9 mi de transações em um dia"},
+   {k:"Visa, média declarada",v:1700,lbl:"≈1.700 TPS",color:"var(--c4)",note:"referência de comparação do setor"},
+   {k:"\"Capacidade de projeto\"",v:65000,lbl:"65.000 TPS",color:"var(--c5)",note:"sem origem primária verificável"}
+  ]});
+
+ CH.bars("f0-3",{height:300,mb:58,barMax:52,
+  cats:["dez|2020","set|2021","abr|2022","jun|2022","set|2022","fev|2023","fev|2024"],
+  y:{dec:1,suf:" h"},yLabel:"duração da parada (horas)",xLabel:"data da interrupção",
+  series:[{name:"duração",color:"var(--c5)",values:[6,17,8,4.5,8.5,19,5]}]});
+})();
+</script>
+</section>

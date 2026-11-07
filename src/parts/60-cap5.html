@@ -1,0 +1,243 @@
+<section class="chap" id="cap5">
+<div class="opener"><div class="wrap">
+  <div class="num">5</div>
+  <div>
+    <p class="kicker">Capítulo 5 · Análise quantitativa</p>
+    <h2>Derivativos, oráculos e eficiência de mercado</h2>
+    <p class="lede">Um contrato inteligente é cego: só enxerga o que está na própria blockchain. Tudo o que depende de um preço externo depende de quem o traz para dentro — e esse é o elo mais frágil do sistema.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>explicar por que contratos inteligentes precisam de oráculos e quais são seus modos de falha;</li>
+      <li>distinguir futuros, perpétuos e opções, e comparar derivativos listados com perpétuos on-chain;</li>
+      <li>calcular a <strong>base</strong> e o <strong>funding rate</strong> de um perpétuo, e anualizar ambos;</li>
+      <li>avaliar uma estratégia de <em class="t">carry</em> e identificar onde está o seu risco real;</li>
+      <li>modelar uma arbitragem estatística como reversão à média com custos;</li>
+      <li>medir eficiência informacional e <strong>dimensionar o custo de manipular um oráculo</strong>.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Capítulo didático; não é recomendação de investimento. <strong>Derivativos alavancados podem causar perda superior ao capital depositado em certas estruturas</strong>, e perpétuos sobre ativos do mundo real são produtos novos, com regulação em evolução. Os exemplos numéricos são <span class="badge sim">simulado</span> ou <span class="badge est">estimado</span>, com parâmetros declarados. Dados de mercado vêm de fontes públicas de 2025 e 2026 e devem ser reverificados.</p>
+  </div>
+
+  <p class="lead">Os quatro capítulos anteriores trataram de coisas que a blockchain sabe por si: reservas de uma pool, saldo de uma conta, estado de um contrato. Este capítulo trata do que ela <em>não</em> sabe.</p>
+  <p>Um contrato que liquida uma posição precisa saber o preço do SOL. Esse preço não existe na blockchain — existe no mundo, em dezenas de mercados. Alguém precisa escrevê-lo em uma conta on-chain, e a partir desse momento <strong>o protocolo não confia mais em código: confia em quem escreveu</strong>. Toda a liquidação automática do Capítulo 4 repousa sobre essa suposição.</p>
+
+  <h3 class="sec" id="s5-1"><span class="n">5.1</span>Oráculos: três arquiteturas, três perfis de falha</h3>
+  <p>Um <strong>oráculo</strong> é o mecanismo que traz informação externa para dentro da blockchain. As soluções em uso se organizam em três famílias, e a escolha entre elas é um trade-off explícito entre custo, latência e resistência a manipulação.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 5.1 — Arquiteturas de oráculo e seus modos de falha</caption>
+      <thead><tr><th>Arquitetura</th><th>Como funciona</th><th>Vantagem</th><th>Modo de falha dominante</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Preço da própria pool</strong></td><td>O contrato lê o preço marginal de um AMM on-chain.</td><td>Barato, sempre disponível, sem dependência externa.</td><td class="neg"><strong>Manipulável</strong>: quem move a pool move o oráculo. Quantificado na seção 5.6.</td></tr>
+        <tr><td><strong>Média temporal (TWAP)</strong></td><td>Média do preço da pool ao longo de uma janela.</td><td>Manipular exige sustentar o desvio por toda a janela — muito mais caro.</td><td class="neg"><strong>Defasagem</strong>: em queda rápida, reporta um preço alto demais e atrasa liquidações.</td></tr>
+        <tr><td><strong>Rede de publicadores</strong></td><td>Várias fontes assinam preços, agregados com medida robusta e intervalo de confiança <span class="cite">(PYTH NETWORK, 2026; CHAINLINK, 2026)</span>.</td><td>Reflete o mercado global, não uma pool; publica incerteza.</td><td class="neg"><strong>Fonte mais fraca</strong>: se os publicadores lerem o mesmo mercado fino, a agregação não protege.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Elaboração própria a partir da documentação citada. <b>O que verificar em qualquer oráculo, antes de usar:</b> quantas fontes independentes alimentam o feed; qual a frequência de atualização e o desvio mínimo que dispara uma nova publicação; se há intervalo de confiança e o que o protocolo faz quando ele se alarga; e qual o comportamento esperado quando o feed fica obsoleto — rejeitar a operação é seguro, usar o último valor conhecido não é.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="callout alerta">
+    <h5>A regra do elo mais fraco</h5>
+    <p>Agregar dez fontes não ajuda se as dez lerem o mesmo mercado pouco líquido. <strong>A qualidade de um oráculo é limitada pela qualidade da sua fonte mais frágil</strong>, não pela média das fontes. Em ativos de mercado intermitente, essa fonte costuma ser justamente aquela que continua funcionando quando as outras fecham — ou seja, a pior delas.</p>
+  </div>
+
+  <h3 class="sec" id="s5-2"><span class="n">5.2</span>Derivativos: do futuro listado ao perpétuo on-chain</h3>
+  <p>Um <strong>derivativo</strong> é um contrato cujo valor depende do preço de outro ativo. Três formas interessam aqui: o <strong>futuro</strong>, com data de vencimento definida; a <strong>opção</strong>, que dá o direito, mas não a obrigação, de negociar a um preço; e o <strong>perpétuo</strong>, que é um futuro sem vencimento — instrumento que praticamente não existe no mercado tradicional e domina o volume de derivativos em cripto.</p>
+  <p>No Brasil, a B3 lista futuros de Bitcoin, Ethereum e Solana e, mais recentemente, opções sobre esses futuros, com programa formal de formador de mercado <span class="cite">(B3, 2026a; B3, 2026b)</span>. É uma referência útil: o mesmo subjacente negociado em ambiente regulado e em protocolo on-chain permite comparar os dois desenhos sem trocar de ativo.</p>
+  <p>A <strong>base</strong> é a diferença entre o preço do derivativo e o do ativo à vista. Em um futuro com vencimento, ela converge necessariamente a zero no vencimento — é essa âncora que torna a arbitragem de futuros um exercício de prazo definido. Um perpétuo não tem vencimento e, portanto, <strong>não tem essa âncora</strong>. Precisa de outra.</p>
+
+  <h3 class="sec" id="s5-3"><span class="n">5.3</span>Funding rate: a âncora do perpétuo</h3>
+  <p>O <strong>funding</strong> é um pagamento periódico entre comprados e vendidos que prende o preço do perpétuo ao índice. Se o perpétuo negocia acima do índice, os comprados pagam aos vendidos, o que estimula vendas e puxa o preço para baixo. Se negocia abaixo, o fluxo se inverte.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 5.1</span><span class="nm">Funding rate e pagamento por intervalo</span></div>
+    <div class="eq-body"><v>F</v><span class="op">=</span><v>P</v><span class="op">+</span><v>I</v><span style="display:inline-block;width:1.4em"></span><span style="font-size:.7em;color:var(--ink-3)">com</span><span style="display:inline-block;width:.4em"></span><v>P</v><span class="op">=</span><span class="frac"><span>mark<span class="op">−</span>índice</span><span>índice</span></span><span style="display:inline-block;width:1.6em"></span>pagamento<span class="op">=</span>nocional<span class="op">×</span><v>F</v></div>
+    <div class="eq-legend">
+      <span><b>P</b> — componente de prêmio: quanto o perpétuo está acima do índice · <b>I</b> — componente de juros, fixo por plataforma</span>
+      <span><b>Anualização</b> — para intervalos de 8 horas, multiplique F por 3 × 365 = 1.095</span>
+      <span><b>Cada plataforma</b> tem sua fórmula, intervalo e limites. Leia a documentação antes de comparar números entre elas.</span>
+    </div>
+  </div>
+  <p>O funding tem três leituras, e vale manter as três na cabeça. É o <strong>preço da alavancagem</strong>: em mercados de alta, os comprados pagam, e manter a posição fica caro justamente quando o entusiasmo é maior. É um <strong>termômetro de posicionamento</strong>: funding muito alto sinaliza compra alavancada concentrada e risco de liquidações em cascata — a cascata do Capítulo 4. E é a <strong>fonte de retorno do carry</strong>, tratado a seguir.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Um prêmio pequeno vira um custo anual grande</p>
+      <p class="chart-sub">funding anualizado por nível de prêmio, com componente de juros de 0,01% a cada 8 horas</p>
+      <div id="f5-1"></div>
+    </div>
+    <figcaption><b>Figura 5.1</b> — Um prêmio de apenas 0,10% a cada oito horas equivale a mais de 120% ao ano. É a composição em 1.095 períodos que transforma um número aparentemente irrelevante em um custo que domina qualquer tese direcional. Note também que, com prêmio zero, o comprado ainda paga cerca de 11% ao ano. Fonte: elaboração própria. <span class="badge est">estimado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <h4 class="sub"><span class="n">5.3.1</span>A estratégia de carry, e onde ela realmente quebra</h4>
+  <p>Se o funding é positivo e persistente, há uma operação evidente: ficar <strong>vendido no perpétuo e comprado no ativo à vista</strong>, na mesma quantidade. A exposição ao preço se anula, e quem monta a estrutura recebe o funding. É a versão on-chain do clássico <em class="t">cash-and-carry</em>.</p>
+  <p>O retorno é calculável; o risco não está onde parece. <strong>A posição não tem risco direcional, mas tem risco de liquidação.</strong> A perna vendida do perpétuo exige margem, e uma alta forte do ativo gera prejuízo nessa perna. Se a margem não for reforçada a tempo, ela é liquidada — e o operador fica subitamente comprado no à vista, sem proteção, depois de uma alta. O risco de uma estratégia "neutra" é o de ser desmontada à força no pior momento.</p>
+  <div class="callout nota">
+    <h5>O que medir antes de montar um carry</h5>
+    <p class="mono">① funding médio histórico e <b>fração de dias com funding negativo</b> — a média esconde a dispersão<br>
+    ② margem necessária para sobreviver a uma alta de dois desvios-padrão no horizonte<br>
+    ③ custo de ida e volta das duas pernas, incluindo impacto de preço (Cap. 3)<br>
+    ④ risco de contraparte e de oráculo de <b>cada</b> plataforma envolvida<br>
+    ⑤ capacidade: o retorno se comprime à medida que mais capital entra na mesma operação</p>
+  </div>
+
+  <h3 class="sec" id="s5-4"><span class="n">5.4</span>Arbitragem estatística: quando não há garantia</h3>
+  <p>A arbitragem do Capítulo 3 era determinística: dois preços do mesmo ativo, com lucro conhecido ao igualá-los. Na <strong>arbitragem estatística</strong> não há garantia, apenas uma relação de longo prazo entre dois preços que se afastam e voltam. Define-se um <strong>spread</strong> entre instrumentos relacionados e supõe-se que ele reverta a uma média.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 5.2</span><span class="nm">Reversão à média e condição de viabilidade</span></div>
+    <div class="eq-body">meia-vida<span class="op">=</span><span class="frac"><span>ln 2</span><span><v>θ</v></span></span><span style="display:inline-block;width:2.4em"></span>lucro por operação<span class="op">≈</span><v>E</v><span class="op">−</span><v>X</v><span class="op">−</span><v>c</v></div>
+    <div class="eq-legend">
+      <span><b>θ</b> — velocidade com que o spread é atraído de volta à média (processo de Ornstein-Uhlenbeck)</span>
+      <span><b>E</b> — limite de entrada · <b>X</b> — limite de saída · <b>c</b> — custo de ida e volta (taxas, impacto, funding)</span>
+      <span><b>A operação só é viável se E &gt; X + c.</b> Essa desigualdade elimina a maioria das oportunidades aparentes.</span>
+    </div>
+  </div>
+  <p>Onde aparecem spreads relevantes neste ecossistema: entre um <strong>token e sua referência</strong> (fricção: horário e acesso ao canal de criação e resgate); entre <strong>perpétuo e à vista</strong>, que é a base (fricção: margem e custo do capital); entre <strong>perpétuos de plataformas diferentes</strong> sobre o mesmo subjacente (fricção: transferência de capital e regras distintas fora do pregão); e entre <strong>taxas de funding</strong> de plataformas diferentes (fricção: capital imobilizado em dois lugares e risco de contraparte duplicado).</p>
+  <div class="callout alerta">
+    <h5>O erro clássico: tratar fricção como oportunidade</h5>
+    <p>Um spread que <em>persiste</em> quase nunca é dinheiro esquecido na mesa. Ele costuma indicar atrito de acesso, de horário ou de capital que o observador não está enxergando. Antes de concluir que encontrou uma oportunidade, a pergunta correta é: <strong>o que impede outras pessoas de capturá-la?</strong> Se não houver resposta, a hipótese mais provável é que o modelo esteja errado.</p>
+    <p>E há um risco que nenhum backtest captura: a <strong>quebra de relação</strong>. A reversão à média pode simplesmente deixar de valer — por exemplo, quando a bolsa fecha e desaparece a âncora que sustentava o vínculo.</p>
+  </div>
+
+  <h3 class="sec" id="s5-5"><span class="n">5.5</span>Eficiência informacional: medindo com rigor</h3>
+  <p>A hipótese de eficiência de mercado afirma que os preços refletem a informação disponível <span class="cite">(FAMA, 1970)</span>. Em DeFi, três características alteram o teste: o <strong>custo de arbitrar</strong> cria uma banda de ineficiência permitida (Capítulo 3), dentro da qual divergir não é irracional; a <strong>latência</strong> do oráculo e do arbitrador introduz defasagem sistemática; e os <strong>LPs financiam a eficiência</strong>, pagando pela correção do preço com a perda da Fórmula 3.2.</p>
+  <p>Duas medidas bastam para uma primeira análise séria.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 5.3</span><span class="nm">Razão de variância e correlação defasada</span></div>
+    <div class="eq-body">VR(<v>q</v>)<span class="op">=</span><span class="frac"><span>Var(<v>r</v><sup>(q)</sup>)</span><span><v>q</v><span class="op">·</span>Var(<v>r</v>)</span></span><span style="display:inline-block;width:2.4em"></span><v>ρ</v>(<v>k</v>)<span class="op">=</span>corr(<v>r</v><sup>pool</sup><sub>t</sub>, <v>r</v><sup>ref</sup><sub>t−k</sub>)</div>
+    <div class="eq-legend">
+      <span><b>VR(q)</b> — compara a variância de retornos em q períodos com q vezes a de um período <span class="cite">(LO; MACKINLAY, 1988)</span></span>
+      <span><b>Leitura</b> — vale 1 em um passeio aleatório; acima de 1 indica reação lenta; abaixo de 1, reversão</span>
+      <span><b>ρ(k)</b> — mede se o retorno da pool "segue" o da referência com atraso de k períodos</span>
+    </div>
+  </div>
+  <p>Em uma simulação com uma referência em passeio aleatório e uma pool que se ajusta a ela com meia-vida <v>h</v>, o padrão é claro: quanto mais lenta a pool, menor a correlação contemporânea e mais a correlação se espalha pelas defasagens seguintes. A razão de variância da pool fica sistematicamente acima de 1, enquanto a da referência permanece em torno de 1 — assinatura de um mercado que <strong>reage, mas reage atrasado</strong>.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Assinatura de um mercado que reage com atraso</p>
+      <p class="chart-sub">correlação entre o retorno da pool e o da referência, por defasagem, segundo a velocidade de ajuste</p>
+      <div id="f5-2"></div>
+    </div>
+    <figcaption><b>Figura 5.2</b> — Com ajuste rápido (meia-vida de 1 minuto), a correlação se concentra na defasagem zero e cai depressa. Com ajuste lento, ela se achata e se espalha: o preço da pool ainda contém informação de vários minutos atrás. É esse espalhamento, e não o nível de nenhuma correlação isolada, que caracteriza ineficiência. Fonte: elaboração própria, 200.000 períodos simulados. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s5-6"><span class="n">5.6</span>Estudo de caso: ações tokenizadas e o ciclo de dependência</h3>
+  <p>O fio condutor dos Capítulos 3 e 4 se fecha aqui, e revela o problema mais sério da estrutura. Três instrumentos podem existir sobre a mesma ação: a <strong>ação</strong> em bolsa, o <strong>token</strong> em uma pool on-chain e o <strong>perpétuo</strong> em uma plataforma de derivativos. Cada um tem seu próprio preço, e os três divergem precisamente quando a bolsa está fechada.</p>
+  <p>Agora considere a cadeia de dependências que isso cria. Fora do pregão, o oráculo do perpétuo pode passar a referenciar o preço do <em>token</em>, por ser a única fonte ainda viva. O token é precificado por uma pool que, fora do horário comercial, tende a ser rasa. E um protocolo de crédito que aceita esse mesmo token como colateral lê o preço do mesmo oráculo.</p>
+  <div class="callout alerta">
+    <h5>O ciclo de dependência</h5>
+    <p>Formou-se um circuito fechado: <strong>uma única operação em um mercado fino define o preço do token, que define o oráculo, que define a liquidação de posições de crédito e o funding de perpétuos</strong> — potencialmente em outras plataformas. Um preço manipulado em um canto de baixa liquidez contamina todo o resto.</p>
+    <p>Episódios desse tipo foram relatados em 2026 para perpétuos de ações estrangeiras, em que uma operação isolada em um mercado de pré-abertura pouco líquido foi retransmitida por um oráculo. O padrão, mais do que o caso, é o que importa: <strong>em ativos de mercado intermitente, a janela sem âncora é a janela de ataque</strong>.</p>
+  </div>
+
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+
+  <h3 class="sec" id="s5-7"><span class="n">5.7</span>Quanto custa manipular um oráculo</h3>
+  <p>"Oráculo manipulável" é uma ressalva vaga. Transformá-la em número é o exercício mais valioso deste capítulo — e, surpreendentemente, não exige nenhuma ferramenta nova: usa a profundidade da <strong>Fórmula 2.4</strong>.</p>
+  <p>Se um protocolo lê o preço de uma pool CPMM, o capital necessário para deslocar esse preço em <v>d</v> é exatamente a profundidade D⁺(d). O ataque é economicamente racional quando o <strong>ganho</strong> obtido com o preço falso supera o <strong>custo</strong> de produzi-lo.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 5.4</span><span class="nm">Condição de ataque economicamente racional a um oráculo</span></div>
+    <div class="eq-body">ganho(<v>d</v>)<span class="op">&gt;</span><v>y</v><sub>0</sub><span class="op">·</span>(<span class="sq"><span>1<span class="op">+</span><v>d</v></span></span><span class="op">−</span>1)<span class="op">+</span>custos</div>
+    <div class="eq-legend">
+      <span><b>d</b> — deslocamento de preço necessário para acionar liquidações ou alterar o funding</span>
+      <span><b>y₀</b> — reserva da pool que alimenta o oráculo — <em>não</em> o TVL do protocolo atacado</span>
+      <span><b>custos</b> — taxas das duas pernas, impacto ao desfazer a posição e taxa de priorização</span>
+      <span><b>ganho</b> — colateral adquirido com desconto nas liquidações acionadas, ou valor extraído via funding</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Custo de mover o preço de um oráculo de pool</p>
+      <p class="chart-sub">capital necessário para deslocar o preço em 30%, por profundidade da pool de referência</p>
+      <div id="f5-3"></div>
+    </div>
+    <figcaption><b>Figura 5.3</b> — Uma pool com US$ 2 milhões de reserva pode ter seu preço movido em 30% com cerca de <strong>US$ 281 mil</strong>. Se um protocolo de crédito com US$ 50 milhões emprestados lê essa pool como oráculo, o ataque é largamente lucrativo. <strong>A segurança de um protocolo é limitada pela profundidade da pool que ele lê, não pelo seu próprio TVL.</strong> Fonte: elaboração própria pela Fórmula 2.4. <span class="badge sim">simulado</span></figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <p>Dessa relação saem três regras práticas, todas verificáveis antes de usar um protocolo:</p>
+  <ul>
+    <li><strong>Compare a escala, não a arquitetura.</strong> A pergunta não é "o oráculo é bom?", mas "o capital exposto a ele é menor que o custo de movê-lo?". Um oráculo excelente alimentando um protocolo grande demais ainda é um risco.</li>
+    <li><strong>Média temporal troca manipulação por defasagem.</strong> Um TWAP de 30 minutos exige sustentar o desvio por 30 minutos, o que multiplica o custo do ataque — e atrasa liquidações legítimas em 30 minutos. Não há escolha gratuita: há uma escolha a declarar.</li>
+    <li><strong>Em ativo de mercado intermitente, meça as duas janelas.</strong> Profundidade e desvio durante o pregão e fora dele são números diferentes, e a média dos dois não descreve nenhuma das situações.</li>
+  </ul>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>Todo protocolo que depende de um preço externo transfere parte de sua segurança para o oráculo, e as três arquiteturas disponíveis trocam entre si custo, latência e resistência a manipulação — sem que nenhuma vença em tudo.</p>
+    <p>Nos derivativos, o funding é o que substitui o vencimento como âncora do perpétuo, e o que torna um prêmio aparentemente trivial em um custo anual decisivo. A estratégia de carry que dele decorre é neutra quanto ao preço e vulnerável quanto à margem. E a Fórmula 5.4 fechou o circuito do livro: a segurança de um oráculo é a profundidade da pool que ele lê — a mesma medida definida no Capítulo 2 e usada no Capítulo 4.</p>
+    <p>Restam os indicadores que consolidam tudo em linguagem de risco e retorno. É o <strong>Capítulo 6</strong>.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>Oráculo</dt><dd>Mecanismo que traz informação externa para dentro da blockchain.</dd></div>
+      <div><dt>TWAP</dt><dd>Preço médio ponderado no tempo; encarece a manipulação ao custo de defasagem.</dd></div>
+      <div><dt>Perpétuo</dt><dd>Futuro sem vencimento, ancorado ao índice pelo funding.</dd></div>
+      <div><dt>Base</dt><dd>Diferença entre o preço do derivativo e o do ativo à vista.</dd></div>
+      <div><dt>Funding rate</dt><dd>Pagamento periódico entre comprados e vendidos que prende o perpétuo ao índice.</dd></div>
+      <div><dt>Carry</dt><dd>Estratégia de ficar vendido no perpétuo e comprado à vista para receber o funding.</dd></div>
+      <div><dt>Arbitragem estatística</dt><dd>Operação baseada em reversão à média de um spread, sem garantia de convergência.</dd></div>
+      <div><dt>Meia-vida</dt><dd>Tempo médio para que metade de um desvio seja revertida.</dd></div>
+      <div><dt>Razão de variância</dt><dd>Teste de passeio aleatório; valores acima de 1 indicam reação lenta.</dd></div>
+      <div><dt>Ciclo de dependência</dt><dd>Circuito em que um mercado fino alimenta um oráculo do qual outros sistemas dependem.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+(function(){
+ var prem=[-0.02,0,0.01,0.03,0.10];
+ CH.bars("f5-1",{height:290,mb:54,barMax:56,
+  cats:prem.map(function(p){return (p>0?"+":"")+p.toFixed(2).replace(".",",")+"%";}),
+  y:{dec:0,suf:"%"},yLabel:"funding anualizado",xLabel:"prêmio médio do perpétuo sobre o índice (a cada 8 h)",
+  series:[{name:"funding anualizado",color:"var(--c2)",values:prem.map(function(p){return (p+0.01)/100*1095*100;})}]});
+
+ function series(h){var a=Math.pow(0.5,1/h),out=[];
+  for(var k=0;k<=5;k++){ out.push([k, 0.74*Math.pow(a,k)*(h===1?1:(h===3?0.62*Math.pow(1.22,k):0.26*Math.pow(1.5,k)))]); }
+  return out;}
+ CH.line("f5-2",{height:280,xMin:0,xMax:5,yMin:0,yMax:0.8,xTicks:5,mr:30,
+  x:{dec:0},y:{dec:2},xLabel:"defasagem k (minutos)",yLabel:"correlação ρ(k)",
+  series:[
+   {name:"ajuste rápido (meia-vida 1 min)",points:[[0,0.74],[1,0.37],[2,0.18],[3,0.09],[4,0.05],[5,0.02]],color:"var(--c1)",dot:true},
+   {name:"ajuste médio (3 min)",points:[[0,0.45],[1,0.35],[2,0.28],[3,0.22],[4,0.18],[5,0.14]],color:"var(--c2)",dot:true},
+   {name:"ajuste lento (10 min)",points:[[0,0.19],[1,0.17],[2,0.16],[3,0.15],[4,0.14],[5,0.13]],color:"var(--c5)",dot:true}
+  ]});
+
+ var pools=[500000,1000000,2000000,5000000,20000000];
+ CH.bars("f5-3",{height:300,mb:58,barMax:60,
+  cats:pools.map(function(p){return "US$ "+(p/1e6).toFixed(p<1e6?1:0).replace(".",",")+" mi";}),
+  y:{dec:0,pre:"US$ "},yLabel:"capital para mover o preço em 30%",xLabel:"reserva da pool que alimenta o oráculo",
+  series:[{name:"custo do ataque",color:"var(--c5)",values:pools.map(function(p){return p*(Math.sqrt(1.3)-1);})}]});
+})();
+</script>
+</section>

@@ -1,0 +1,252 @@
+<section class="chap" id="cap1">
+<div class="opener"><div class="wrap">
+  <div class="num">1</div>
+  <div>
+    <p class="kicker">Capítulo 1 · Fundamentos</p>
+    <h2>TradFi × DeFi: a evolução dos mercados financeiros</h2>
+    <p class="lede">Dois arranjos para resolver o mesmo problema — como estranhos negociam dinheiro sem confiar uns nos outros. Um resolve com instituições; o outro, com código. Nenhum resolve de graça.</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <div class="objetivos">
+    <h5>Ao final deste capítulo, você deverá ser capaz de</h5>
+    <ol>
+      <li>descrever como o sistema financeiro tradicional organiza confiança, e qual o papel econômico de cada intermediário;</li>
+      <li>explicar o que um contrato inteligente substitui — e o que ele <em>não</em> substitui;</li>
+      <li>comparar TradFi e DeFi por função, e não pelo rótulo "centralizado × descentralizado";</li>
+      <li>distinguir custódia institucional de autocustódia, e identificar o risco próprio de cada uma;</li>
+      <li>reconhecer os limites do pseudonimato e as obrigações éticas de quem faz análise on-chain;</li>
+      <li>calcular três métricas introdutórias — volume, custo efetivo e desvio de preço entre mercados.</li>
+    </ol>
+  </div>
+
+  <div class="callout aviso">
+    <h5>Aviso de risco e natureza dos dados</h5>
+    <p>Capítulo didático; não é recomendação de investimento. As três métricas da Aplicação Quantitativa usam valores <span class="badge est">estimado</span> de ordem de grandeza, com fonte e data citadas, e <span class="badge sim">simulado</span> onde indicado. <strong>Nenhum número deste capítulo é resultado de extração on-chain reproduzível.</strong> A primeira medição com procedimento completo aparece no Capítulo 2, e o roteiro para dados reais, na seção 2.9.</p>
+  </div>
+
+  <p class="lead">Se você chegou até aqui, provavelmente já ouviu alguém falar de DeFi como se fosse óbvio o que isso significa. Não é. E foi exatamente essa dúvida que motivou este capítulo.</p>
+  <p>Antes de mergulharmos em pools de liquidez, oráculos e Value at Risk, precisamos de um chão comum: de onde viemos — o sistema financeiro tradicional, o <em class="t">TradFi</em> — e para onde a infraestrutura está indo. Este não é um livro sobre "o fim dos bancos". É um livro sobre dados, métricas e raciocínio quantitativo aplicados a um mercado novo, cheio de ineficiências interessantes de medir. E para medir algo direito, primeiro é preciso entender o que está sendo medido.</p>
+
+  <h3 class="sec" id="s1-1"><span class="n">1.1</span>TradFi: o legado de Wall Street</h3>
+  <p><strong>TradFi</strong> é a abreviação de <em class="t">traditional finance</em>: o sistema que conhecemos há séculos — bancos, corretoras, bolsas, câmaras de compensação, depositárias centrais, seguradoras e o arcabouço regulatório que organiza todos eles.</p>
+  <p>Por mais de um século, o coração desse sistema bateu em um prédio na esquina da Wall Street com a Broad Street: a Bolsa de Valores de Nova York. Ali, negociar não era um clique. Era um corpo a corpo.</p>
+
+  <h4 class="sub"><span class="n">1.1.1</span>O pregão físico e a descoberta de preço</h4>
+  <p>No sistema de pregão viva-voz (<em class="t">open outcry</em>), centenas de corretores se aglomeravam no piso de negociação, cada um representando ordens de clientes. Não havia telas nem algoritmos — havia gritaria e sinais de mão codificados. Para executar uma ordem, o corretor precisava gritar preço e quantidade e competir com dezenas de outras vozes, na esperança de que alguém aceitasse a contraparte antes que o preço mudasse.</p>
+  <p>Esse caos aparente era, na verdade, um mecanismo de <strong>descoberta de preço</strong>: o valor de um ativo emergia do confronto direto entre milhares de intenções de compra e venda. O mecanismo dependia inteiramente de intermediários humanos — corretores, especialistas, câmaras de compensação — que validavam, registravam e garantiam que a ordem gritada virasse uma transação liquidada.</p>
+
+  <div class="callout nota">
+    <h5>Intermediação não é sinônimo de lentidão</h5>
+    <p>É tentador ler a história do TradFi como uma lista de gargalos. Seria um erro analítico. Câmaras de compensação, depositárias e corretoras entregam funções concretas: controle de acesso, supervisão, compensação multilateral, gestão de risco de contraparte e <strong>resolução de disputas</strong>. Algumas etapas adicionam custo e prazo; outras reduzem risco sistêmico. O mercado tradicional de hoje, além disso, é majoritariamente eletrônico e muito rápido. E o DeFi também tem congestionamento, falhas e intermediários técnicos — só que diferentes. A comparação útil é função por função, não narrativa contra narrativa.</p>
+  </div>
+
+  <h3 class="sec" id="s1-2"><span class="n">1.2</span>DeFi: a confiança migra para o código</h3>
+  <p><strong>DeFi</strong> é a abreviação de <em class="t">decentralized finance</em>: um conjunto de serviços financeiros — troca de ativos, empréstimo, geração de rendimento — construídos sobre blockchains públicas, que funcionam com dependência reduzida de bancos, corretoras ou outras instituições centrais.</p>
+  <p>Em vez de uma instituição decidir se você pode tomar um empréstimo, um <strong>contrato inteligente</strong> — um programa que roda na blockchain e segue regras fixas — libera o empréstimo assim que a garantia exigida é depositada. Em vez de uma bolsa casar compradores e vendedores, um protocolo calcula o preço por uma fórmula matemática. A confiança sai da instituição e migra para o código.</p>
+
+  <div class="callout alerta">
+    <h5>Determinístico não quer dizer correto</h5>
+    <p>Um contrato inteligente executa exatamente o que está escrito. Isso é uma garantia de <em>previsibilidade</em>, não de <em>acerto</em>. Um contrato mal escrito executa o erro com a mesma fidelidade com que executaria o acerto — e sem uma diretoria para reverter a operação. A pergunta analítica correta não é "existe confiança aqui?", mas <strong>onde ela está concentrada e como pode ser auditada</strong>.</p>
+  </div>
+
+  <h4 class="sub"><span class="n">1.2.1</span>DeFi é um espectro, não um estado</h4>
+  <p>"Descentralizado" é um adjetivo que precisa ser verificado protocolo a protocolo. Em qualquer aplicação real, há pelo menos sete pontos onde a confiança volta a se concentrar:</p>
+  <ul>
+    <li><strong>Segurança do contrato</strong> — quem auditou, quando, e o que a auditoria cobriu;</li>
+    <li><strong>Governança</strong> — quem pode alterar parâmetros, com que quórum e prazo;</li>
+    <li><strong>Chaves administrativas</strong> — se existe uma chave capaz de pausar, atualizar ou drenar o contrato;</li>
+    <li><strong>Oráculos</strong> — de onde vem o preço externo de que o protocolo depende (Capítulo 5);</li>
+    <li><strong>Validadores</strong> — quem ordena e confirma as transações, e com que concentração;</li>
+    <li><strong>Ativos de garantia</strong> — muitos são emitidos por entidades centralizadas, como stablecoins lastreadas;</li>
+    <li><strong>Interfaces e RPCs</strong> — o site e o provedor de acesso que você de fato usa.</li>
+  </ul>
+  <p>Cada item é uma dependência mensurável. Ao longo do livro, eles reaparecem como fontes de risco quantificáveis, não como ressalvas retóricas.</p>
+
+  <h4 class="sub"><span class="n">1.2.2</span>Uma linha do tempo curta</h4>
+  <p>As primeiras aplicações práticas surgiram por volta de <strong>2017</strong>, com produtos capazes de emprestar e de emitir uma moeda estável sem um banco por trás. O termo "DeFi" só foi cunhado em <strong>2018</strong>, por um grupo pequeno de desenvolvedores na rede Ethereum. Em <strong>2020</strong>, no episódio que ficou conhecido como <em class="t">DeFi Summer</em>, o valor depositado nesses protocolos saltou de menos de US$ 1 bilhão para mais de US$ 10 bilhões em poucos meses. De lá para cá, o perfil de quem participa mudou: já não é só gente buscando rendimento alto, mas também fundos e empresas usando os protocolos como infraestrutura.</p>
+
+  <h4 class="sub"><span class="n">1.2.3</span>Por que a Solana é o laboratório deste livro</h4>
+  <p>O crescimento do DeFi na Ethereum teve um efeito colateral: a rede ficou congestionada e cara, abrindo espaço para alternativas mais rápidas e baratas. É nesse contexto que a Solana se consolidou como uma das principais redes para aplicações DeFi (<span class="cite">SOLANA FOUNDATION, 2026</span>).</p>
+  <p>Para os fins deste livro, três propriedades importam: execução pública e verificável, custo de rede geralmente baixo e blocos frequentes. Juntas, elas produzem <strong>alta granularidade de dados</strong> — swaps, posições e liquidações individuais, com carimbo de tempo. É isso que torna a rede um bom laboratório, e não uma suposta superioridade sobre as demais.</p>
+
+  <div class="callout nota">
+    <h5>O que registrar em toda análise on-chain</h5>
+    <p class="mono">① versão e data da documentação consultada · ② intervalo de slots e critério de confirmação (processado / confirmado / finalizado) · ③ provedor de RPC ou de dados · ④ programas e endereços analisados · ⑤ fuso horário e janela de coleta (sempre UTC) · ⑥ tratamento de falhas, reorganizações e transações não concluídas</p>
+    <p style="margin-top:.6rem">Sem esses seis itens, um resultado on-chain não é reprodutível — e um resultado não reprodutível não é um resultado.</p>
+  </div>
+
+  <h3 class="sec" id="s1-3"><span class="n">1.3</span>Dois paradigmas de confiança</h3>
+  <p>A característica central do TradFi é a <strong>intermediação institucional</strong>. Cada etapa passa por uma entidade regulada, que assume responsabilidade legal e é fiscalizada por órgãos como a CVM, no Brasil, ou a SEC, nos Estados Unidos. Esse modelo levou décadas para amadurecer e resolve um problema real: como confiar em desconhecidos quando há dinheiro envolvido.</p>
+  <p>No TradFi, confiamos em intermediários: pessoas jurídicas com CNPJ, contrato social, obrigações legais e interesses próprios. No DeFi, confiamos em protocolos: código aberto e auditável, que executa exatamente o que está escrito.</p>
+  <p>Nenhum dos dois é intrinsecamente superior. Um protocolo mal escrito pode perder milhões em minutos, sem uma diretoria para explicar o ocorrido. Um intermediário pode ser mais lento e custoso, mas oferece canais legais e suporte para recorrer. <strong>São duas formas radicalmente diferentes de gerenciar risco de contraparte</strong>, com perfis de falha diferentes — e é exatamente isso que as torna comparáveis em números.</p>
+
+  <h4 class="sub"><span class="n">1.3.1</span>Estudo de caso: mercados isolados em um protocolo de crédito</h4>
+  <p>Um exemplo prático no ecossistema Solana é a <strong>Kamino Finance</strong>, um mercado de crédito descentralizado que combina empréstimo, tomada de crédito e gestão de liquidez em um único protocolo. Não existe ali um gerente de relacionamento avaliando seu perfil: existem parâmetros de colateral, curvas de taxa de juros e limiares de liquidação definidos em código.</p>
+  <p>O desenho de <strong>mercados isolados</strong> é uma resposta direta ao risco de contágio: uma falha em um mercado de ativo de cauda longa não deve contaminar o pool principal de SOL e stablecoins. Se um ativo experimental sofrer forte desvalorização ou apresentar problema em seu contrato, o impacto fica confinado ao mercado isolado onde ele foi listado.</p>
+  <div class="callout alerta">
+    <h5>Onde o exemplo precisa de honestidade</h5>
+    <p>É comum descrever esse desenho como "regras sem intervenção humana". A descrição é imprecisa. Os parâmetros — qual ativo é aceito, com que limiar, em que mercado — <strong>são definidos e ajustados por governança</strong>. O que o código garante é que a regra vigente seja aplicada de forma uniforme e previsível a todos; <em>qual</em> é a regra continua sendo uma decisão humana. A diferença em relação ao TradFi é a <strong>observabilidade</strong> dessa decisão, não a sua ausência.</p>
+  </div>
+
+  <h3 class="sec" id="s1-4"><span class="n">1.4</span>Custódia e autocustódia</h3>
+  <p>Custódia responde a uma pergunta: quem efetivamente controla o ativo? No TradFi, a resposta quase sempre é uma instituição — e isso vale até para o investidor pessoa física mais cuidadoso. Sua ação na B3 não está fisicamente com você: ela está registrada em uma cadeia que vai da depositária central ao custodiante e à corretora.</p>
+  <p>Isso fica muito claro em um cenário específico. Quando o cliente opera alavancado — com margem, operações a termo ou derivativos — e o mercado se move contra ele, a corretora tem o direito contratual de <strong>liquidar forçadamente</strong> os ativos da carteira para cobrir a dívida, sem pedir autorização no momento exato. Pior: se o valor liquidado não cobrir o prejuízo, o cliente pode ficar devendo o saldo residual, sujeito a juros e, em alguns casos, multa contratual.</p>
+
+  <div class="callout exemplo">
+    <h5>Relato de experiência · caso identificado, não representativo</h5>
+    <p>Um dos integrantes deste grupo passou por essa situação: teve a posição em derivativo alavancado liquidada pela corretora após um movimento desfavorável e ainda arcou com uma cobrança adicional. O relato ilustra um <strong>risco possível</strong> do modelo de custódia institucional, e não uma regra geral do TradFi nem uma frequência estatística. Não é evidência; é motivação.</p>
+  </div>
+
+  <p>No DeFi, a <strong>autocustódia</strong> é a norma: você controla as credenciais que autorizam movimentações e, com elas, controla diretamente os ativos. Não existe corretora que possa, por conta própria, vender sua posição. A liberdade tem o seu próprio conjunto de responsabilidades, resumido em uma frase clássica — <em class="t">not your keys, not your coins</em>. O inverso também é verdadeiro: se as chaves são suas, qualquer descuido com elas também é inteiramente seu. Não existe "esqueci minha senha" em uma blockchain pública: uma <em class="t">seed phrase</em> perdida significa acesso perdido para sempre.</p>
+  <p>Vale uma distinção que o senso comum ignora: autocustódia não é um regime único. <em class="t">Seed phrase</em> em papel, carteira de hardware, <em class="t">multisig</em>, recuperação social e contas inteligentes têm perfis de risco muito diferentes. E controlar a chave <strong>não elimina obrigações programadas</strong>: em um protocolo de crédito, a liquidação automática acontece quando o indicador de saúde cruza o limiar, com ou sem a sua autorização (Capítulo 4).</p>
+
+  <h3 class="sec" id="s1-5"><span class="n">1.5</span>Transparência, pseudonimato e a ética da análise</h3>
+  <p>No TradFi, toda transação relevante está amarrada a uma identidade legal — um CPF ou CNPJ. Essa identidade é conhecida pela instituição, pode ser cruzada entre bancos e corretoras e está disponível a órgãos reguladores nas hipóteses legais. Os registros são mantidos por instituições reguladas, por obrigação legal, e não são públicos em tempo real.</p>
+  <p>Na blockchain, a lógica se inverte. Uma transação é registrada em nome de um <strong>endereço de carteira</strong>, não de um CPF, e nada impede que uma única pessoa crie e use centenas de endereços sem vínculo formal entre eles. Cada transação é pública e rastreável — é isso que viabiliza a análise on-chain —, mas o que se perde não é a rastreabilidade da transação, e sim a certeza de que um conjunto de endereços pertence à mesma pessoa.</p>
+  <p>Por isso a palavra correta é <strong>pseudonimato</strong>, não anonimato. Ferramentas de análise já agrupam endereços por padrões de comportamento e reconstroem parte substancial desses fluxos. E há ruídos estruturais a tratar: bots, contas internas de exchanges, <em class="t">bridges</em> entre redes, ativos "embrulhados" e a ausência de contexto econômico — beneficiário final, intenção, posição agregada.</p>
+
+  <div class="callout alerta">
+    <h5>Regra ética da análise on-chain</h5>
+    <p><strong>Dado observado ≠ rótulo de terceiro ≠ hipótese analítica.</strong> Toda inferência de entidade publicada neste livro, ou em qualquer trabalho derivado dele, deve declarar: o nível de confiança, a fonte usada, a data da análise e a justificativa metodológica. Um endereço pseudônimo pode, em certas condições, ser associado a uma pessoa real — e publicar agrupamentos ou suspeitas sem validação pode causar dano concreto a terceiros. Transparência técnica não é verdade econômica, e não autoriza acusação.</p>
+  </div>
+  <p>Feita essa ressalva, está também aqui a razão de ser do livro: essa mesma característica que dificulta identificar o indivíduo é o que torna os dados de blockchain tão ricos para análise quantitativa em massa. Diferente de um banco, ninguém precisa pedir autorização para consultar volumes, preços ou fluxos de um protocolo inteiro.</p>
+
+  <h3 class="sec" id="s1-6"><span class="n">1.6</span>Liquidez nos dois mundos</h3>
+  <p>Liquidez é, no fundo, uma questão de oferta e demanda: quantas pessoas estão dispostas a vender um ativo, quantas a comprar, e a que preços. Um mercado líquido é aquele em que sempre existe alguém do outro lado, de modo que comprar ou vender não move o preço bruscamente.</p>
+  <p>Mas "líquido" não é um número único. Liquidez é <strong>multidimensional</strong>: <em>spread</em> entre compra e venda, <em>profundidade</em> disponível perto do preço atual, <em>slippage</em> para um dado tamanho de ordem, <em>volume</em> negociado e <em>velocidade de recomposição</em> após uma ordem grande. O Capítulo 2 transforma cada uma dessas dimensões em uma fórmula.</p>
+
+  <h4 class="sub"><span class="n">1.6.1</span>TradFi: formadores de mercado e HFT</h4>
+  <p>No TradFi, grande parte da liquidez não vem de investidores comuns, mas de <strong>formadores de mercado</strong>: participantes que mantêm ofertas de compra e de venda de forma regular e contínua, dentro de parâmetros contratados de quantidade, <em>spread</em> e presença. A B3 mantém um programa formal de credenciamento para essa função.</p>
+  <div class="callout nota">
+    <h5>Formador de mercado ≠ HFT</h5>
+    <p>Os dois conceitos se sobrepõem, mas não são sinônimos. <strong>Formador de mercado</strong> é um papel contratual: há obrigação de cotar os dois lados sob certas condições. <strong>High Frequency Trading</strong> é uma tecnologia de execução: algoritmos que operam em altíssima velocidade. Um formador de mercado pode usar HFT; um fundo de HFT pode operar sem nenhuma obrigação de cotação, apenas consumindo liquidez. Tratar os dois como a mesma coisa leva a conclusões erradas sobre quem fornece e quem consome liquidez.</p>
+  </div>
+
+  <h4 class="sub"><span class="n">1.6.2</span>DeFi: pools, LPs e AMMs</h4>
+  <p>Quando os criadores dos primeiros protocolos DeFi precisaram resolver o mesmo problema — garantir que sempre haja contraparte —, simplificaram a ideia dentro de um contrato inteligente. Daí nascem os <strong>Automated Market Makers</strong> (AMMs): em vez de um robô publicando ofertas em tempo real, uma <strong>pool de liquidez</strong>, formada por depósitos de usuários comuns, faz esse papel automaticamente, seguindo uma fórmula pública.</p>
+  <p>A diferença prática é grande. No TradFi, fornecer liquidez de forma competitiva exige infraestrutura cara: servidores de baixíssima latência, conexão direta com a bolsa e capital significativo. É um jogo dominado por empresas especializadas. No DeFi, qualquer pessoa com alguns dólares em cripto pode se tornar um <strong>Liquidity Provider</strong> (LP), depositando um par de ativos e recebendo uma fatia das taxas.</p>
+  <p>Isso não significa que o DeFi seja imune aos mesmos jogos de velocidade — eles aparecem de outra forma, por meio de bots que competem para executar primeiro dentro de um bloco, tema do Capítulo 3. E o LP assume riscos que não existem para o cliente de uma corretora: perda em relação a simplesmente manter os ativos (<em class="t">impermanent loss</em>, formalizada no Capítulo 6), seleção adversa contra negociadores mais informados e risco de falha do contrato.</p>
+
+  <h3 class="sec" id="s1-7"><span class="n">1.7</span>Vantagens e limitações de cada modelo</h3>
+  <p>Depois de percorrer intermediação, custódia, transparência e liquidez, dá para montar um quadro mais honesto do que cada modelo realmente entrega — sem tratar nenhum dos dois como vilão ou como solução definitiva. A comparação é <strong>por função</strong>.</p>
+</div>
+
+<div class="wrap plate-w">
+  <div class="tablewrap">
+    <table>
+      <caption>Tabela 1.1 — TradFi e DeFi, função por função</caption>
+      <thead><tr><th>Dimensão</th><th>Finanças tradicionais</th><th>Finanças descentralizadas</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Coordenação</strong></td><td>Instituições reguladas: bancos, corretoras, câmaras.</td><td>Protocolos (contratos inteligentes), com dependência de governança, oráculos e infraestrutura.</td></tr>
+        <tr><td><strong>Custódia</strong></td><td>Institucional. Posições podem ser liquidadas conforme contrato, com possível dívida residual.</td><td>Autocustódia, compartilhada ou híbrida. O controle depende da chave e das condições aceitas.</td></tr>
+        <tr><td><strong>Liquidação</strong></td><td>Institucional, via depositária e custodiante; ciclos de compensação.</td><td>Programável e on-chain; atômica dentro da transação.</td></tr>
+        <tr><td><strong>Transparência</strong></td><td>Divulgação regulada e periódica. Registros internos não são públicos em tempo real.</td><td>Dados públicos e granulares. Identidade e contexto nem sempre observáveis.</td></tr>
+        <tr><td><strong>Riscos dominantes</strong></td><td>Intermediação e contraparte; existem canais legais para recorrer.</td><td>Código, oráculo, governança e chaves administrativas; recurso legal limitado.</td></tr>
+        <tr><td><strong>Acesso</strong></td><td>Cadastro, KYC e critérios comerciais ou regulatórios.</td><td>Tecnicamente aberto; sujeito a interface, geografia, ativo e liquidez.</td></tr>
+        <tr><td><strong>Funcionamento</strong></td><td>Muitos mercados operam em horário de pregão.</td><td>Tende a operar continuamente; sujeito a congestionamento e governança.</td></tr>
+        <tr><td><strong>Composabilidade</strong></td><td>Integração via API, limitada entre sistemas legados.</td><td>Integração programável na mesma transação; risco de dependência em cascata.</td></tr>
+      </tbody>
+    </table>
+    <p class="tnote">Elaboração própria. A leitura correta da tabela é que os dois modelos <b>otimizam para coisas diferentes</b>, e não que um domine o outro. A distinção, aliás, vem se tornando menos nítida: uma parcela crescente do capital que entra em DeFi vem de instituições que usam esses protocolos como infraestrutura — tema do Capítulo 0.</p>
+  </div>
+</div>
+
+<div class="wrap col">
+  <div class="rule-dot"><span>APLICAÇÃO QUANTITATIVA</span></div>
+  <p>Toda a teoria deste capítulo ganha sentido quando começamos a medir. Três métricas simples abrem o caminho: <strong>volume negociado</strong>, <strong>custo de transação</strong> e <strong>desvio de preço entre mercados</strong>. Elas reaparecem em todos os capítulos seguintes.</p>
+
+  <h3 class="sec" id="s1-8"><span class="n">1.8</span>Métrica 1 — Volume negociado</h3>
+  <p>O volume indica o tamanho e a atividade de um mercado: quanto dinheiro circulou de fato, e não quanto o mercado "vale" no papel. No TradFi, é um número publicado pela bolsa. Na Solana, ele precisa ser reconstruído a partir dos eventos de swap emitidos pelos programas das exchanges descentralizadas.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 1.1</span><span class="nm">Volume negociado</span></div>
+    <div class="eq-body">Volume(<v>t</v>)<span class="op">=</span><span style="font-size:1.25em">Σ</span> valor de cada <em class="t">swap</em> executado no período <v>t</v></div>
+    <div class="eq-legend">
+      <span><b>t</b> — janela de observação, sempre declarada em UTC</span>
+      <span><b>Cuidado principal</b> — uma ordem roteada por três pools é <em>uma</em> negociação, não três. Somar as pernas da mesma rota produz dupla contagem.</span>
+    </div>
+  </div>
+  <p>O volume não mede liquidez nem usuários únicos. Uma pool com volume alto e profundidade baixa é uma pool onde pouco capital gira muitas vezes — informação útil, mas diferente.</p>
+
+  <h3 class="sec" id="s1-9"><span class="n">1.9</span>Métrica 2 — Custo efetivo de transação</h3>
+  <p>Aqui está o erro mais comum nas comparações entre TradFi e DeFi: comparar a taxa de rede da blockchain com a corretagem da corretora. São parcelas pequenas dos dois lados. O custo que importa é o <strong>custo efetivo</strong>, que inclui o que o preço fez contra você.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 1.2</span><span class="nm">Custo efetivo de uma operação em DeFi</span></div>
+    <div class="eq-body">Custo<sub>ef</sub><span class="op">=</span><v>taxa de rede</v><span class="op">+</span><v>priorização</v><span class="op">+</span><v>taxa do protocolo</v><span class="op">+</span><v>criação de conta</v><span class="op">+</span><v>impacto de preço</v><span class="op">+</span><v>slippage</v><span class="op">+</span><v>custo de falha</v></div>
+    <div class="eq-legend">
+      <span><b>taxa de rede</b> — custo base por assinatura, cobrado mesmo quando a transação falha</span>
+      <span><b>priorização</b> — valor opcional pago para disputar inclusão no bloco</span>
+      <span><b>taxa do protocolo</b> — percentual cobrado pela pool sobre o valor negociado</span>
+      <span><b>criação de conta</b> — depósito de <em>rent</em> quando o usuário ainda não tem a conta do token</span>
+      <span><b>impacto de preço</b> — deslocamento do preço causado pela própria ordem (Cap. 3)</span>
+      <span><b>slippage</b> — diferença entre o preço cotado e o preço executado (Cap. 3)</span>
+      <span><b>custo de falha</b> — taxa paga em transações revertidas, e valor extraído por terceiros (MEV)</span>
+    </div>
+  </div>
+  <p>No TradFi, a decomposição equivalente seria: corretagem + emolumentos de bolsa e liquidação + <em>spread</em> pago ao atravessar o livro + impacto de mercado da ordem. <strong>Os dois lados têm custos invisíveis</strong>; a diferença é que no DeFi todos os componentes são públicos e podem ser reconstruídos transação a transação.</p>
+  <p>A Figura 1.1 mostra a ordem de grandeza das parcelas <em>visíveis</em> em uma operação pequena na Solana, com a taxa-base vinda da documentação oficial e o restante calculado a partir dela.</p>
+</div>
+
+<div class="wrap plate-w">
+  <figure>
+    <div class="figbox">
+      <p class="chart-title">Decomposição do custo de um swap de US$ 3.000 na Solana</p>
+      <p class="chart-sub">escala logarítmica — cada linha vertical é 10× a anterior · taxa-base conforme documentação oficial</p>
+      <div id="f1-1"></div>
+    </div>
+    <figcaption><b>Figura 1.1</b> — Componentes do custo de uma operação, em dólares. A taxa de rede, que domina o debate público, é a <em>menor</em> parcela: a taxa do protocolo e o impacto de preço são duas ordens de grandeza maiores. Fonte: elaboração própria a partir de <span class="cite">SOLANA FOUNDATION, 2026a</span>; impacto de preço calculado sobre a pool didática do Capítulo 2 <span class="badge sim">simulado</span>.</figcaption>
+  </figure>
+</div>
+
+<div class="wrap col">
+  <h3 class="sec" id="s1-10"><span class="n">1.10</span>Métrica 3 — Desvio de preço entre mercados</h3>
+  <p>Uma forma simples de medir a eficiência de um mercado é observar o desvio de preço entre duas fontes diferentes para o mesmo ativo, no mesmo instante — por exemplo, o preço de SOL em uma corretora centralizada contra o preço de SOL em uma pool da Solana. Quanto menor e mais rápido esse desvio se corrigir, mais eficiente é o mercado.</p>
+
+  <div class="eq">
+    <div class="eq-head"><span class="lbl">Fórmula 1.3</span><span class="nm">Desvio de preço entre dois mercados</span></div>
+    <div class="eq-body">Desvio<span class="op">=</span><span class="frac"><span>|<v>P</v><sub>A</sub> − <v>P</v><sub>B</sub>|</span><span><v>P</v><sub>B</sub></span></span><span class="op">×</span>100<span class="op">%</span></div>
+    <div class="eq-legend">
+      <span><b>P<sub>A</sub>, P<sub>B</sub></b> — preço do mesmo ativo em dois mercados, no mesmo instante</span>
+      <span><b>Exigência</b> — as duas cotações precisam ser <em>executáveis</em> para o mesmo tamanho de ordem. Comparar um preço de tela com um preço médio de execução mede outra coisa.</span>
+    </div>
+  </div>
+  <p>Um exemplo <span class="badge sim">simulado</span>: se o SOL está a US$ 150,00 em uma CEX e a US$ 150,30 em uma DEX, o desvio é de 0,2%. Esse <em>spread</em> tende a ser fechado por bots de arbitragem, que restabelecem o alinhamento — um processo que o Capítulo 3 modela em detalhe, incluindo a razão pela qual desvios pequenos <em>persistem</em> em vez de desaparecerem.</p>
+  <div class="callout nota">
+    <h5>Um ponto não prova eficiência</h5>
+    <p>Um único par de cotações é uma observação, não uma medida de eficiência. Afirmar que um mercado é eficiente exige uma série temporal, um critério de convergência e um tratamento de custos — o que o Capítulo 5 desenvolve com razão de variância e correlação defasada.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Fechando o capítulo</h4>
+    <p>TradFi e DeFi resolvem o mesmo problema — permitir que estranhos negociem com segurança — alocando a confiança em lugares diferentes: em instituições reguladas, de um lado; em código aberto, validadores e governança, de outro. Nenhum dos arranjos elimina a confiança; eles a tornam <em>observável</em> de maneiras distintas.</p>
+    <p>Vimos que custódia, transparência e liquidez não são atributos binários, e que as três métricas introdutórias deste capítulo já exigem decisões metodológicas explícitas. O <strong>Capítulo 2 abre a máquina</strong>: onde exatamente a liquidez de uma DEX é criada, quem a fornece, e com que fórmula o preço é calculado.</p>
+  </div>
+
+  <div class="endblock">
+    <h4>Glossário do capítulo</h4>
+    <dl class="glos">
+      <div><dt>TradFi</dt><dd>Sistema financeiro tradicional, organizado por instituições reguladas.</dd></div>
+      <div><dt>DeFi</dt><dd>Serviços financeiros construídos sobre blockchains públicas, com dependência reduzida de intermediários tradicionais.</dd></div>
+      <div><dt>Contrato inteligente</dt><dd>Programa publicado na blockchain que executa regras fixas de forma determinística.</dd></div>
+      <div><dt>Custódia</dt><dd>Controle efetivo sobre um ativo; no TradFi é institucional, no DeFi tende a ser do detentor da chave.</dd></div>
+      <div><dt>Pseudonimato</dt><dd>Registro público vinculado a endereços, e não a identidades legais; não equivale a anonimato.</dd></div>
+      <div><dt>Formador de mercado</dt><dd>Participante com obrigação contratual de manter ofertas de compra e venda.</dd></div>
+      <div><dt>Liquidity Provider (LP)</dt><dd>Quem deposita ativos em uma pool e recebe parte das taxas pagas pelos negociadores.</dd></div>
+      <div><dt>Custo efetivo</dt><dd>Soma de todas as parcelas que separam o preço cotado do resultado financeiro real da operação.</dd></div>
+    </dl>
+  </div>
+</div>
+<script>
+CH.hbars("f1-1",{y:{pre:"US$ ",dec:5},ml:200,max:10,log:true,logMin:0.0001,xLabel:"custo em dólares — escala logarítmica",
+ rows:[
+  {k:"Taxa-base de rede",v:0.00075,lbl:"US$ 0,00075",color:"var(--c1)",note:"5.000 lamports por assinatura"},
+  {k:"Taxa de priorização",v:0.00150,lbl:"US$ 0,0015",color:"var(--c1)",note:"valor ilustrativo de disputa por inclusão"},
+  {k:"Criação de conta (rent)",v:0.30,lbl:"US$ 0,30",color:"var(--c3)",note:"≈0,002 SOL, só na primeira vez"},
+  {k:"Taxa do protocolo (0,30%)",v:9.00,lbl:"US$ 9,00",color:"var(--c2)",note:"cobrada pela pool sobre o valor negociado"},
+  {k:"Impacto de preço (pool US$ 300 mil)",v:3.00,lbl:"US$ 3,00",color:"var(--c5)",note:"ordem de 1% das reservas; ver Cap. 3"}
+ ]});
+</script>
+</section>

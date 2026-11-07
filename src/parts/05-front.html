@@ -1,0 +1,90 @@
+<div class="topbar">
+  <div class="wrap">
+    <span class="brandmark">Análise Quantitativa em DeFi · Solana Data Lab</span>
+    <button class="tb-btn" id="tocBtn" aria-haspopup="dialog">Sumário</button>
+    <button class="tb-btn" id="themeBtn" aria-label="Alternar tema claro e escuro">Tema</button>
+    <div id="progress"></div>
+  </div>
+</div>
+
+<div id="toc" hidden role="dialog" aria-modal="true" aria-label="Sumário">
+  <div class="toc-card">
+    <h2>Sumário</h2>
+    <ol>
+      <li><a href="#como-ler"><span class="tn">—</span><span>Como ler este livro</span></a></li>
+      <li><a href="#cap0"><span class="tn">Cap 0</span><span>A Máquina de Registros: Blockchain Além da Criptomoeda</span></a></li>
+      <li><a href="#cap1"><span class="tn">Cap 1</span><span>TradFi × DeFi: A Evolução dos Mercados Financeiros</span></a></li>
+      <li><a href="#cap2"><span class="tn">Cap 2</span><span>A Infraestrutura dos Mercados DeFi</span></a></li>
+      <li><a href="#cap3"><span class="tn">Cap 3</span><span>Mecânica de Mercado: Swaps, Slippage e Price Impact</span></a></li>
+      <li><a href="#cap4"><span class="tn">Cap 4</span><span>Crédito Descentralizado e Geração de Rendimento</span></a></li>
+      <li><a href="#cap5"><span class="tn">Cap 5</span><span>Derivativos, Oráculos e Eficiência de Mercado</span></a></li>
+      <li><a href="#cap6"><span class="tn">Cap 6</span><span>Risco, Retorno e Volatilidade em DeFi</span></a></li>
+      <li><a href="#cap7"><span class="tn">Cap 7</span><span>Da Teoria à Carteira: Corretoras, Conversão e Custódia</span></a></li>
+      <li><a href="#cap8"><span class="tn">Cap 8</span><span>Cripto Contra o Resto: Uma Década em Números</span></a></li>
+      <li><a href="#conclusao"><span class="tn">—</span><span>Conclusão: Uma Mentalidade Data-Driven</span></a></li>
+      <li><a href="#referencias"><span class="tn">—</span><span>Referências (ABNT NBR 6023:2025)</span></a></li>
+      <li><a href="#autores"><span class="tn">—</span><span>Sobre os autores</span></a></li>
+    </ol>
+  </div>
+</div>
+
+<header class="cover" id="capa">
+  <div class="wrap">
+    <p class="cover-eyebrow">Coleção Solana Data Lab · Volume 6</p>
+    <h1>Análise<br>Quantitativa<br>em <em>DeFi</em></h1>
+    <p class="sub">Medir finanças descentralizadas com os dados que a blockchain publica — usando a Solana como laboratório.</p>
+    <div class="cover-meta">
+      <div><b>Autores</b>Andreas Toledo · Carlos Eduardo<br>Guilherme Meira · Jhordy Santos · Pedro Soares</div>
+      <div><b>Instituição</b>Fatec Cotia<br>Tecnologia em Ciência de Dados</div>
+      <div><b>Edição</b>1ª edição revisada<br>novembro de 2026</div>
+    </div>
+  </div>
+  <svg class="curvefig" viewBox="0 0 320 320" aria-hidden="true" fill="none">
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C85C00"/><stop offset="1" stop-color="#2F61B0"/></linearGradient></defs>
+    <g stroke="#8FA3BC" stroke-width=".5" opacity=".45">
+      <path d="M40 0v320M100 0v320M160 0v320M220 0v320M280 0v320M0 40h320M0 100h320M0 160h320M0 220h320M0 280h320"/>
+    </g>
+    <path d="M40 300C40 300 70 90 150 70S300 48 300 48" stroke="url(#cg)" stroke-width="2.5" stroke-linecap="round" transform="rotate(0)"/>
+    <path d="M30 40C120 40 160 80 180 160s40 130 110 130" stroke="url(#cg)" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="180" cy="160" r="5" fill="#C85C00"/>
+    <circle cx="180" cy="160" r="11" stroke="#C85C00" stroke-width="1" opacity=".5"/>
+  </svg>
+</header>
+
+<section class="chap" id="como-ler">
+  <div class="wrap col" style="padding-top:3rem">
+    <h3 class="sec" style="margin-top:0"><span class="n">Nota dos autores</span>Como ler este livro</h3>
+    <p class="lead">Este é um livro sobre medir, não sobre acreditar. Ele parte de uma pergunta prática: quando alguém afirma que um mercado descentralizado é eficiente, barato ou arriscado, com que número essa afirmação se sustenta — e como reproduzi-lo?</p>
+    <p>A blockchain tornou possível um tipo de pesquisa que o mercado tradicional raramente permite: qualquer pessoa pode ler, transação a transação, o que aconteceu em um mercado inteiro, sem pedir autorização a ninguém. É um conjunto de dados público, granular e contínuo. O custo disso é que ninguém limpa, rotula ou contextualiza esses dados por você. O trabalho analítico começa antes do primeiro cálculo.</p>
+    <p>Escolhemos a <strong>Solana</strong> como laboratório porque ela combina custo de transação baixo, blocos frequentes e um ecossistema DeFi grande o bastante para gerar os fenômenos que queremos medir. Essa escolha é metodológica, não uma recomendação: os conceitos valem para qualquer rede, e dizemos ao longo do texto onde a comparação entre redes exigiria cuidado adicional.</p>
+
+    <h4 class="sub">A regra editorial: todo número diz de onde veio</h4>
+    <p>A maior parte do que se publica sobre DeFi mistura, sem aviso, três coisas muito diferentes: o que foi medido, o que foi estimado e o que foi inventado para ilustrar. Neste livro, cada número carrega um selo:</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Convenção de origem dos dados</caption>
+        <thead><tr><th>Selo</th><th>Significa</th><th>O que você pode fazer com ele</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge real">real</span></td><td>Extraído de uma fonte primária citada, com data.</td><td>Citar, verificar na fonte, usar como evidência.</td></tr>
+          <tr><td><span class="badge est">estimado</span></td><td>Ordem de grandeza derivada de fontes públicas, com método declarado.</td><td>Usar para dimensionar, nunca como medição.</td></tr>
+          <tr><td><span class="badge sim">simulado</span></td><td>Gerado pelos autores a partir de parâmetros declarados.</td><td>Entender o mecanismo. Não é evidência empírica.</td></tr>
+        </tbody>
+      </table>
+      <p class="tnote">Um número sem selo em um texto sobre DeFi é um número sem procedência. A maior parte dos exemplos deste livro é <b>simulada</b>, e isso é deliberado: um exemplo controlado mostra o mecanismo com clareza que um dado real, cheio de ruído, não mostra. O que não fazemos é apresentar simulação como medição.</p>
+    </div>
+
+    <h4 class="sub">Como o livro está organizado</h4>
+    <p>São nove capítulos em quatro movimentos. O <strong>Capítulo 0</strong> trata da camada que sustenta tudo: o que uma blockchain realmente faz, por que isso interessa fora do mundo das criptomoedas e como a Solana vende essa infraestrutura a empresas e bancos. Os <strong>Capítulos 1 e 2</strong> constroem o vocabulário: como o mercado tradicional e o descentralizado organizam confiança, e onde a liquidez de uma DEX é criada. Os <strong>Capítulos 3 a 6</strong> são o corpo quantitativo: o custo de uma negociação, o risco de um empréstimo, o preço de um derivativo e, por fim, a consolidação de tudo em indicadores de risco e retorno. Os <strong>Capítulos 7 e 8</strong> levam as ferramentas para a prática: como entrar no mercado pela corretora, guardar e fazer render os ativos, e como cripto se compara, com dados reais de uma década, ao CDI, à bolsa e aos fundos imobiliários — com um questionário que libera a comparação adequada ao seu perfil.</p>
+    <p>Cada capítulo abre com objetivos de aprendizagem e um aviso sobre a natureza dos seus dados, e fecha com glossário e referências próprias. A lista completa em formato ABNT NBR 6023 está no fim do volume.</p>
+
+    <div class="callout aviso">
+      <h5>Aviso geral de risco</h5>
+      <p>Este livro é material didático e <strong>não constitui recomendação de investimento</strong>. Protocolos DeFi envolvem risco de perda total do capital por falha de código, de oráculo, de governança ou de custódia das chaves. Operações alavancadas podem gerar perdas superiores ao valor depositado. Os dados de mercado citados têm data e devem ser reverificados antes de qualquer uso prático.</p>
+    </div>
+
+    <h4 class="sub">O que você deve conseguir fazer no fim</h4>
+    <p>Abrir um protocolo DeFi que nunca viu, identificar de onde vem sua liquidez, calcular quanto custaria negociar nele, estimar a probabilidade de uma posição de crédito ser liquidada, reconhecer de que oráculo o sistema depende e produzir um indicador de risco-retorno que você consiga defender diante de alguém que peça a metodologia. Nada disso exige programação avançada: exige disciplina com dados.</p>
+    <div class="rule-dot"><span>◆ ◆ ◆</span></div>
+  </div>
+</section>

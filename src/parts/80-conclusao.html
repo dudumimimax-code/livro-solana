@@ -1,0 +1,52 @@
+<section class="chap" id="conclusao">
+<div class="opener"><div class="wrap">
+  <div class="num">∑</div>
+  <div>
+    <p class="kicker">Conclusão</p>
+    <h2>Construindo uma mentalidade data-driven para DeFi</h2>
+    <p class="lede">O que fica de um livro inteiro de fórmulas não são as fórmulas. É o hábito de perguntar, diante de qualquer afirmação sobre esse mercado: de onde veio esse número?</p>
+  </div>
+</div></div>
+
+<div class="wrap col">
+  <p class="lead">Começamos com uma pergunta simples — como medir um mercado que publica tudo e explica nada — e chegamos a um conjunto de ferramentas que cabe em uma página. Vale recapitular o que foi efetivamente construído, porque o encadeamento é mais importante que qualquer peça isolada.</p>
+
+  <h3 class="sec" id="c-1"><span class="n">Síntese</span>Como as peças se encaixam</h3>
+  <p>O <strong>Capítulo 0</strong> estabeleceu o critério para decidir quando a tecnologia se justifica, e mostrou que fora da criptomoeda os usos com evidência sólida são financeiros — stablecoins como trilho de pagamento e tokenização de ativos — enquanto os não financeiros carecem de números auditáveis. Mostrou também que a oferta institucional da Solana reintroduz controle centralizado dentro do token, trocando parte da autocustódia por liquidação compartilhada.</p>
+  <p>O <strong>Capítulo 1</strong> recusou a oposição fácil entre centralizado e descentralizado, substituindo-a por uma comparação função a função: os dois arranjos alocam a confiança em lugares diferentes, e nenhum a elimina. O <strong>Capítulo 2</strong> abriu a máquina e produziu a medida que o resto do livro usa sem parar — a <strong>profundidade</strong>, isto é, quanta negociação cabe perto do preço atual.</p>
+  <p>O <strong>Capítulo 3</strong> separou os quatro componentes do custo de negociar e mostrou que a eficiência de preço é financiada pelos provedores de liquidez. O <strong>Capítulo 4</strong> levou isso ao crédito e chegou a um resultado que surpreende: o que decide se uma queda vira crise não é o nível de alavancagem, e sim a razão entre a profundidade de venda e o colateral total. O <strong>Capítulo 5</strong> fechou o circuito ao mostrar que a segurança de um oráculo também se reduz à profundidade da pool que ele lê. E o <strong>Capítulo 6</strong> reuniu tudo em indicadores de risco e retorno, com a ressalva de que os riscos mais destrutivos em DeFi não aparecem em nenhuma série histórica.</p>
+  <p>Os <strong>Capítulos 7 e 8</strong> levaram as ferramentas para fora do protocolo. O 7 mostrou que o custo de converter reais em cripto é a Fórmula 3.1 aplicada à corretora — e que o tipo de ordem pesa mais que a escolha da rota —, além de tratar custódia e rendimento com a mesma pergunta de sempre: quem paga, e qual é o risco. O 8 comparou uma década de dados reais e chegou a duas conclusões que só parecem contraditórias: cripto rendeu mais que tudo para quem entrou cedo e aguentou quedas de 80%, e perdeu para o CDI para quem entrou em 2022.</p>
+
+  <div class="callout nota">
+    <h5>Se você guardar uma única coisa deste livro</h5>
+    <p>Que seja esta: <strong>profundidade de mercado é a variável central do DeFi quantitativo</strong>. Ela determina o custo de uma negociação (Cap. 3), decide se uma liquidação funciona ou gera dívida incobrável (Cap. 4), define quanto custa manipular um oráculo (Cap. 5) e limita a capacidade de sair de qualquer posição (Cap. 6). Capitalização de mercado, TVL e volume são medidas de escala; profundidade é a medida de <em>capacidade</em>. Quase todo erro de avaliação nesse mercado consiste em confundir as duas.</p>
+  </div>
+
+  <h3 class="sec" id="c-2"><span class="n">Prática</span>Seis hábitos que valem mais que as fórmulas</h3>
+  <ol>
+    <li><strong>Declare a origem de cada número.</strong> Real, estimado ou simulado — e, se real, com fonte e data. A divergência de três vezes entre agregadores de ativos tokenizados (Figura 0.1) mostra que isso não é formalidade.</li>
+    <li><strong>Prefira números que você consiga recalcular.</strong> Um total trimestral dividido por segundos é auditável; "65.000 TPS" não é.</li>
+    <li><strong>Distinga anúncio, piloto e produção.</strong> A maior parte da cobertura do setor não faz essa separação, e ela muda completamente o que se pode concluir.</li>
+    <li><strong>Pergunte quem paga o rendimento.</strong> Juros, taxas, emissão da rede ou incentivos em token. Os três primeiros são receita; o quarto é despesa de marketing paga em ativo próprio.</li>
+    <li><strong>Separe o que é determinístico do que é estocástico.</strong> Price impact se calcula antes de enviar a ordem; slippage se estima. Tratar os dois como a mesma coisa impede diagnosticar o que encarece uma operação.</li>
+    <li><strong>Nomeie o risco que você não consegue medir.</strong> Código, oráculo, governança e contraparte não aparecem em séries de preço. Um relatório que os omite não está dizendo que são pequenos — está dizendo que não olhou.</li>
+  </ol>
+
+  <h3 class="sec" id="c-3"><span class="n">Limites</span>O que este livro não fez</h3>
+  <p>A honestidade que exigimos das fontes vale para nós. Esta edição tem três limitações que o leitor deve conhecer.</p>
+  <p><strong>Primeira: quase tudo dos Capítulos 2 a 6 é simulado.</strong> As fórmulas são corretas e os exemplos controlados mostram o mecanismo com clareza que dados ruidosos não dariam. Mas o livro propõe roteiros de extração on-chain (seções 2.9 e 3.8) que ainda não foram executados. Nenhuma tabela deste volume apresenta medição reproduzível da rede Solana, e dizê-lo em voz alta é parte da regra editorial. O Capítulo 8 é a exceção: usa séries reais de preço — mas em frequência anual, o que esconde as quedas dentro de cada ano, como a própria Tabela 8.2 mostra.</p>
+  <p><strong>Segunda: os dados de mercado envelhecem rápido.</strong> As informações institucionais do Capítulo 0 são de 2025 e 2026, em um setor em que anúncios viram produtos ou desaparecem em meses. Tratamos cada uma com data e fonte justamente para que o leitor possa reverificá-las — não para que confie nelas indefinidamente.</p>
+  <p><strong>Terceira: um único laboratório.</strong> Usar a Solana foi uma escolha metodológica, e ela tem um custo: parâmetros de custo, latência e estrutura de contas são específicos. Os conceitos transferem; os números, não.</p>
+
+  <h3 class="sec" id="c-4"><span class="n">Continuidade</span>O próximo passo deste trabalho</h3>
+  <p>A continuação natural é executar o que foi projetado. Em ordem de dificuldade crescente: extrair uma série real de swaps SOL/USDC e refazer a Tabela 2.5 com dados medidos; comparar o slippage realizado por faixa de tamanho de ordem entre rotas diferentes, controlando por volatilidade; aplicar a Fórmula 5.4 aos oráculos efetivamente usados pelos principais protocolos de crédito da rede e publicar a razão entre custo de ataque e capital exposto; e, por fim, preencher o framework da Tabela 6.2 para um conjunto de protocolos reais, com a metodologia aberta.</p>
+  <p>Esse último item é o que mais falta ao setor. Existem painéis de TVL em abundância e quase nenhuma avaliação de risco com método declarado e reprodutível. É um espaço aberto para quem tem as ferramentas deste livro — e elas são, no fim, bastante simples.</p>
+
+  <div class="callout exemplo">
+    <h5>Uma última observação</h5>
+    <p>A tentação, ao estudar um mercado novo, é escolher um lado: ou ele é uma revolução, ou é um cassino. As duas posições têm o mesmo defeito — dispensam a medição. O que a análise quantitativa oferece não é uma terceira opinião, mas um procedimento: medir, declarar o método, reconhecer o que ficou de fora e deixar que outra pessoa refaça a conta. É menos empolgante do que uma tese, e consideravelmente mais útil.</p>
+  </div>
+
+  <div class="rule-dot"><span>FIM DO TEXTO PRINCIPAL</span></div>
+</div>
+</section>
