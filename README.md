@@ -25,25 +25,6 @@ Nove capítulos, mais de 20 gráficos, seis simuladores interativos (swap em CPM
 
 **Regra editorial:** todo número carrega um selo — `real` (fonte primária citada, com data), `estimado` (ordem de grandeza com método declarado) ou `simulado` (gerado pelos autores a partir de parâmetros declarados). Os exemplos dos Capítulos 2 a 6 são, em sua maioria, simulados e servem para entender mecanismos, não como evidência empírica. O Capítulo 8 usa séries reais de preço (fechamentos anuais de 2015 a 2025 e 31/10/2026).
 
-## Publicar no GitHub Pages
-
-1. Crie o repositório e envie estes arquivos (`git init && git add . && git commit -m "Livro DeFi quantitativo" && git push`).
-2. No GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch `main`, pasta `/ (root)`.
-3. Em ~1 minuto o livro estará em `https://<usuario>.github.io/<repositorio>/`.
-
-O arquivo `.nojekyll` já está incluído. As fontes (Fraunces, Spectral, IBM Plex Mono) são carregadas do Google Fonts; sem internet o livro usa fontes serifadas e monoespaçadas do sistema.
-
-## Estrutura
-
-```
-index.html                  ← o livro completo (arquivo final, é o que o Pages serve)
-docs/                       ← PDF do livro
-src/parts/                  ← fonte editável, um arquivo por seção/capítulo
-src/build.sh · build.py     ← reconstroem index.html a partir de src/parts
-src/make-pdf.js             ← regera o PDF (Node + Playwright)
-```
-
-Para editar: altere o capítulo em `src/parts/`, rode `src/build.sh` e, se quiser, `node src/make-pdf.js`.
 
 ## Autores
 
@@ -53,7 +34,3 @@ Fatec Cotia — Tecnologia em Ciência de Dados
 ## Aviso
 
 Material didático. **Não constitui recomendação de investimento.** Protocolos DeFi envolvem risco de perda total do capital. Os dados de mercado citados têm data e devem ser reverificados antes de qualquer uso prático.
-
-## Licença
-
-Ainda não definida — escolha antes de tornar o repositório público (sugestão para texto: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.pt-br); para o código das figuras/simuladores: MIT).
