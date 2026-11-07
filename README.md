@@ -6,7 +6,7 @@ Coleção Solana Data Lab · Volume 6 · 1ª edição revisada (novembro de 2026
 Livro aberto, em português, publicado como uma única página HTML (sem dependências de build).
 Nove capítulos, mais de 20 gráficos, seis simuladores interativos (swap em CPMM, Health Factor, custo de conversão, comparação histórica e duas trilhas por perfil), um questionário de perfil de investidor, glossários por capítulo e referências em ABNT NBR 6023:2025.
 
-- 📖 **Ler online:** `https://<seu-usuario>.github.io/<nome-do-repositorio>/` (após ativar o GitHub Pages — veja abaixo)
+- 📖 **Ler online:** https://dudumimimax-code.github.io/livro-solana/ 
 - 📄 **Versão PDF (A4, 107 páginas):** [`docs/analise-quantitativa-defi.pdf`](docs/analise-quantitativa-defi.pdf)
 
 ## Conteúdo
