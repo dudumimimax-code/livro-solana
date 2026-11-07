@@ -6,8 +6,8 @@ Coleção Solana Data Lab · Volume 6 · 1ª edição revisada (novembro de 2026
 Livro aberto, em português, publicado como uma única página HTML (sem dependências de build).
 Nove capítulos, mais de 20 gráficos, seis simuladores interativos (swap em CPMM, Health Factor, custo de conversão, comparação histórica e duas trilhas por perfil), um questionário de perfil de investidor, glossários por capítulo e referências em ABNT NBR 6023:2025.
 
-- 📖 **Ler online:** https://dudumimimax-code.github.io/livro-solana/ (após ativar o GitHub Pages — veja abaixo)
-- 📄 **Versão PDF (A4, 80 páginas):** [`docs/analise-quantitativa-defi.pdf`](docs/analise-quantitativa-defi.pdf)
+- 📖 **Ler online:** `https://<seu-usuario>.github.io/<nome-do-repositorio>/` (após ativar o GitHub Pages — veja abaixo)
+- 📄 **Versão PDF (A4, 107 páginas):** [`docs/analise-quantitativa-defi.pdf`](docs/analise-quantitativa-defi.pdf)
 
 ## Conteúdo
 
@@ -29,7 +29,7 @@ Nove capítulos, mais de 20 gráficos, seis simuladores interativos (swap em CPM
 
 1. Crie o repositório e envie estes arquivos (`git init && git add . && git commit -m "Livro DeFi quantitativo" && git push`).
 2. No GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch `main`, pasta `/ (root)`.
-3. Em ~1 minuto o livro estará em https://dudumimimax-code.github.io/livro-solana/.
+3. Em ~1 minuto o livro estará em `https://<usuario>.github.io/<repositorio>/`.
 
 O arquivo `.nojekyll` já está incluído. As fontes (Fraunces, Spectral, IBM Plex Mono) são carregadas do Google Fonts; sem internet o livro usa fontes serifadas e monoespaçadas do sistema.
 
